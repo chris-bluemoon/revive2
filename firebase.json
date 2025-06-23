@@ -1,1 +1,38 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"revive-ff08d","appId":"1:973384003437:android:84f295e8441066da5b7464","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"revive-ff08d","configurations":{"android":"1:973384003437:android:84f295e8441066da5b7464","ios":"1:973384003437:ios:12bc3584f535e8055b7464"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "revive-ff08d",
+          "appId": "1:973384003437:android:84f295e8441066da5b7464",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "revive-ff08d",
+          "configurations": {
+            "android": "1:973384003437:android:84f295e8441066da5b7464",
+            "ios": "1:973384003437:ios:12bc3584f535e8055b7464"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    }
+  ]
+}

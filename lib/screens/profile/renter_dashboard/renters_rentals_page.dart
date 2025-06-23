@@ -7,6 +7,7 @@ import 'package:revivals/models/ledger.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/models/review.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/services/stripe_sevice.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
 
@@ -74,6 +75,14 @@ class _RentersRentalsPageState extends State<RentersRentalsPage> {
               Tab(text: "Purchases"),
             ],
           ),
+          actions: [
+            IconButton(
+                onPressed: () async {
+                  await StripeService.instance
+                      .initPaymentSheet(context, amount: 100);
+                },
+                icon: Icon(Icons.access_alarm))
+          ],
         ),
         body: TabBarView(
           children: [
@@ -320,56 +329,57 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                 ),
               ],
             ),
-            if (widget.itemRenter.status == "accepted")
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      // await StripeService.instance.makePayment(widget.price);
+            // if (widget.itemRenter.status == "accepted")
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    await StripeService.instance
+                        .initPaymentSheet(context, amount: widget.price);
 
-                      setState(() {
-                        widget.itemRenter.status = "paid";
-                      });
-                      widget.status = "paid";
-                      ItemStoreProvider itemStore =
-                          Provider.of<ItemStoreProvider>(context, listen: false);
-                      itemStore.saveItemRenter(widget.itemRenter);
-                      Ledger newLedgerEntry = Ledger(
-                        id: uuid.v4(), // Use uuid v4 for unique id
-                        itemRenterId: widget.itemRenter.id,
-                        owner: widget.itemRenter.ownerId,
-                        date: DateTime.now().toIso8601String(),
-                        type: "rental",
-                        desc: "Payment for rental of ${widget.itemName}",
-                        amount: widget.price,
-                        balance: itemStore.getBalance() +
-                            widget.price, // Update balance logic 
-                      );
-                      itemStore.addLedger(newLedgerEntry);
-                      // Make payment logic here
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('MAKE PAYMENT'),
+                    setState(() {
+                      widget.itemRenter.status = "paid";
+                    });
+                    widget.status = "paid";
+                    ItemStoreProvider itemStore =
+                        Provider.of<ItemStoreProvider>(context, listen: false);
+                    itemStore.saveItemRenter(widget.itemRenter);
+                    Ledger newLedgerEntry = Ledger(
+                      id: uuid.v4(), // Use uuid v4 for unique id
+                      itemRenterId: widget.itemRenter.id,
+                      owner: widget.itemRenter.ownerId,
+                      date: DateTime.now().toIso8601String(),
+                      type: "rental",
+                      desc: "Payment for rental of ${widget.itemName}",
+                      amount: widget.price,
+                      balance: itemStore.getBalance() +
+                          widget.price, // Update balance logic
+                    );
+                    itemStore.addLedger(newLedgerEntry);
+                    // Make payment logic here
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
                   ),
-                  const SizedBox(width: 12),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        widget.itemRenter.status = "cancelled";
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('CANCEL'),
+                  child: const Text('MAKE PAYMENT'),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      widget.itemRenter.status = "cancelled";
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey,
+                    foregroundColor: Colors.white,
                   ),
-                ],
-              ),
+                  child: const Text('CANCEL'),
+                ),
+              ],
+            ),
             if (DateTime.parse(widget.itemRenter.endDate)
                     .isBefore(DateTime.now()) &&
                 widget.status != "reviewed")

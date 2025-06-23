@@ -3,7 +3,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/providers/create_item_provider.dart';
@@ -19,10 +21,11 @@ import 'package:revivals/theme.dart';
 
 import 'firebase_options.dart';
 
-void main() async {
-  // Firebase initialize
+Future main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  // Stripe.publishableKey = stripePublishableKey;
+
+  await dotenv.load(fileName: ".env");
+  Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'] ?? '';
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // Allow only portrait mode
@@ -30,7 +33,6 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
   await Firebase.initializeApp(
     // name: "revivals dev project",
     options: DefaultFirebaseOptions.currentPlatform,
@@ -87,7 +89,8 @@ class MyApp extends StatelessWidget {
         // '/dateAddedItems': (context) => const DateAddedItems(),
         '/login': (context) => const Authenticate(), // <-- Add this line
         '/authenticate': (context) => const Authenticate(), // <-- Add this line
-        '/sign_in': (context) => const GoogleSignInScreen(), // <-- Add this line
+        '/sign_in': (context) =>
+            const GoogleSignInScreen(), // <-- Add this line
       },
     );
   }
