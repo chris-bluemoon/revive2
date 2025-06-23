@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +30,10 @@ class EarningsPage extends StatelessWidget {
     final String userId = itemStore.renter.id;
 
     // Get earnings from the itemStore ledger for this user
+    log('Ledger entries for user $userId and count is ${itemStore.ledgers.length}');
+    for (var entry in itemStore.ledgers) {
+      log('Entry: ${entry.id}, Desc: ${entry.desc}, Amount: ${entry.amount}, Date: ${entry.date}');
+    }
     final earnings = itemStore.ledgers
         .where((entry) => entry.owner == userId)
         .toList();

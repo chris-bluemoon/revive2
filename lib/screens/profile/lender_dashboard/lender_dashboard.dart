@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:revivals/screens/profile/lender_dashboard/balance_page.dart';
 import 'package:revivals/screens/profile/lender_dashboard/earnings_page.dart';
+import 'package:revivals/screens/profile/lender_dashboard/insights_page.dart';
 import 'package:revivals/screens/profile/lender_dashboard/lenders_rentals_page.dart';
 import 'package:revivals/shared/styled_text.dart';
 
@@ -60,7 +61,13 @@ class LenderDashboard extends StatelessWidget {
             leading: const Icon(Icons.insights),
             title: const Text('Insights'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const InsightsPage(),
+                ),
+              );
+            },
           ),
           const Divider(),
           ListTile(

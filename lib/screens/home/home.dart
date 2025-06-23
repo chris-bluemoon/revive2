@@ -31,14 +31,18 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
-    itemStore.fetchItemsOnce();
-    itemStore.fetchItemRentersOnce();
-    itemStore.fetchFittingRentersOnce();
-    itemStore.fetchLedgersOnce();
-    itemStore.fetchMessagesOnce();
-    itemStore.fetchReviewsOnce();
-    // itemStore.listenToMessages(itemStore.renter.id);
-   } // Initialize the items list or fetch it from the provider if neededjkI
+
+    // Wait for fetchRentersOnce to complete before moving on
+    itemStore.fetchRentersOnce().then((_) {
+      itemStore.fetchItemsOnce();
+      itemStore.fetchItemRentersOnce();
+      // itemStore.fetchFittingRentersOnce();
+      itemStore.fetchLedgersOnce();
+      itemStore.fetchMessagesOnce();
+      itemStore.fetchReviewsOnce();
+      // itemStore.listenToMessages(itemStore.renter.id);
+    });
+  } // Initialize the items list or fetch it from the provider if neededjkI
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;

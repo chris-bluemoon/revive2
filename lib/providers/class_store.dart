@@ -19,8 +19,6 @@ class ItemStoreProvider extends ChangeNotifier {
   final double width =
       WidgetsBinding.instance.platformDispatcher.views.first.physicalSize.width;
 
-  Ledger? _ledger; // Only the current user's ledger
-
   final List<Ledger> _ledgers = []; // Store all ledgers for the current user
   final List<Message> _messages = [];
   final List<ItemImage> _images = [];
@@ -118,7 +116,6 @@ class ItemStoreProvider extends ChangeNotifier {
   get sleevesFilter => _sleevesFilter;
   get rangeValuesFilter => _rangeValuesFilter;
   get reviews => _reviews;
-  Ledger? get ledger => _ledger;
 
   get currentRenter => null;
 
@@ -167,10 +164,12 @@ class ItemStoreProvider extends ChangeNotifier {
     final userId = _user.id;
     _ledgers.clear();
     final snapshot = await FirestoreService.getLedgersOnce();
+    log('Fetching ledgers for user: $userId, count: ${snapshot.docs.length}');
     for (var doc in snapshot.docs) {
       final ledger = doc.data();
       if (ledger.owner == userId) {
         _ledgers.add(ledger);
+        log('Added ledger: ${ledger.id} with amount: ${ledger.amount} and balance: ${ledger.balance}');
       }
     }
     notifyListeners();
@@ -248,7 +247,7 @@ class ItemStoreProvider extends ChangeNotifier {
         _items.add(doc.data());
       }
       log('ENDING FETCHITEMSONCE');
-      fetchRentersOnce();
+      // fetchRentersOnce();
       fetchImages(); // FIXED AS fetchRenters now done here, KEEP AN EYE ON THIS, ARE WE FETCHING BEFORE USERS VERIFY IMAGE IS SET
       populateFavourites();
       // populateFittings();
@@ -445,7 +444,7 @@ class ItemStoreProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void fetchRentersOnce() async {
+  Future<bool> fetchRentersOnce() async {
     if (renters.length == 0) {
       final snapshot = await FirestoreService.getRentersOnce();
       for (var doc in snapshot.docs) {
@@ -455,6 +454,7 @@ class ItemStoreProvider extends ChangeNotifier {
     }
     setCurrentUser();
     notifyListeners();
+    return true;
   }
 
   void saveItemRenter(ItemRenter itemRenter) async {
