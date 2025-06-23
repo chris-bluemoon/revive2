@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "973384003437",
+    "project_id": "revive-ff08d",
+    "storage_bucket": "revive-ff08d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:973384003437:android:84f295e8441066da5b7464",
+        "android_client_info": {
+          "package_name": "sg.bluemoon.revive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "973384003437-jteuqg1d92f7t39frn8ljol41056bmp4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "sg.bluemoon.revive",
+            "certificate_hash": "32862912dc818dedf47401d4c47f7f4b5542ebc2"
+          }
+        },
+        {
+          "client_id": "973384003437-va0o9j0kdn7hoaf46s5k9c3sanqvd5e6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMN0fOCMpfaCUhCgzMgbSYMnuViUdDfSU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "973384003437-va0o9j0kdn7hoaf46s5k9c3sanqvd5e6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "973384003437-2vuflvrrv8j2n17ug63vn36c5ka8bodt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.revive"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

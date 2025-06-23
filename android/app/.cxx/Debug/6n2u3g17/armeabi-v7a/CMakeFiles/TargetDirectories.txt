@@ -1,0 +1,2 @@
+C:/Users/Chris Milner/revive/android/app/.cxx/Debug/6n2u3g17/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Chris Milner/revive/android/app/.cxx/Debug/6n2u3g17/armeabi-v7a/CMakeFiles/rebuild_cache.dir
