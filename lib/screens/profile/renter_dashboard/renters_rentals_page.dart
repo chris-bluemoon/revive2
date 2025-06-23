@@ -333,17 +333,18 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                       });
                       widget.status = "paid";
                       ItemStoreProvider itemStore =
-                          Provider.of<ItemStoreProvider>(context,
-                              listen: false);
+                          Provider.of<ItemStoreProvider>(context, listen: false);
                       itemStore.saveItemRenter(widget.itemRenter);
                       Ledger newLedgerEntry = Ledger(
-                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        id: uuid.v4(), // Use uuid v4 for unique id
                         itemRenterId: widget.itemRenter.id,
                         owner: widget.itemRenter.ownerId,
                         date: DateTime.now().toIso8601String(),
                         type: "rental",
                         desc: "Payment for rental of ${widget.itemName}",
                         amount: widget.price,
+                        balance: itemStore.getBalance() +
+                            widget.price, // Update balance logic 
                       );
                       itemStore.addLedger(newLedgerEntry);
                       // Make payment logic here

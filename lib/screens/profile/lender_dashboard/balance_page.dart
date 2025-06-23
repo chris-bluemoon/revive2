@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/screens/profile/lender_dashboard/add_bank_account_page.dart';
 
 class BalancePage extends StatelessWidget {
 
@@ -9,7 +12,8 @@ class BalancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    const double balance = 1234.56; // Example balance value
+    final itemStore = Provider.of<ItemStoreProvider>(context, listen: true);
+    final int balance = itemStore.getBalance();
     const payouts = [ ]; // Example payouts data
     return Scaffold(
       appBar: AppBar(
@@ -36,7 +40,7 @@ class BalancePage extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  '${balance.toStringAsFixed(2)} tbh',
+                  '${balance.toStringAsFixed(2)} TBH',
                   style: const TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
@@ -48,6 +52,27 @@ class BalancePage extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    // Withdraw logic here
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Withdraw to Bank Account',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ],
@@ -66,7 +91,11 @@ class BalancePage extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // Add bank account logic here
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const AddBankAccountPage(),
+                    ),
+                  );
                 },
                 child: const Text(
                   'Add',

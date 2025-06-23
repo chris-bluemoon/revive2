@@ -87,6 +87,8 @@ class _CreateItemState extends State<CreateItem> {
     'Purple',
     'Pink',
     'Cyan',
+    'Multi-coloured',
+    'Other',
   ];
 
   // String productTypeValue = '';

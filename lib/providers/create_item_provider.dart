@@ -19,7 +19,7 @@ class CreateItemProvider with ChangeNotifier {
   final shortDescController = TextEditingController();
   final longDescController = TextEditingController();
   void checkFormComplete() {
-    if (images.isNotEmpty &&
+    if (images.length > 1 &&
         productTypeValue.isNotEmpty &&
         colourValue.isNotEmpty &&
         brandValue.isNotEmpty &&

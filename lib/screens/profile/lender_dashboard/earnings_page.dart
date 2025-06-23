@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
 
@@ -32,6 +33,14 @@ class EarningsPage extends StatelessWidget {
         .toList();
 
     int total = earnings.fold(0, (sum, entry) => sum + entry.amount);
+
+    // Group earnings by month
+    final Map<String, List<dynamic>> earningsByMonth = {};
+    for (var entry in earnings) {
+      final date = DateTime.parse(entry.date);
+      final monthKey = DateFormat('MMMM yyyy').format(date);
+      earningsByMonth.putIfAbsent(monthKey, () => []).add(entry);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -69,25 +78,38 @@ class EarningsPage extends StatelessWidget {
                 ),
                 const Divider(),
                 Expanded(
-                  child: ListView.separated(
-                    itemCount: earnings.length,
-                    separatorBuilder: (context, index) => const Divider(),
-                    itemBuilder: (context, index) {
-                      final entry = earnings[index];
-                      return ListTile(
-                        title: Text(entry.description),
-                        subtitle: Text(
-                          '${entry.date.day}/${entry.date.month}/${entry.date.year}',
-                        ),
-                        trailing: Text(
-                          '\$${entry.amount.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
+                  child: ListView(
+                    children: earningsByMonth.entries.expand((entry) {
+                      final month = entry.key;
+                      final monthEarnings = entry.value;
+                      return [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          child: Text(
+                            month,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
                           ),
                         ),
-                      );
-                    },
+                        ...monthEarnings.map<Widget>((e) {
+                          final formattedDate = DateFormat('dd MMM yyyy, HH:mm').format(DateTime.parse(e.date));
+                          return ListTile(
+                            title: Text(e.desc),
+                            subtitle: Text(formattedDate),
+                            trailing: Text(
+                              '\$${e.amount.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          );
+                        }),
+                        const Divider(),
+                      ];
+                    }).toList(),
                   ),
                 ),
               ],

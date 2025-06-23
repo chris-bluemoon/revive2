@@ -19,7 +19,9 @@ class ItemStoreProvider extends ChangeNotifier {
   final double width =
       WidgetsBinding.instance.platformDispatcher.views.first.physicalSize.width;
 
-  final List<Ledger> _ledgers = [];
+  Ledger? _ledger; // Only the current user's ledger
+
+  final List<Ledger> _ledgers = []; // Store all ledgers for the current user
   final List<Message> _messages = [];
   final List<ItemImage> _images = [];
   final List<Item> _items = [];
@@ -116,6 +118,7 @@ class ItemStoreProvider extends ChangeNotifier {
   get sleevesFilter => _sleevesFilter;
   get rangeValuesFilter => _rangeValuesFilter;
   get reviews => _reviews;
+  Ledger? get ledger => _ledger;
 
   get currentRenter => null;
 
@@ -159,10 +162,33 @@ class ItemStoreProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addLedger(Ledger ledger) async {
+  // Fetch and set all ledgers for the current user
+  Future<void> fetchLedgersOnce() async {
+    final userId = _user.id;
+    _ledgers.clear();
+    final snapshot = await FirestoreService.getLedgersOnce();
+    for (var doc in snapshot.docs) {
+      final ledger = doc.data();
+      if (ledger.owner == userId) {
+        _ledgers.add(ledger);
+      }
+    }
+    notifyListeners();
+  }
+
+  // Returns the latest balance for the current user
+  int getBalance() {
+    if (_ledgers.isEmpty) return 0;
+    _ledgers.sort((a, b) => b.date.compareTo(a.date));
+    return _ledgers.first.balance;
+  }
+
+  // Add a ledger for the current user
+  Future<void> addLedger(Ledger ledger) async {
     _ledgers.add(ledger);
+    log('Adding ledger: ${ledger.id} with amount: ${ledger.amount} and balance: ${ledger.balance}');
     await FirestoreService.addLedger(ledger);
-    // notifyListeners();
+    notifyListeners();
   }
 
   void addItem(Item item) async {
@@ -210,15 +236,6 @@ class ItemStoreProvider extends ChangeNotifier {
     _fittingRenters.add(fittingRenter);
     await FirestoreService.addFittingRenter(fittingRenter);
     notifyListeners();
-  }
-
-  void fetchLedgersOnce() async {
-    if (ledgers.length == 0) {
-      final snapshot = await FirestoreService.getLedgersOnce();
-      for (var doc in snapshot.docs) {
-        _ledgers.add(doc.data());
-      }
-    }
   }
 
   Future<void> fetchItemsOnce() async {
@@ -621,4 +638,5 @@ class ItemStoreProvider extends ChangeNotifier {
       rethrow;
     }
   }
+
 }

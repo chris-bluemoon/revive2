@@ -226,8 +226,8 @@ class _SummaryRentalState extends State<SummaryRental> {
                     ItemStoreProvider itemStoreProvider =
                         Provider.of<ItemStoreProvider>(context, listen: false);
                     String renterId = itemStoreProvider.renter.id;
-                    String email = itemStoreProvider.renter.email;
-                    String name = itemStoreProvider.renter.name;
+                    // String email = itemStoreProvider.renter.email;
+                    // String name = itemStoreProvider.renter.name;
                     String startDateText = widget.startDate.toString();
                     String endDateText = widget.endDate.toString();
                     String ownerId = '';
@@ -243,7 +243,7 @@ class _SummaryRentalState extends State<SummaryRental> {
                         widget.item.id,
                         startDateText,
                         endDateText,
-                        widget.item.rentPriceDaily,
+                        widget.price,
                         widget.status);
                     // String startDateTextForEmail =
                     //     DateFormat('yMMMd').format(widget.startDate);
