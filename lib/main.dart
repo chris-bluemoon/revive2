@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/providers/create_item_provider.dart';
@@ -15,7 +14,6 @@ import 'package:revivals/screens/help_centre/how_it_works.dart';
 import 'package:revivals/screens/help_centre/sizing_guide.dart';
 import 'package:revivals/screens/help_centre/who_are_we.dart';
 import 'package:revivals/screens/home_page.dart';
-import 'package:revivals/screens/profile/follow_list_screen.dart';
 import 'package:revivals/screens/sign_up/google_sign_in.dart';
 import 'package:revivals/theme.dart';
 
