@@ -151,7 +151,7 @@ class _ItemResultsState extends State<ItemResults> {
           }
       }
       for (Item i in filteredItems) {
-        Set colourSet = {...i.colour};
+        Set colourSet = {i.colour};
         // TODO: FIX THIS
         if (
             coloursSet.intersection(colourSet).isNotEmpty &&
@@ -174,7 +174,7 @@ class _ItemResultsState extends State<ItemResults> {
             }
             // Check hashtags, colour, brand (any word), and name (any word) fields for any match with searchTerms (case-insensitive)
             bool matchesHashtag = i.hashtags.any((tag) => searchTerms.contains(tag.toLowerCase()));
-            bool matchesColour = i.colour.any((c) => searchTerms.contains(c.toLowerCase()));
+            bool matchesColour = searchTerms.any((term) => i.colour.toLowerCase() == term);
             // Split brand into words and check if any word matches a search term
             bool matchesBrand = i.brand
                 .split(RegExp(r'\s+'))

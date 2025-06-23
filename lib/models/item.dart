@@ -31,7 +31,7 @@ class Item {
   String dateAdded;
   String name;
   String brand;
-  List colour;
+  String colour;
   String size;
   int rentPriceDaily;
   int rentPriceWeekly;

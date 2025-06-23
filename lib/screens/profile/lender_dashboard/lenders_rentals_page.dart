@@ -98,7 +98,7 @@ class _LendersRentalsPageState extends State<LendersRentalsPage> {
                             bookingType: '',
                             dateAdded: '',
                             brand: '',
-                            colour: [],
+                            colour: '',
                             size: '',
                             rentPriceDaily: 0,
                             rentPriceWeekly: 0,

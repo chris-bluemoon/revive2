@@ -417,7 +417,7 @@ class _SetPricingState extends State<SetPricing> {
       dateAdded: DateTime.now().toIso8601String(),
       name: widget.title,
       brand: widget.brand,
-      colour: [widget.colour],
+      colour: widget.colour,
       size: widget.size,
       rentPriceDaily: int.parse(spp.dailyPriceController.text),
       rentPriceWeekly: int.parse(spp.weeklyPriceController.text),
