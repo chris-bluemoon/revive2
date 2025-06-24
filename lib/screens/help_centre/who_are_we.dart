@@ -13,6 +13,10 @@ class WhoAreWe extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left, size: 32),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const StyledTitle('Who Are We?'), 
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
@@ -26,7 +30,6 @@ class WhoAreWe extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const StyledTitle("Who Are We?"),
                   const SizedBox(height: 20),
                   const StyledBody(
                       'Welcome to Unearthed Collections, where style meets convenience! We’re more than just a dress rental service, we’re your go-to destination for unforgettable fashion experiences.',
