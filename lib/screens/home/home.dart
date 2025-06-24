@@ -370,3 +370,9 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
+// In your theme.dart or directly in main.dart
+final ThemeData primaryTheme = ThemeData(
+  fontFamily: 'Inter', // or your chosen font family
+  // ...other theme settings...
+);
