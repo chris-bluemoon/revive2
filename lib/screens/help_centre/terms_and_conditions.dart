@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:revivals/shared/styled_text.dart';
 
 class TermsAndConditionsPage extends StatelessWidget {
-  const TermsAndConditionsPage({Key? key}) : super(key: key);
+  const TermsAndConditionsPage({super.key});
 
   // Example section widget for reuse
   Widget section(String title, String body) {
@@ -120,10 +119,11 @@ Address: ''',
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Introductory text under the AppBar
-            Text(
-              'Last Updated: [Insert Date]\n\n'
+            const Text(
+              'Last Updated: 24 June 2025\n\n'
               'Welcome to Velaa! These Terms and Conditions ("Terms") govern your access to and use of the [App Name] mobile application and website (collectively, the “Platform”), operated by [Company Name], referred to as "we", "us", or "our".\n\n'
-              'By using or accessing the Platform, you agree
+              'By using or accessing the Platform, you agree...',
+            ),
             ...List.generate(
               sections.length,
               (i) => section('${i + 1}. ${sections[i]}', sectionBodies[i]),
