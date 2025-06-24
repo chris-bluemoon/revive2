@@ -64,15 +64,15 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
-  flutter_launcher_icons: ^0.14.1
+  flutter_launcher_icons: ^0.13.1
 
 dependency_overrides:
   intl: ^0.19.0
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/logos/uc_icon.png"
+  image_path: "assets/logos/velaa_logo_image_only.png"
 
 flutter:
   uses-material-design: true
@@ -91,7 +91,7 @@ flutter:
       - assets/img/backgrounds/
       - assets/img/icons/
       - assets/img/icons/
-      - .env
+      # - .env
 
 flutter_native_splash:
   android: true
