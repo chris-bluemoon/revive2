@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:revivals/shared/styled_text.dart';
 
 class TermsAndConditionsPage extends StatelessWidget {
   const TermsAndConditionsPage({super.key});
@@ -100,12 +101,14 @@ Address: ''',
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(112), // Default is 56, so double is 112
+        preferredSize: const Size.fromHeight(140), // Increased height for full title visibility
         child: AppBar(
-          title: const Text(
-            'T & Cs\nTerms and Conditions',
-            textAlign: TextAlign.center,
-            style: TextStyle(height: 1.2),
+          leading: IconButton(
+            icon: const Icon(Icons.chevron_left, size: 32),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: const StyledTitle(
+            'Terms and\nConditions',
           ),
           centerTitle: true,
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
