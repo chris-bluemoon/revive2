@@ -100,11 +100,19 @@ Address: ''',
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const StyledTitle('TERMS AND CONDITIONS'),
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
-        elevation: Theme.of(context).appBarTheme.elevation ?? 4,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(112), // Default is 56, so double is 112
+        child: AppBar(
+          title: const Text(
+            'T & Cs\nTerms and Conditions',
+            textAlign: TextAlign.center,
+            style: TextStyle(height: 1.2),
+          ),
+          centerTitle: true,
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
+          elevation: Theme.of(context).appBarTheme.elevation ?? 4,
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -115,10 +123,7 @@ Address: ''',
             Text(
               'Last Updated: [Insert Date]\n\n'
               'Welcome to Velaa! These Terms and Conditions ("Terms") govern your access to and use of the [App Name] mobile application and website (collectively, the “Platform”), operated by [Company Name], referred to as "we", "us", or "our".\n\n'
-              'By using or accessing the Platform, you agree to be bound by these Terms. If you do not agree, do not use the Platform.',
-              style: const TextStyle(fontSize: 15, color: Colors.black87),
-            ),
-            const SizedBox(height: 24),
+              'By using or accessing the Platform, you agree
             ...List.generate(
               sections.length,
               (i) => section('${i + 1}. ${sections[i]}', sectionBodies[i]),
