@@ -114,11 +114,13 @@ class _HomeState extends State<Home> {
                   ),
                 ]
               : [],
-          title: SizedBox(
-            child: Image.asset(
-              'assets/logos/revive2.png',
-              fit: BoxFit.fill,
-              height: width * 0.15,
+          title: const Text(
+            'VELAA',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 28,
+              color: Colors.black,
+              letterSpacing: 2,
             ),
           ),
         ),
