@@ -30,17 +30,17 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
-
-    // Wait for fetchRentersOnce to complete before moving on
-    itemStore.fetchRentersOnce().then((_) {
-      itemStore.fetchItemsOnce();
-      itemStore.fetchItemRentersOnce();
-      // itemStore.fetchFittingRentersOnce();
-      itemStore.fetchLedgersOnce();
-      itemStore.fetchMessagesOnce();
-      itemStore.fetchReviewsOnce();
-      // itemStore.listenToMessages(itemStore.renter.id);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+      itemStore.fetchRentersOnce().then((_) {
+        itemStore.fetchItemsOnce();
+        itemStore.fetchItemRentersOnce();
+        // itemStore.fetchFittingRentersOnce();
+        itemStore.fetchLedgersOnce();
+        itemStore.fetchMessagesOnce();
+        itemStore.fetchReviewsOnce();
+        // itemStore.listenToMessages(itemStore.renter.id);
+      });
     });
   } // Initialize the items list or fetch it from the provider if neededjkI
   @override
