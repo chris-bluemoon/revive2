@@ -44,26 +44,23 @@ class InboxPage extends StatelessWidget {
             return const Center(child: Text('No messages'));
           }
           // Filter out messages deleted for the current user
-          final filteredDocs = snapshot.data!.docs.where((doc) =>
-            !List<String>.from((doc.data() as Map<String, dynamic>)['deletedFor'] ?? []).contains(currentUserId)
-          ).toList();
+          final filteredDocs = snapshot.data!.docs.where((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final deletedFor = List<String>.from(data['deletedFor'] ?? []);
+            return !deletedFor.contains(currentUserId);
+          }).toList();
+
           // Group messages by other participant to get the latest message per conversation
           final Map<String, QueryDocumentSnapshot> latestMessages = {};
           for (var doc in filteredDocs) {
             final data = doc.data() as Map<String, dynamic>;
-            if (data['deletedFor'] != null &&
-                List<String>.from(data['deletedFor']).contains(currentUserId)) {
-                log('Skipping message deleted for current user: ${doc.id}');
-              // Skip messages deleted for the current user
-              continue;
-            } 
+            // No need to check deletedFor again here
             final participants = List<String>.from(data['participants'] ?? []);
             log('Participants: $participants');
-            final otherUserId = participants.firstWhere(
-              (id) => id != currentUserId,
-              orElse: () => '',
-            );
-            if (otherUserId.isNotEmpty && !latestMessages.containsKey(otherUserId)) {
+            final otherUserIds = participants.where((id) => id != currentUserId).toList();
+            if (otherUserIds.isEmpty) continue;
+            final otherUserId = otherUserIds.first;
+            if (!latestMessages.containsKey(otherUserId)) {
               latestMessages[otherUserId] = doc;
             }
           }

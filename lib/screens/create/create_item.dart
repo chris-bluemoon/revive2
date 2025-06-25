@@ -56,6 +56,7 @@ class _CreateItemState extends State<CreateItem> {
       cip.titleController.text = widget.item!.name.toString();
       cip.images.clear();
       for (ItemImage i in Provider.of<ItemStoreProvider>(context, listen: false).images) {
+        log('imageId: ${i.imageId}');
         for (String itemImageString in widget.item!.imageId) {
           if (i.id == itemImageString) {
             cip.images.add(i.imageId);
@@ -282,6 +283,16 @@ class _CreateItemState extends State<CreateItem> {
                       ],
                     ),
                     SizedBox(height: width * 0.02),
+                    // Show warning if less than 2 images
+                    if (cip.images.length < 2)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          "You must upload at least 2 images to your listing",
+                          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     const Divider(),
                     InkWell(
                       onTap: () => showModalBottomSheet(

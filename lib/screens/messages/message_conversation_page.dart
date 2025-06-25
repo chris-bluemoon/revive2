@@ -176,8 +176,12 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                   }
                   // Filter only messages between these two users
                   final docs = snapshot.data!.docs.where((doc) {
-                    final participants = List<String>.from(doc['participants'] ?? []);
-                    return participants.contains(widget.otherUserId) && participants.contains(widget.currentUserId);
+                    final data = doc.data() as Map<String, dynamic>;
+                    final participants = List<String>.from(data['participants'] ?? []);
+                    final deletedFor = List<String>.from(data['deletedFor'] ?? []);
+                    return participants.contains(widget.otherUserId) &&
+                           participants.contains(widget.currentUserId) &&
+                           !deletedFor.contains(widget.currentUserId);
                   }).toList();
 
                   return ListView.builder(
