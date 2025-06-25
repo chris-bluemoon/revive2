@@ -127,6 +127,7 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
 
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: width * 0.2,
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
