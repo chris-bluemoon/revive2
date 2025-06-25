@@ -880,6 +880,7 @@ class _CreateItemState extends State<CreateItem> {
                         cip.images.add(croppedFile.path);
                         _imageFiles.add(XFile(croppedFile.path));
                         log('Added cropped imageFile: ${croppedFile.path}');
+                        cip.checkFormComplete(); // <-- Add this line to check form completeness after adding image
                       }
                     }
 
@@ -920,6 +921,7 @@ class _CreateItemState extends State<CreateItem> {
                         cip.images.add(croppedFile.path);
                         _imageFiles.add(XFile(croppedFile.path));
                         log('Added cropped imageFile: ${croppedFile.path}');
+                        cip.checkFormComplete(); // <-- Add this line to check form completeness after adding image
                       }
                     }
 
