@@ -10,12 +10,12 @@ import 'package:revivals/models/item.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/create/create_item.dart';
+import 'package:revivals/screens/messages/message_conversation_page.dart';
 import 'package:revivals/screens/profile/profile.dart';
 import 'package:revivals/screens/sign_up/google_sign_in.dart';
 import 'package:revivals/screens/summary/summary_purchase.dart';
 import 'package:revivals/screens/to_rent/item_widget.dart';
 import 'package:revivals/screens/to_rent/rent_this_with_date_selecter.dart';
-import 'package:revivals/screens/to_rent/send_message_screen.dart';
 import 'package:revivals/screens/to_rent/user_card.dart';
 import 'package:revivals/shared/get_country_price.dart';
 import 'package:revivals/shared/item_card.dart';
@@ -280,10 +280,18 @@ class _ToRentState extends State<ToRent> {
                         if (!isOwner)
                           IconButton(
                             onPressed: () {
-                              setState(() {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => SendMessageScreen(to: ownerName, subject: widget.item.name)));
-                              });
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => MessageConversationPage(
+                                    currentUserId: Provider.of<ItemStoreProvider>(context, listen: false).renter.id,
+                                    otherUserId: widget.item.owner,
+                                    otherUser: {
+                                      'name': ownerName,
+                                      'profilePicUrl': '', // Add profilePic if available
+                                    },
+                                  ),
+                                ),
+                              );
                             },
                             icon: Icon(Icons.email_outlined, size: width * 0.05),
                           ),

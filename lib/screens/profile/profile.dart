@@ -8,11 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/screens/messages/message_conversation_page.dart';
 import 'package:revivals/screens/profile/account/account_page.dart';
 import 'package:revivals/screens/profile/admin/admin_page.dart';
 import 'package:revivals/screens/profile/follow_list_screen.dart';
 import 'package:revivals/screens/profile/lender_dashboard/lender_dashboard.dart';
-import 'package:revivals/screens/profile/message_page.dart';
 import 'package:revivals/screens/profile/notifications/notifications_page.dart';
 import 'package:revivals/screens/profile/renter_dashboard/renter_dashboard.dart';
 import 'package:revivals/screens/to_rent/to_rent.dart';
@@ -527,9 +527,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             onPressed: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => MessagePage(
-                                    user: profileOwner,
-                                    item: items[0],
+                                  builder: (context) => MessageConversationPage(
+                                    currentUserId: currentRenter.id,
+                                    otherUserId: profileOwner.id,
+                                    otherUser: {
+                                      'name': profileOwner.name,
+                                      'profilePicUrl': profileOwner.profilePicUrl,
+                                    },
                                   ),
                                 ),
                               );
