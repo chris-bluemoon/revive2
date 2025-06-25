@@ -47,7 +47,7 @@ class _CreateItemState extends State<CreateItem> {
       final cip = Provider.of<CreateItemProvider>(context, listen: false);
       cip.sizeValue = (widget.item!.size.isNotEmpty) ? widget.item!.size[0].toString() : '';
       cip.productTypeValue = widget.item!.type;
-      cip.colourValue = widget.item!.colour[0];
+      cip.colourValue = widget.item!.colour;
       cip.brandValue = widget.item!.brand;
       cip.retailPriceValue = widget.item!.rrp.toString();
       cip.retailPriceController.text = widget.item!.rrp.toString();
@@ -763,22 +763,22 @@ class _CreateItemState extends State<CreateItem> {
                   ? () async {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => SetPricing(
-                          cip.productTypeValue,
-                          cip.brandValue,
-                          cip.titleController.text,
-                          cip.colourValue,
-                          cip.retailPriceValue,
-                          cip.shortDescController.text,
-                          cip.longDescController.text,
-                          cip.sizeValue,
-                          const [],
-                          _imageFiles,
+                          productType: cip.productTypeValue,
+                          brand: cip.brandValue,
+                          title: cip.titleController.text,
+                          colour: cip.colourValue,
+                          retailPrice: cip.retailPriceValue,
+                          shortDesc: cip.shortDescController.text,
+                          longDesc: cip.longDescController.text,
+                          size: cip.sizeValue,
+                          existingImagePaths: (widget.item?.imageId ?? []).cast<String>(),
+                          imageFiles: _imageFiles,
                           dailyPrice: widget.item?.rentPriceDaily.toString(),
                           weeklyPrice: widget.item?.rentPriceWeekly.toString(),
                           monthlyPrice: widget.item?.rentPriceMonthly.toString(),
                           minRentalPeriod: widget.item?.minDays.toString(),
                           hashtags: hashtags,
-                          id: widget.item?.id, // <-- Pass the id here
+                          id: widget.item?.id,
                         ),
                       ));
                     }

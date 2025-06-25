@@ -374,6 +374,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                       final reviewController = TextEditingController();
                       return StatefulBuilder(
                         builder: (context, setState) => AlertDialog(
+                          backgroundColor: Colors.white, // Set dialog background to white
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(0)), // Square corners
                           ),

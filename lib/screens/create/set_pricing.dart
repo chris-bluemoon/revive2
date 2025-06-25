@@ -15,28 +15,6 @@ import 'package:uuid/uuid.dart';
 var uuid = const Uuid();
 
 class SetPricing extends StatefulWidget {
-  final String? id; // <-- Add this line
-
-  const SetPricing(
-    this.productType,
-    this.brand,
-    this.title,
-    this.colour,
-    this.retailPrice,
-    this.shortDesc,
-    this.longDesc,
-    this.size,
-    this.imagePath,
-    this.imageFiles, {
-    this.dailyPrice,
-    this.weeklyPrice,
-    this.monthlyPrice,
-    this.minRentalPeriod,
-    required this.hashtags,
-    this.id, // <-- Add this line
-    super.key,
-  });
-
   final String productType;
   final String brand;
   final String title;
@@ -45,16 +23,34 @@ class SetPricing extends StatefulWidget {
   final String shortDesc;
   final String longDesc;
   final String size;
-  final List<String> imagePath;
+  final List<String> existingImagePaths;
   final List<XFile> imageFiles;
-
-  final List<String> hashtags;
-
-  // Add these optional fields for editing
   final String? dailyPrice;
   final String? weeklyPrice;
   final String? monthlyPrice;
   final String? minRentalPeriod;
+  final List<String> hashtags;
+  final String? id;
+
+  const SetPricing({
+    super.key,
+    required this.productType,
+    required this.brand,
+    required this.title,
+    required this.colour,
+    required this.retailPrice,
+    required this.shortDesc,
+    required this.longDesc,
+    required this.size,
+    required this.existingImagePaths,
+    required this.imageFiles,
+    this.dailyPrice,
+    this.weeklyPrice,
+    this.monthlyPrice,
+    this.minRentalPeriod,
+    required this.hashtags,
+    this.id,
+  });
 
   @override
   State<SetPricing> createState() => _SetPricingState();
@@ -83,6 +79,8 @@ class _SetPricingState extends State<SetPricing> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       spp.checkFormComplete();
     });
+    // Combine existing image paths and new image files
+    imagePaths = List<String>.from(widget.existingImagePaths);
   }
 
   List<String> imagePaths = [];
@@ -95,7 +93,7 @@ class _SetPricingState extends State<SetPricing> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-
+    log('Image files length: ${widget.imageFiles.length}');
     return Consumer<SetPriceProvider>(
       builder: (context, SetPriceProvider spp, child) {
         return Stack(
@@ -403,8 +401,9 @@ class _SetPricingState extends State<SetPricing> {
     log('OwnerId when submitting: $ownerId');
     SetPriceProvider spp =
         Provider.of<SetPriceProvider>(context, listen: false);
+    // Only upload new images
     for (XFile passedFile in widget.imageFiles) {
-      await uploadFile(passedFile); // Await each upload!
+      await uploadFile(passedFile); // This adds to imagePaths
     }
 
     final item = Item(
@@ -426,7 +425,7 @@ class _SetPricingState extends State<SetPricing> {
       rrp: int.tryParse(widget.retailPrice.replaceAll(RegExp(r'[^\d]'), '')) ?? 0,
       description: widget.shortDesc,
       longDescription: widget.longDesc,
-      imageId: imagePaths,
+      imageId: imagePaths, // This now includes both old and new images
       status: 'submitted',
       minDays: int.tryParse(spp.minimalRentalPeriodController.text) ?? 1,
       hashtags: widget.hashtags,

@@ -50,8 +50,13 @@ class InsightsPage extends StatelessWidget {
         .toList()
       ..sort((a, b) => a.monthDate.compareTo(b.monthDate));
 
+    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.chevron_left, size: width * 0.08),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const StyledTitle('INSIGHTS'),
         centerTitle: true,
         backgroundColor: Colors.white,

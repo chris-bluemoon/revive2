@@ -19,9 +19,14 @@ class _VacationPageState extends State<VacationPage> {
     final provider = Provider.of<ItemStoreProvider>(context);
     final vacations = provider.renter.vacations;
     final dateFormat = DateFormat('MMM d, yyyy');
+    final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.chevron_left, size: width * 0.08),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const StyledTitle('VACATIONS'),
         centerTitle: true,
         backgroundColor: Colors.white,

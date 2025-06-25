@@ -163,88 +163,95 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                   children: [
                     LayoutBuilder(
                       builder: (context, constraints) {
-                        // Calculate a responsive width based on screen size, with a minimum
                         double chipWidth = (MediaQuery.of(context).size.width * 0.7).clamp(220, 400);
                         return Column(
                           children: [
-                            SizedBox(
-                              width: chipWidth,
-                              child: RadioListTile<int>(
-                                value: 3,
-                                groupValue: selectedOption,
-                                onChanged: (val) {
-                                  setState(() {
-                                    selectedOption = val!;
-                                    noOfDays = 3;
-                                  });
-                                },
-                                title: RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(
-                                      fontSize: width * 0.042,
-                                      color: Colors.black,
+                            // Only show the first radio if minDays <= 6
+                            if (widget.item.minDays <= 6)
+                              SizedBox(
+                                width: chipWidth,
+                                child: RadioListTile<int>(
+                                  value: widget.item.minDays,
+                                  groupValue: selectedOption,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedOption = val!;
+                                      noOfDays = widget.item.minDays;
+                                    });
+                                  },
+                                  title: RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        fontSize: width * 0.042,
+                                        color: Colors.black,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: '${widget.item.minDays}+ days @ ',
+                                        ),
+                                        TextSpan(
+                                          text: '${getPricePerDay(3)}$symbol',
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        const TextSpan(
+                                          text: ' per day',
+                                        ),
+                                      ],
                                     ),
-                                    children: [
-                                      TextSpan(
-                                        text: '${widget.item.minDays}+ days @ ',
-                                      ),
-                                      TextSpan(
-                                        text: '${getPricePerDay(3)}$symbol', // <-- Add $symbol here
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                      const TextSpan(
-                                        text: ' per day',
-                                      ),
-                                    ],
                                   ),
+                                  activeColor: Colors.black,
+                                  contentPadding: EdgeInsets.zero,
+                                  dense: true,
                                 ),
-                                activeColor: Colors.black,
-                                contentPadding: EdgeInsets.zero,
-                                dense: true,
                               ),
-                            ),
-                            const Divider(
-                              height: 1,
-                              thickness: 2,
-                              color: Color(0xFF444444),
-                            ),
-                            const SizedBox(height: 10),
-                            SizedBox(
-                              width: chipWidth,
-                              child: RadioListTile<int>(
-                                value: 7,
-                                groupValue: selectedOption,
-                                onChanged: (val) {
-                                  setState(() {
-                                    selectedOption = val!;
-                                    noOfDays = 7;
-                                  });
-                                },
-                                title: RichText(
-                                  text: TextSpan(
-                                    style: TextStyle(
-                                      fontSize: width * 0.042,
-                                      color: Colors.black,
+                            if (widget.item.minDays <= 29)
+                              Column(
+                                children: [
+                                  const Divider(
+                                    height: 1,
+                                    thickness: 2,
+                                    color: Color(0xFF444444),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  SizedBox(
+                                    width: chipWidth,
+                                    child: RadioListTile<int>(
+                                      value: 7,
+                                      groupValue: selectedOption,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          selectedOption = val!;
+                                          noOfDays = 7;
+                                        });
+                                      },
+                                      title: RichText(
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            fontSize: width * 0.042,
+                                            color: Colors.black,
+                                          ),
+                                          children: [
+                                            const TextSpan(
+                                              text: '7+ days @ ',
+                                            ),
+                                            TextSpan(
+                                              text: '${getPricePerDay(7)}$symbol',
+                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            const TextSpan(
+                                              text: ' per day',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      activeColor: Colors.black,
+                                      contentPadding: EdgeInsets.zero,
+                                      dense: true,
                                     ),
-                                    children: [
-                                      const TextSpan(
-                                        text: '7+ days @ ',
-                                      ),
-                                      TextSpan(
-                                        text: '${getPricePerDay(7)}$symbol', // <-- Add $symbol here
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                      const TextSpan(
-                                        text: ' per day',
-                                      ),
-                                    ],
                                   ),
-                                ),
-                                activeColor: Colors.black,
-                                contentPadding: EdgeInsets.zero,
-                                dense: true,
+                                ],
                               ),
-                            ),
+                            // Always show the 30+ days option
                             const Divider(
                               height: 1,
                               thickness: 2,
@@ -273,7 +280,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                         text: '30+ days @ ',
                                       ),
                                       TextSpan(
-                                        text: '${getPricePerDay(30)}$symbol', // <-- Add $symbol here
+                                        text: '${getPricePerDay(30)}$symbol',
                                         style: const TextStyle(fontWeight: FontWeight.bold),
                                       ),
                                       const TextSpan(
@@ -343,6 +350,8 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                       while (blackoutDates.contains(nextSelectableEnd)) {
                         nextSelectableEnd = nextSelectableEnd.add(const Duration(days: 1));
                       }
+
+
 
                       DateTimeRange initialRange = DateTimeRange(
                         start: nextSelectable,

@@ -71,13 +71,6 @@ class LenderDashboard extends StatelessWidget {
           ),
           const Divider(),
           ListTile(
-            leading: const Icon(Icons.swap_horiz),
-            title: const Text('Transfers'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
-          ),
-          const Divider(),
-          ListTile(
             leading: const Icon(Icons.assignment),
             title: const Text('Rentals/Purchases'),
             trailing: const Icon(Icons.chevron_right),
@@ -90,12 +83,6 @@ class LenderDashboard extends StatelessWidget {
             }
           ),
           const Divider(),
-          ListTile(
-            leading: const Icon(Icons.beach_access),
-            title: const Text('Vacation Mode'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
-          ),
         ],
       ),
     );
