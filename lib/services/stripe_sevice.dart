@@ -14,15 +14,11 @@ class StripeService {
 
       final functions = FirebaseFunctions.instanceFor(region: 'us-central1');
       final callable = functions.httpsCallable('createPaymentIntent');
-
       final result = await callable.call({
-        'email': "yenaythway77@mgail.com",
-        'currency': 'THB',
+        // 'currency': 'THB',
         'amount': amount,
       });
-
       final data = result.data;
-
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: data['paymentIntent'],
@@ -39,6 +35,7 @@ class StripeService {
         const SnackBar(content: Text('Payment Successful')),
       );
     } catch (e) {
+      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Payment failed: ${e.toString()}')),
       );
