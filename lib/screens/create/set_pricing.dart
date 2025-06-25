@@ -272,6 +272,18 @@ class _SetPricingState extends State<SetPricing> {
                           controller: spp.minimalRentalPeriodController,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: (text) {
+                            // Only allow minDays between 1 and 30
+                            if (text.isNotEmpty) {
+                              int value = int.tryParse(text) ?? 1;
+                              if (value > 30) {
+                                spp.minimalRentalPeriodController.text = '30';
+                              } else if (value < 1) {
+                                spp.minimalRentalPeriodController.text = '1';
+                              }
+                              spp.minimalRentalPeriodController.selection = TextSelection.fromPosition(
+                                TextPosition(offset: spp.minimalRentalPeriodController.text.length),
+                              );
+                            }
                             spp.checkFormComplete();
                           },
                           decoration: InputDecoration(
