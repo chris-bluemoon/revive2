@@ -76,14 +76,6 @@ class _RentersRentalsPageState extends State<RentersRentalsPage> {
               Tab(text: "Purchases"),
             ],
           ),
-          actions: [
-            IconButton(
-                onPressed: () async {
-                  await StripeService.instance
-                      .initPaymentSheet(context, amount: 100);
-                },
-                icon: const Icon(Icons.access_alarm))
-          ],
         ),
         body: TabBarView(
           children: [
@@ -337,7 +329,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                 ElevatedButton(
                   onPressed: () async {
                     await StripeService.instance
-                        .initPaymentSheet(context, amount: widget.price);
+                        .makePayment(context, widget.price);
 
                     setState(() {
                       widget.itemRenter.status = "paid";
@@ -406,9 +398,11 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                       final reviewController = TextEditingController();
                       return StatefulBuilder(
                         builder: (context, setState) => AlertDialog(
-                          backgroundColor: Colors.white, // Set dialog background to white
+                          backgroundColor:
+                              Colors.white, // Set dialog background to white
                           shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(0)), // Square corners
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(0)), // Square corners
                           ),
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
