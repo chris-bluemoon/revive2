@@ -574,12 +574,9 @@ class _CreateItemState extends State<CreateItem> {
                                 cip.checkFormComplete();
                               },
                               decoration: InputDecoration(
-                                counterText: "", // Hide character counter if you want
+                                counterText: "",
                                 isDense: true,
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: width * 0.025, // Increase vertical padding for centering
-                                  horizontal: 12,
-                                ),
+                                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12), // <-- Increased vertical padding
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(color: Colors.black),
                                   borderRadius: BorderRadius.circular(10.0),
@@ -589,12 +586,14 @@ class _CreateItemState extends State<CreateItem> {
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                                 border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: const BorderSide(color: Colors.black)),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: const BorderSide(color: Colors.black),
+                                ),
                                 filled: true,
                                 hintStyle: TextStyle(
-                                    color: Colors.grey[800], fontSize: width * 0.03),
-                                // hintText: "Enter price",
+                                  color: Colors.grey[800], 
+                                  fontSize: width * 0.03,
+                                ),
                                 fillColor: Colors.white70,
                               ),
                             ),
