@@ -684,18 +684,20 @@ class _ToRentState extends State<ToRent> {
           padding: const EdgeInsets.all(10),
           child: Row(
             children: [
-              Row(
-                children: [
-                  StyledHeading(
-                    "${NumberFormat('#,###').format(widget.item.rentPriceDaily)}$symbol / day",
-                    color: Colors.black,
-                  ),
-                  StyledBody(
-                    '  (${widget.item.minDays} ${widget.item.minDays == 1 ? "day)" : "days)"}',
-                    color: Colors.black,
-                  ),
-                ],
-              ),
+              // Only show the rentPriceDaily row if not in edit mode
+              if (!(ModalRoute.of(context)?.settings.name == '/edit'))
+                Row(
+                  children: [
+                    StyledHeading(
+                      "${NumberFormat('#,###').format(widget.item.rentPriceDaily)}$symbol / day",
+                      color: Colors.black,
+                    ),
+                    StyledBody(
+                      '  (${widget.item.minDays} ${widget.item.minDays == 1 ? "day)" : "days)"}',
+                      color: Colors.black,
+                    ),
+                  ],
+                ),
               const SizedBox(width: 10),
               (widget.item.bookingType == 'buy' ||
                       widget.item.bookingType == 'both')
