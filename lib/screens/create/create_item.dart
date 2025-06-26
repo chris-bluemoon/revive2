@@ -293,6 +293,7 @@ class _CreateItemState extends State<CreateItem> {
                           textAlign: TextAlign.center,
                         ),
                       ),
+                    SizedBox(height: width * 0.05), // <-- Add this line for more gap below the warning
                     const Divider(),
                     InkWell(
                       onTap: () => showModalBottomSheet(
@@ -594,7 +595,6 @@ class _CreateItemState extends State<CreateItem> {
                                   color: Colors.grey[800],
                                   fontSize: width * 0.03,
                                 ),
-                                hintText: "Retail Price",
                                 fillColor: Colors.white70,
                               ),
                             ),
