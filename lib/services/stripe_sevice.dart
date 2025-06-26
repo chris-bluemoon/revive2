@@ -6,58 +6,35 @@ class StripeService {
   StripeService._();
   static final StripeService instance = StripeService._();
 
-  Future<void> makePayment(BuildContext context, int amount) async {
+  Future<bool> makePayment(int amount) async {
     try {
       String? paymentIntentClientSecret =
           await _createPaymentIntent(amount, "THB");
-      if (paymentIntentClientSecret == null) return;
+      if (paymentIntentClientSecret == null) return false;
 
-      Stripe.instance.initPaymentSheet(
+      await Stripe.instance.initPaymentSheet(
           paymentSheetParameters: SetupPaymentSheetParameters(
               paymentIntentClientSecret: paymentIntentClientSecret,
               merchantDisplayName: "REVIVE"));
       await _processPayment();
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Payment Successful')),
-      );
+      return true;
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Payment failed: ${e.toString()}')),
-      );
+      return false;
     }
   }
 
   Future<void> _processPayment() async {
     try {
       await Stripe.instance.presentPaymentSheet();
-      await Stripe.instance.confirmPaymentSheetPayment();
+      // await Stripe.instance.confirmPaymentSheetPayment();
     } catch (e) {
-      print(e);
+      print(e.toString());
+      // return e.toString();
     }
   }
 
   Future<String?> _createPaymentIntent(int amount, String currency) async {
     try {
-      // final Dio dio = Dio();
-      // Map<String, dynamic> data = {
-      //   "amount": _calculateAmount(amount),
-      //   "currency": currency
-      // };
-      // var response = await dio.post("https://api.stripe.com/v1/payment_intents",
-      // data: data,
-      // options: Options(
-      //   contentType: Headers.formUrlEncodedContentType,
-      //   headers: {
-      //     "Authorization": "Bearer $stripeSecretkey",
-      //     "Content-Type": 'application/x-www-form-urlencoded'
-      //   },
-      // ));
-      // if (response.data != null) {
-      //   // print(response.data);
-      //   return response.data["client_secret"];
-      // }
-
       final functions = FirebaseFunctions.instanceFor(region: 'us-central1');
       final callable = functions.httpsCallable('createPaymentIntent');
       final result = await callable.call({

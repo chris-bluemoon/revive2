@@ -328,29 +328,45 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    await StripeService.instance
-                        .makePayment(context, widget.price);
+                    bool success =
+                        await StripeService.instance.makePayment(widget.price);
+                    if (success) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Payment successful!'),
+                        ),
+                      );
+                      setState(() {
+                        widget.itemRenter.status = "paid";
+                      });
+                      widget.status = "paid";
+                      ItemStoreProvider itemStore =
+                          Provider.of<ItemStoreProvider>(context,
+                              listen: false);
+                      itemStore.saveItemRenter(widget.itemRenter);
+                      Ledger newLedgerEntry = Ledger(
+                        id: uuid.v4(), // Use uuid v4 for unique id
+                        itemRenterId: widget.itemRenter.id,
+                        owner: widget.itemRenter.ownerId,
+                        date: DateTime.now().toIso8601String(),
+                        type: "rental",
+                        desc: "Payment for rental of ${widget.itemName}",
+                        amount: widget.price,
+                        balance: itemStore.getBalance() +
+                            widget.price, // Update balance logic
+                      );
+                      itemStore.addLedger(newLedgerEntry);
+                    } else {
+                      if (!context.mounted) return;
 
-                    setState(() {
-                      widget.itemRenter.status = "paid";
-                    });
-                    widget.status = "paid";
-                    ItemStoreProvider itemStore =
-                        Provider.of<ItemStoreProvider>(context, listen: false);
-                    itemStore.saveItemRenter(widget.itemRenter);
-                    Ledger newLedgerEntry = Ledger(
-                      id: uuid.v4(), // Use uuid v4 for unique id
-                      itemRenterId: widget.itemRenter.id,
-                      owner: widget.itemRenter.ownerId,
-                      date: DateTime.now().toIso8601String(),
-                      type: "rental",
-                      desc: "Payment for rental of ${widget.itemName}",
-                      amount: widget.price,
-                      balance: itemStore.getBalance() +
-                          widget.price, // Update balance logic
-                    );
-                    itemStore.addLedger(newLedgerEntry);
-                    // Make payment logic here
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text('Something went wrong with the payment.'),
+                        ),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
