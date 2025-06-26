@@ -684,19 +684,21 @@ class _ToRentState extends State<ToRent> {
           padding: const EdgeInsets.all(10),
           child: Row(
             children: [
-              Row(
-                children: [
-                  StyledHeading(
-                    "${NumberFormat('#,###').format(widget.item.rentPriceDaily)}$symbol / day",
-                    color: Colors.black,
-                  ),
-                  StyledBody(
-                    '  (${widget.item.minDays} ${widget.item.minDays == 1 ? "day)" : "days)"}',
-                    color: Colors.black,
-                  ),
-                ],
-              ),
-              const SizedBox(width: 10),
+              // Only show the rentPriceDaily row if not in edit mode
+              if (!isOwner)
+                Row(
+                  children: [
+                    StyledHeading(
+                      "${NumberFormat('#,###').format(widget.item.rentPriceDaily)}$symbol / day",
+                      color: Colors.black,
+                    ),
+                    StyledBody(
+                      '  (${widget.item.minDays} ${widget.item.minDays == 1 ? "day)" : "days)"}',
+                      color: Colors.black,
+                    ),
+                  const SizedBox(width: 10),
+                  ],
+                ),
               (widget.item.bookingType == 'buy' ||
                       widget.item.bookingType == 'both')
                   ? Expanded(
@@ -799,8 +801,7 @@ class _ToRentState extends State<ToRent> {
                                               ],
                                             ),
                                           ),
-                                        ),
-                                      );
+                                        ));
                                       if (confirm == true) {
                                         final store = Provider.of<ItemStoreProvider>(context, listen: false);
 
@@ -839,12 +840,12 @@ class _ToRentState extends State<ToRent> {
                                       minimumSize: const Size(120, 48), // Wider and taller minimum size
                                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                     ),
-                                    child: const Text(
+                                    child: Text(
                                       'DELETE',
                                       style: TextStyle(
                                         color: Colors.red,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 18, // Larger font
+                                        fontSize: width * 0.05, // Larger font
                                         letterSpacing: 1.2,
                                       ),
                                       maxLines: 2, // Allow up to 2 lines
@@ -875,12 +876,12 @@ class _ToRentState extends State<ToRent> {
                                       minimumSize: const Size(120, 48), // Wider and taller minimum size
                                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                     ),
-                                    child: const Text(
+                                    child: Text(
                                       'EDIT',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 18, // Larger font
+                                        fontSize: width * 0.05, // Larger font
                                         letterSpacing: 1.2,
                                       ),
                                       maxLines: 2, // Allow up to 2 lines
@@ -911,12 +912,12 @@ class _ToRentState extends State<ToRent> {
                                 minimumSize: const Size(100, 44),
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
-                              child: const Text(
+                              child: Text(
                                 'RENT',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  fontSize: width * 0.05,// Changed from 18 to 16
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18,
+                                  color: Colors.white,
                                   letterSpacing: 1.2,
                                 ),
                                 maxLines: 1,

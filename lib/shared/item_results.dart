@@ -6,7 +6,7 @@ import 'package:pluralize/pluralize.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/item.dart';
 import 'package:revivals/providers/class_store.dart';
-import 'package:revivals/screens/create/to_rent_submission.dart';
+import 'package:revivals/screens/profile/admin/to_rent_submission.dart';
 import 'package:revivals/screens/to_rent/to_rent.dart';
 import 'package:revivals/shared/filters_page.dart';
 import 'package:revivals/shared/item_card.dart';
@@ -328,13 +328,8 @@ class _ItemResultsState extends State<ItemResults> {
                                   child: ItemCard(finalItems[index])),
                           onTap: () {
                             final item = finalItems[index];
-                            final currentUserId = Provider.of<ItemStoreProvider>(context, listen: false).renter.id;
-                            if (item.owner == currentUserId) {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => ToRent(item),
-                              ));
-                            } else if (widget.attribute != 'status' &&
-                                widget.attribute != 'myItems') {
+                            // final currentUserId = Provider.of<ItemStoreProvider>(context, listen: false).renter.id;
+                            if (widget.attribute != 'status') {
                               Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => ToRent(item),
                               ));
@@ -342,11 +337,7 @@ class _ItemResultsState extends State<ItemResults> {
                               Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => ToRentSubmission(item),
                               ));
-                            } else if (widget.attribute == 'myItems') {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => ToRent(item),
-                              ));
-                            }
+                            } 
                           }),
                     );
                   }),
