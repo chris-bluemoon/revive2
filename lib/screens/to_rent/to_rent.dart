@@ -685,7 +685,7 @@ class _ToRentState extends State<ToRent> {
           child: Row(
             children: [
               // Only show the rentPriceDaily row if not in edit mode
-              if (!(ModalRoute.of(context)?.settings.name == '/edit'))
+              if (!isOwner)
                 Row(
                   children: [
                     StyledHeading(
@@ -696,9 +696,9 @@ class _ToRentState extends State<ToRent> {
                       '  (${widget.item.minDays} ${widget.item.minDays == 1 ? "day)" : "days)"}',
                       color: Colors.black,
                     ),
+                  const SizedBox(width: 10),
                   ],
                 ),
-              const SizedBox(width: 10),
               (widget.item.bookingType == 'buy' ||
                       widget.item.bookingType == 'both')
                   ? Expanded(

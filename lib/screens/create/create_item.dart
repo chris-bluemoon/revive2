@@ -576,7 +576,7 @@ class _CreateItemState extends State<CreateItem> {
                               decoration: InputDecoration(
                                 counterText: "",
                                 isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12), // <-- Increased vertical padding
+                                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(color: Colors.black),
                                   borderRadius: BorderRadius.circular(10.0),
@@ -591,9 +591,10 @@ class _CreateItemState extends State<CreateItem> {
                                 ),
                                 filled: true,
                                 hintStyle: TextStyle(
-                                  color: Colors.grey[800], 
+                                  color: Colors.grey[800],
                                   fontSize: width * 0.03,
                                 ),
+                                hintText: "Retail Price",
                                 fillColor: Colors.white70,
                               ),
                             ),
