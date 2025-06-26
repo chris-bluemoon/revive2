@@ -328,10 +328,8 @@ class _ItemResultsState extends State<ItemResults> {
                                   child: ItemCard(finalItems[index])),
                           onTap: () {
                             final item = finalItems[index];
-                            final currentUserId = Provider.of<ItemStoreProvider>(context, listen: false).renter.id;
-                            if (item.owner == currentUserId && 
-                                widget.attribute != 'status' &&
-                                widget.attribute != 'myItems') {
+                            // final currentUserId = Provider.of<ItemStoreProvider>(context, listen: false).renter.id;
+                            if (widget.attribute != 'status') {
                               Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => ToRent(item),
                               ));
