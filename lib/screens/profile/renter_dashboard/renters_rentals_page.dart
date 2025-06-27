@@ -322,73 +322,72 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                 ),
               ],
             ),
-            // if (widget.itemRenter.status == "accepted")
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    bool success =
-                        await StripeService.instance.makePayment(widget.price);
-                    if (success) {
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Payment successful!'),
-                        ),
-                      );
-                      setState(() {
-                        widget.itemRenter.status = "paid";
-                      });
-                      widget.status = "paid";
-                      ItemStoreProvider itemStore =
-                          Provider.of<ItemStoreProvider>(context,
-                              listen: false);
-                      itemStore.saveItemRenter(widget.itemRenter);
-                      Ledger newLedgerEntry = Ledger(
-                        id: uuid.v4(), // Use uuid v4 for unique id
-                        itemRenterId: widget.itemRenter.id,
-                        owner: widget.itemRenter.ownerId,
-                        date: DateTime.now().toIso8601String(),
-                        type: "rental",
-                        desc: "Payment for rental of ${widget.itemName}",
-                        amount: widget.price,
-                        balance: itemStore.getBalance() +
-                            widget.price, // Update balance logic
-                      );
-                      itemStore.addLedger(newLedgerEntry);
-                    } else {
-                      if (!context.mounted) return;
+            if (widget.itemRenter.status == "accepted")
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      bool success = await StripeService.instance
+                          .makePayment(widget.price);
+                      if (success) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Payment successful!'),
+                          ),
+                        );
+                        setState(() {
+                          widget.itemRenter.status = "paid";
+                        });
+                        widget.status = "paid";
+                        ItemStoreProvider itemStore =
+                            Provider.of<ItemStoreProvider>(context,
+                                listen: false);
+                        itemStore.saveItemRenter(widget.itemRenter);
+                        Ledger newLedgerEntry = Ledger(
+                          id: uuid.v4(), // Use uuid v4 for unique id
+                          itemRenterId: widget.itemRenter.id,
+                          owner: widget.itemRenter.ownerId,
+                          date: DateTime.now().toIso8601String(),
+                          type: "rental",
+                          desc: "Payment for rental of ${widget.itemName}",
+                          amount: widget.price,
+                          balance: itemStore.getBalance() +
+                              widget.price, // Update balance logic
+                        );
+                        itemStore.addLedger(newLedgerEntry);
+                      } else {
+                        if (!context.mounted) return;
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                              Text('Something went wrong with the payment.'),
-                        ),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Payment failed.'),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('MAKE PAYMENT'),
                   ),
-                  child: const Text('MAKE PAYMENT'),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      widget.itemRenter.status = "cancelled";
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    foregroundColor: Colors.white,
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        widget.itemRenter.status = "cancelled";
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('CANCEL'),
                   ),
-                  child: const Text('CANCEL'),
-                ),
-              ],
-            ),
+                ],
+              ),
             if (DateTime.parse(widget.itemRenter.endDate)
                     .isBefore(DateTime.now()) &&
                 widget.status != "reviewed")
