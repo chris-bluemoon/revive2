@@ -91,7 +91,7 @@ flutter:
       - assets/img/backgrounds/
       - assets/img/icons/
       - assets/img/icons/
-      # - .env
+      - .env
 
 flutter_native_splash:
   android: true

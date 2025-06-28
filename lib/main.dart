@@ -24,8 +24,8 @@ import 'firebase_options.dart';
 Future main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
-  // await dotenv.load(fileName: ".env");
-  // Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'] ?? '';
+  await dotenv.load(fileName: ".env");
+  Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'] ?? '';
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // Allow only portrait mode
