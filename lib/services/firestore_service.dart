@@ -140,12 +140,6 @@ class FirestoreService {
     });
   }
 
-  static Future<void> updateFittingRenter(FittingRenter fittingRenter) async {
-    await refFittingRenter.doc(fittingRenter.id).update({
-      'status': fittingRenter.status,
-    });
-  }
-
   static Future<void> updateItem(Item item) async {
     await refItem.doc(item.id).update({
       'owner': item.owner,
@@ -264,5 +258,9 @@ class FirestoreService {
         }
       }
     }
+  }
+
+  static Future<void> deleteItemById(String itemId) async {
+    await FirebaseFirestore.instance.collection('item').doc(itemId).delete();
   }
 }

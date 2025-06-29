@@ -11,7 +11,7 @@ class Renter {
     required this.countryCode,
     required this.phoneNum,
     required this.favourites,
-    required this.verified,
+    required this.verified, // String
     required this.imagePath,
     required this.creationDate,
     required this.location,
@@ -19,9 +19,10 @@ class Renter {
     required this.followers,
     required this.following,
     this.fcmToken = '',
-    this.avgReview = 0.0,
-    this.lastLogin,
-    this.vacations = const [],
+    required this.avgReview,
+    required this.lastLogin,
+    required this.vacations,
+    required this.status,
   });
 
   String id;
@@ -41,14 +42,15 @@ class Renter {
   List<String> followers;
   List<String> following;
   double avgReview;
-  DateTime? lastLogin;
+  DateTime lastLogin;
   String? fcmToken;
-
-  /// List of vacation periods, each as a map with 'startDate' and 'endDate' DateTime values.
   List<Map<String, DateTime>> vacations;
+  String status; // <-- Added status field
 
   Renter copyWith({
     List<Map<String, DateTime>>? vacations,
+    String? verified,
+    required String status, // <-- Added status field
     // add other fields here if needed
   }) {
     return Renter(
@@ -61,7 +63,7 @@ class Renter {
       countryCode: countryCode,
       phoneNum: phoneNum,
       favourites: favourites,
-      verified: verified,
+      verified: verified ?? this.verified,
       imagePath: imagePath,
       creationDate: creationDate,
       location: location,
@@ -72,10 +74,10 @@ class Renter {
       lastLogin: lastLogin,
       vacations: vacations ?? this.vacations,
       fcmToken: fcmToken
+      status: status,
     );
   }
 
-  // item to firestore (map)
   Map<String, dynamic> toFirestore() {
     return {
       'email': email,
@@ -94,18 +96,18 @@ class Renter {
       'followers': followers,
       'following': following,
       'avgReview': avgReview,
-      'lastLogin': lastLogin?.toIso8601String(),
+      'lastLogin': lastLogin.toIso8601String(),
       'vacations': vacations
           .map((v) => {
                 'startDate': v['startDate']?.toIso8601String(),
                 'endDate': v['endDate']?.toIso8601String(),
               })
           .toList(),
+      'status': status, // <-- Added status field
       'fcmToken' : fcmToken
     };
   }
 
-  // character from firestore
   factory Renter.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
@@ -122,17 +124,17 @@ class Renter {
     }
     Renter renter = Renter(
       id: snapshot.id,
-      email: data['email'],
-      name: data['name'],
+      email: data['email'] ?? '',
+      name: data['name'] ?? '',
       type: data['type'] ?? 'USER',
-      size: data['size'],
-      address: data['address'],
-      countryCode: data['countryCode'],
-      phoneNum: data['phoneNum'],
-      favourites: data['favourites'],
-      verified: data['verified'],
-      imagePath: data['imagePath'],
-      creationDate: data['creationDate'],
+      size: data['size'] ?? 0,
+      address: data['address'] ?? '',
+      countryCode: data['countryCode'] ?? '',
+      phoneNum: data['phoneNum'] ?? '',
+      favourites: data['favourites'] ?? [],
+      verified: data['verified']?.toString() ?? '',
+      imagePath: data['imagePath'] ?? '',
+      creationDate: data['creationDate'] ?? '',
       location: data['location'] ?? '',
       bio: data['bio'] ?? '',
       followers: List<String>.from(data['followers'] ?? []),
@@ -141,10 +143,11 @@ class Renter {
       lastLogin: data['lastLogin'] != null
           ? (data['lastLogin'] is Timestamp
               ? (data['lastLogin'] as Timestamp).toDate()
-              : DateTime.tryParse(data['lastLogin'].toString()))
-          : null,
+              : (DateTime.tryParse(data['lastLogin'].toString()) ?? DateTime.fromMillisecondsSinceEpoch(0)))
+          : DateTime.fromMillisecondsSinceEpoch(0),
       vacations: vacationsList,
       fcmToken: data['fcmToken'],
+      status: data['status']?.toString() ?? '', // <-- especially here!
     );
 
     return renter;

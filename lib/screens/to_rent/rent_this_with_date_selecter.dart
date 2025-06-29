@@ -70,11 +70,12 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
       DateTime endDate = DateFormat("yyyy-MM-dd").parse(itemRenters[i].endDate);
       String itemIdDB = itemRenters[i].itemId;
       if (itemIdDB == itemId) {
+        // Add blackout days before and after the booking
         for (int y = 0;
-            y <=
-                endDate
-                    .difference(startDate.subtract(Duration(days: daysToRent)))
-                    .inDays;
+            y <= endDate
+                .add(const Duration(days: 1)) // <-- Add 1 extra day after booking
+                .difference(startDate.subtract(Duration(days: daysToRent)))
+                .inDays;
             y++) {
           tempList.add(startDate
               .subtract(Duration(days: daysToRent))
@@ -634,7 +635,18 @@ List<DateTime> getVacationBlackoutDates(String ownerId) {
       address: '',
       followers: [],
       following: [],
-      vacations: [], type: '', size: 0, countryCode: '', favourites: [], verified: '', creationDate: '', location: '', bio: '',
+      vacations: [], 
+      type: '', 
+      size: 0, 
+      countryCode: '', 
+      favourites: [], 
+      verified: '', 
+      creationDate: '', 
+      location: '', 
+      bio: '',
+      status: 'not active', 
+      avgReview: 0, 
+      lastLogin: DateTime.now(), // <-- Added status field
       // Add any other required fields with default values here
     ),
   );

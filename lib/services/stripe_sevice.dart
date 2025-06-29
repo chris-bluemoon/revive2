@@ -15,20 +15,25 @@ class StripeService {
       await Stripe.instance.initPaymentSheet(
           paymentSheetParameters: SetupPaymentSheetParameters(
               paymentIntentClientSecret: paymentIntentClientSecret,
+              customFlow: true,
               merchantDisplayName: "REVIVE"));
-      await _processPayment();
-      return true;
+      return await _processPayment();
     } catch (e) {
       return false;
     }
   }
 
-  Future<void> _processPayment() async {
+  Future<bool> _processPayment() async {
     try {
       await Stripe.instance.presentPaymentSheet();
-      // await Stripe.instance.confirmPaymentSheetPayment();
+      await Stripe.instance.confirmPaymentSheetPayment();
+      return true;
+    } on StripeException catch (e) {
+      print(e.toString());
+      return false;
     } catch (e) {
       print(e.toString());
+      return false;
       // return e.toString();
     }
   }

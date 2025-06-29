@@ -146,7 +146,12 @@ class _LendersRentalsPageState extends State<LendersRentalsPage> {
                             location: '',
                             bio: '',
                             followers: [],
-                            following: []), // Provide a default Renter
+                            following: [],
+                            avgReview: 0.0,
+                            lastLogin: DateTime.now(),
+                            vacations: [],
+                            status: 'not active'
+                            ), // Provide a default Renter
                       );
                       final renterName = renter.name;
 
@@ -238,6 +243,8 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
   @override
   Widget build(BuildContext context) {
     final formattedPrice = NumberFormat("#,##0", "en_US").format(widget.price);
+    final DateTime rentalStartDate = DateTime.parse(widget.itemRenter.startDate);
+    final bool canCancel = rentalStartDate.isAfter(DateTime.now().add(const Duration(days: 2)));
     return Card(
       color: Colors.white,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -462,6 +469,27 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                   foregroundColor: Colors.white,
                 ),
                 child: const Text('LEAVE REVIEW'),
+              ),
+            if (canCancel && (widget.itemRenter.status == "accepted" || widget.itemRenter.status == "requested"))
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        widget.itemRenter.status = "cancelledLender";
+                        widget.status = "cancelledLender";
+                      });
+                      Provider.of<ItemStoreProvider>(context, listen: false)
+                          .saveItemRenter(widget.itemRenter);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('CANCEL'),
+                  ),
+                ],
               ),
             // Add more fields here as needed
           ],

@@ -87,13 +87,17 @@ class ItemStoreProvider extends ChangeNotifier {
     countryCode: '',
     phoneNum: '',
     favourites: [],
-    verified: '',
+    verified: 'not started',
     imagePath: '',
     creationDate: '',
     location: '', // <-- Add this line
     bio: '',
     followers: [],
     following: [],
+    avgReview: 0.0,
+    lastLogin: DateTime.now(),
+    vacations: [],
+    status: 'not active', // <-- Added status field
   );
   bool _loggedIn = false;
   // String _region = 'BANGKOK';
@@ -317,13 +321,17 @@ class ItemStoreProvider extends ChangeNotifier {
         address: '',
         phoneNum: '',
         favourites: [],
-        verified: '',
+        verified: 'not started',
         imagePath: '',
         creationDate: '',
         location: '', // <-- Add this line
         bio: '',
         following: [],
         followers: [],
+        vacations: [],
+        avgReview: 0.0,
+        lastLogin: DateTime.now(),
+        status: 'not active'
       );
       notifyListeners();
     } 
@@ -459,12 +467,6 @@ class ItemStoreProvider extends ChangeNotifier {
 
   void saveItemRenter(ItemRenter itemRenter) async {
     await FirestoreService.updateItemRenter(itemRenter);
-    notifyListeners();
-    return;
-  }
-
-  void saveFittingRenter(FittingRenter fittingRenter) async {
-    await FirestoreService.updateFittingRenter(fittingRenter);
     notifyListeners();
     return;
   }
@@ -639,4 +641,15 @@ class ItemStoreProvider extends ChangeNotifier {
     }
   }
 
+  void deleteItemById(String itemId) async {
+  // Find the item in the local list
+  final index = _items.indexWhere((item) => item.id == itemId);
+  if (index != -1) {
+    // Set status to "deleted"
+    _items[index].status = "deleted";
+    // Update in Firestore
+    await FirestoreService.updateItem(_items[index]);
+    notifyListeners();
+  }
+}
 }

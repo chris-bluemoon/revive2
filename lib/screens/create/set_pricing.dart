@@ -262,7 +262,7 @@ class _SetPricingState extends State<SetPricing> {
                         ),
                         const StyledBody('Minimal Rental Period'),
                         const StyledBody(
-                            'Tip: The most common minimum rental period is 4 days',
+                            'Tip: The most common minimum rental period is 4 days (max 30 days)',
                             weight: FontWeight.normal),
                         SizedBox(height: width * 0.03),
                         TextField(

@@ -416,18 +416,17 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 if (profileOwner.location.isNotEmpty)
                   const SizedBox(height: 6), // <-- Add this gap
               // --- Add Last seen row here ---
-              if (profileOwner.lastLogin != null)
-                Row(
-                  children: [
-                    Icon(Icons.access_time, color: Colors.grey[700] ?? Colors.grey, size: width * 0.05),
-                    const SizedBox(width: 6),
-                    StyledBody(
-                      'Last seen: ${formatLastSeen(profileOwner.lastLogin!)}',
-                      color: Colors.grey[700] ?? Colors.grey,
-                      weight: FontWeight.normal,
-                    ),
-                  ],
-                ),
+              Row(
+                children: [
+                  Icon(Icons.access_time, color: Colors.grey[700] ?? Colors.grey, size: width * 0.05),
+                  const SizedBox(width: 6),
+                  StyledBody(
+                    'Last seen: ${formatLastSeen(profileOwner.lastLogin)}',
+                    color: Colors.grey[700] ?? Colors.grey,
+                    weight: FontWeight.normal,
+                  ),
+                ],
+              ),
               // --- End Last seen row ---
               // --- Add avgReview display here ---
               const SizedBox(height: 6),
@@ -616,7 +615,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 // ITEMS tab
                 Builder(
                   builder: (context) {
-                    final myItems = items.where((item) => item.owner == profileOwner.id && (item.status != 'deleted' && item.status != 'submitted')).toList();
+                    final myItems = items.where((item) {
+                      final isOwner = isOwnProfile;
+                      if (item.owner != profileOwner.id) return false;
+                      if (item.status == 'accepted') return true;
+                      if (item.status == 'submitted' && isOwner) return true;
+                      return false;
+                    }).toList();
                     if (myItems.isEmpty) {
                       return const Center(
                         child: StyledBody(
@@ -766,6 +771,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               children: [
                                 StyledBody('฿${item.rentPriceDaily} per day', color: Colors.black, weight: FontWeight.normal),
                                 StyledBody('${item.type}', color: Colors.grey[700] ?? Colors.grey, weight: FontWeight.normal),
+                                // StyledBody('Status: ${item.status}', color: Colors.blueGrey, weight: FontWeight.normal), // <-- Added line
                               ],
                             ),
                           ),
@@ -827,6 +833,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             favourites: [],
                             verified: 'false',
                             creationDate: DateTime.now().toString(),
+                            status:'not active', 
+                            lastLogin: DateTime.now(), 
+                            vacations: [], // <-- Added status field
                           ),
                         );
                         final reviewerPic = reviewer?.profilePicUrl ?? '';

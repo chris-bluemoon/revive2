@@ -377,7 +377,7 @@ class _ToRentState extends State<ToRent> {
                                     fontSize: width * 0.042,
                                   ),
                                   StyledBody(
-                                    widget.item.colour.isNotEmpty ? widget.item.colour[0] : '',
+                                    widget.item.colour.isNotEmpty ? widget.item.colour : '',
                                     weight: FontWeight.bold, // <-- Make value bold
                                     color: Colors.black,
                                     fontSize: width * 0.042,
@@ -597,8 +597,8 @@ class _ToRentState extends State<ToRent> {
                   Consumer<ItemStoreProvider>(
   builder: (context, store, _) {
     log('isOwner: $isOwner');
-    final allItems = store.items ?? [];
-    final brandItems = allItems
+    final allAcceptedItems = store.items.where((i) => i.status == "accepted").toList();
+    final brandItems = allAcceptedItems
         .where((i) =>
             i.brand == widget.item.brand &&
             i.id != widget.item.id)
@@ -616,7 +616,7 @@ class _ToRentState extends State<ToRent> {
             bottom: width * 0.01,
           ),
           child: const Text(
-            "YOU MIGHT ALSO LIKE",
+            "YOU MAY ALSO LIKE",
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
@@ -737,6 +737,8 @@ class _ToRentState extends State<ToRent> {
                                   flex: 2, // Increased flex for wider buttons
                                   child: OutlinedButton(
                                     onPressed: () async {
+                                      final store = Provider.of<ItemStoreProvider>(context, listen: false);
+
                                       // Confirm before deleting
                                       final confirm = await showDialog<bool>(
                                         context: context,
@@ -786,7 +788,19 @@ class _ToRentState extends State<ToRent> {
                                                 SizedBox(
                                                   width: 110,
                                                   child: OutlinedButton(
-                                                    onPressed: () => Navigator.of(context).pop(true),
+                                                    onPressed: () async {
+                                                      // Call deleteItem before popping
+                                                      store.deleteItemById(widget.item.id);
+
+                                                      // Replace pop with popUntilReplace to go to the first route
+                                                      Navigator.of(context).popUntil((route) {
+                                                        if (route.isFirst) {
+                                                          // Replace the first route with a new page if needed, or just return true to stop popping
+                                                          return true;
+                                                        }
+                                                        return false;
+                                                      });
+                                                    },
                                                     style: OutlinedButton.styleFrom(
                                                       backgroundColor: Colors.red,
                                                       side: const BorderSide(color: Colors.red, width: 1),
@@ -802,33 +816,33 @@ class _ToRentState extends State<ToRent> {
                                             ),
                                           ),
                                         ));
-                                      if (confirm == true) {
-                                        final store = Provider.of<ItemStoreProvider>(context, listen: false);
+                                      // if (confirm == true) {
+                                      //   final store = Provider.of<ItemStoreProvider>(context, listen: false);
 
-                                        // Check for future bookings
-                                        final hasFutureBooking = store.itemRenters.any((itemRenters) =>
-                                            itemRenters.itemId == widget.item.id &&
-                                            itemRenters.endDate.isAfter(DateTime.now()) &&
-                                            itemRenters.status != 'cancelled');
+                                      //   // Check for future bookings
+                                      //   final hasFutureBooking = store.itemRenters.any((itemRenters) =>
+                                      //       itemRenters.itemId == widget.item.id &&
+                                      //       itemRenters.endDate.isAfter(DateTime.now()) &&
+                                      //       itemRenters.status != 'cancelled');
 
-                                        if (hasFutureBooking) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text('Cannot delete: This item has future bookings.'),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                          return;
-                                        }
+                                      //   if (hasFutureBooking) {
+                                      //     ScaffoldMessenger.of(context).showSnackBar(
+                                      //       const SnackBar(
+                                      //         content: Text('Cannot delete: This item has future bookings.'),
+                                      //         backgroundColor: Colors.red,
+                                      //       ),
+                                      //     );
+                                      //     return;
+                                      //   }
 
-                                        // Update item status to 'deleted'
-                                        widget.item.status = 'deleted';
-                                        store.saveItem(widget.item);
+                                      //   // Update item status to 'deleted'
+                                      //   widget.item.status = 'deleted';
+                                      //   store.saveItem(widget.item);
 
-                                        // Pop back twice: first the dialog, then the ToRent screen
-                                        Navigator.of(context).pop(); // Pop dialog
-                                        Navigator.of(context).pop(); // Pop ToRent screen
-                                      }
+                                      //   // Pop back twice: first the dialog, then the ToRent screen
+                                      //   Navigator.of(context).pop(); // Pop dialog
+                                      //   Navigator.of(context).pop(); // Pop ToRent screen
+                                      // }
                                     },
                                     style: OutlinedButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 0), // More vertical padding, no horizontal

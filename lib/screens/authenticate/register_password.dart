@@ -107,7 +107,9 @@ class _RegisterPassword extends State<RegisterPassword> {
           followers: [],
           following: [],
           avgReview: 0.0,
-          lastLogin: DateTime.now(), 
+          lastLogin: DateTime.now(),
+          status: 'active', // <-- Added status field
+          vacations: [],
         );
         
         Provider.of<ItemStoreProvider>(context, listen: false).addRenter(newRenter);
