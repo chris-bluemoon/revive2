@@ -241,6 +241,10 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
     final formattedPrice = NumberFormat("#,##0", "en_US").format(widget.price);
     final DateTime rentalStartDate = DateTime.parse(widget.itemRenter.startDate);
     final bool canCancel = rentalStartDate.isAfter(DateTime.now().add(const Duration(days: 2)));
+    // Show ACCEPT/REJECT only if status is "requested" AND startDate is today or in the future
+    final bool showAcceptReject = widget.itemRenter.status == "requested" &&
+        (rentalStartDate.isAtSameMomentAs(DateTime.now()) || rentalStartDate.isAfter(DateTime.now()));
+
     return Card(
       color: Colors.white,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -326,7 +330,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                 ),
               ],
             ),
-            if (widget.itemRenter.status == "requested")
+            if (showAcceptReject)
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

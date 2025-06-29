@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -86,7 +88,7 @@ class AccountPage extends StatelessWidget {
                   style: TextStyle(color: Colors.red),
                 ),
                 trailing: const Icon(Icons.chevron_right, color: Colors.red),
-                onTap: () => _showDeleteAccountDialog(context),
+                onTap: () => _showDeleteAccountDialog(context, renter),
               ),
             ],
           ),
@@ -116,7 +118,7 @@ class AccountPage extends StatelessWidget {
     );
   }
 
-  void _showDeleteAccountDialog(BuildContext context) {
+  void _showDeleteAccountDialog(BuildContext context, Renter renter) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -150,7 +152,12 @@ class AccountPage extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              await Provider.of<ItemStoreProvider>(context, listen: false).deleteUser();
+              // When the user presses CONFIRM to delete account:
+              final updatedRenter = renter.copyWith(status: 'deleted');
+              Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
+              log('Logged in status set to ${Provider.of<ItemStoreProvider>(context, listen: false).loggedIn}');
+              await Provider.of<ItemStoreProvider>(context, listen: false).saveRenter(updatedRenter);
+
               Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false); 
             },
             child: const Text(

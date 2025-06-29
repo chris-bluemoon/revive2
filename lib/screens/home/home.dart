@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +44,7 @@ class _HomeState extends State<Home> {
         // itemStore.listenToMessages(itemStore.renter.id);
       });
     });
+    log('Logged in status at Home.dart: ${Provider.of<ItemStoreProvider>(context, listen: false).loggedIn}');
   } // Initialize the items list or fetch it from the provider if neededjkI
   @override
   Widget build(BuildContext context) {
@@ -50,8 +53,6 @@ class _HomeState extends State<Home> {
     // Get the current user id from ItemStoreProvider
     final itemStore = Provider.of<ItemStoreProvider>(context);
     final String userId = itemStore.renter.id; // <-- Set dynamically
-    final String userName = itemStore.renter.name; // <-- Set dynamically
-    final loggedIn = itemStore.loggedIn; // Check if user is logged in
 
     // Replace unreadMessages with actual unread count from itemStore
     // itemStore.refreshMessages();
