@@ -42,6 +42,7 @@ class _HomePageState extends State<HomePage> {
     // Provider.of<ItemStoreProvider>(context, listen: false).populateFittings();
     // Provider.of<ItemStoreProvider>(context, listen: false).addAllFavourites();
     // getCurrentUser();
+    log('initState Logged in status at home_page.dart: ${Provider.of<ItemStoreProvider>(context, listen: false).loggedIn}');
   }
 
   @override

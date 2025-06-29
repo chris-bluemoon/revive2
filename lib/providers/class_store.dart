@@ -166,7 +166,10 @@ class ItemStoreProvider extends ChangeNotifier {
   // Fetch and set all ledgers for the current user
   Future<void> fetchLedgersOnce() async {
     final userId = _user.id;
-    _ledgers.clear();
+    if (_ledgers.isNotEmpty) {
+      log('Ledgers already fetched for user: $userId, count: ${_ledgers.length}');
+      return; // Return early if ledgers are already fetched
+    }
     final snapshot = await FirestoreService.getLedgersOnce();
     log('Fetching ledgers for user: $userId, count: ${snapshot.docs.length}');
     for (var doc in snapshot.docs) {
@@ -459,8 +462,8 @@ class ItemStoreProvider extends ChangeNotifier {
         _renters.add(doc.data());
         log('Fetched renter: ${doc.data().type}');
       }
+      setCurrentUser();
     }
-    setCurrentUser();
     notifyListeners();
     return true;
   }
