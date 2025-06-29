@@ -771,7 +771,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               children: [
                                 StyledBody('฿${item.rentPriceDaily} per day', color: Colors.black, weight: FontWeight.normal),
                                 StyledBody('${item.type}', color: Colors.grey[700] ?? Colors.grey, weight: FontWeight.normal),
-                                StyledBody('Status: ${item.status}', color: Colors.blueGrey, weight: FontWeight.normal), // <-- Added line
+                                // StyledBody('Status: ${item.status}', color: Colors.blueGrey, weight: FontWeight.normal), // <-- Added line
                               ],
                             ),
                           ),

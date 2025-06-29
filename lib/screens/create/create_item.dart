@@ -571,7 +571,19 @@ class _CreateItemState extends State<CreateItem> {
                               controller: cip.retailPriceController,
                               maxLength: 6, // <-- Limit to 6 digits
                               onChanged: (text) {
-                                cip.retailPriceValue = text;
+                                cip.retailPriceController.text = text.trimRight();
+                                cip.retailPriceController.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: cip.retailPriceController.text.length),
+                                );
+                                cip.retailPriceValue = cip.retailPriceController.text;
+                                cip.checkFormComplete();
+                              },
+                              onSubmitted: (text) {
+                                cip.retailPriceController.text = text.trimRight();
+                                cip.retailPriceController.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: cip.retailPriceController.text.length),
+                                );
+                                cip.retailPriceValue = cip.retailPriceController.text;
                                 cip.checkFormComplete();
                               },
                               decoration: InputDecoration(
@@ -617,6 +629,17 @@ class _CreateItemState extends State<CreateItem> {
                       maxLength: 30,
                       controller: cip.titleController,
                       onChanged: (text) {
+                        cip.titleController.text = text.trimRight();
+                        cip.titleController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: cip.titleController.text.length),
+                        );
+                        cip.checkFormComplete();
+                      },
+                      onSubmitted: (text) {
+                        cip.titleController.text = text.trimRight();
+                        cip.titleController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: cip.titleController.text.length),
+                        );
                         cip.checkFormComplete();
                       },
                       decoration: InputDecoration(
@@ -647,7 +670,17 @@ class _CreateItemState extends State<CreateItem> {
                       maxLength: 200,
                       controller: cip.shortDescController,
                       onChanged: (text) {
-                        // checkContents(text);
+                        cip.shortDescController.text = text.trimRight();
+                        cip.shortDescController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: cip.shortDescController.text.length),
+                        );
+                        cip.checkFormComplete();
+                      },
+                      onSubmitted: (text) {
+                        cip.shortDescController.text = text.trimRight();
+                        cip.shortDescController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: cip.shortDescController.text.length),
+                        );
                         cip.checkFormComplete();
                       },
                       decoration: InputDecoration(
@@ -677,7 +710,17 @@ class _CreateItemState extends State<CreateItem> {
                       maxLength: 1000,
                       controller: cip.longDescController,
                       onChanged: (text) {
-                        // checkContents(text);
+                        cip.longDescController.text = text.trimRight();
+                        cip.longDescController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: cip.longDescController.text.length),
+                        );
+                        cip.checkFormComplete();
+                      },
+                      onSubmitted: (text) {
+                        cip.longDescController.text = text.trimRight();
+                        cip.longDescController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: cip.longDescController.text.length),
+                        );
                         cip.checkFormComplete();
                       },
                       decoration: InputDecoration(
