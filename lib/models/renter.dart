@@ -73,7 +73,7 @@ class Renter {
       avgReview: avgReview,
       lastLogin: lastLogin,
       vacations: vacations ?? this.vacations,
-      fcmToken: fcmToken
+      fcmToken: fcmToken,
       status: status,
     );
   }

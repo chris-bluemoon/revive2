@@ -241,7 +241,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
   Widget build(BuildContext context) {
     final formattedPrice = NumberFormat("#,##0", "en_US").format(widget.price);
     final DateTime rentalStartDate = DateTime.parse(widget.itemRenter.startDate);
-    final bool canCancel = rentalStartDate.isAfter(DateTime.now().add(const Duration(hours: 48)));
+    final bool canCancel = rentalStartDate.isAfter(DateTime.now());
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
