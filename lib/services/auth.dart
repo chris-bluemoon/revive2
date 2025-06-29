@@ -26,6 +26,7 @@ class AuthService {
             bio: '',
             followers: [],
             following: [],
+            status: 'not active', // <-- Added status field
           )
         : null;
   }

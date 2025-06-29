@@ -65,6 +65,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         bio: '',
         followers: [],
         following: [],
+        status: 'not active', // <-- Added status field
       ));
 
       // userLoggedIn = true;
@@ -85,6 +86,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         bio: '',
         followers: [],
         following: [],
+        status: 'not active', // <-- Added status field
       ));
     }
 

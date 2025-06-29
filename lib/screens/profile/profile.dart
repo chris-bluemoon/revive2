@@ -833,6 +833,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             favourites: [],
                             verified: 'false',
                             creationDate: DateTime.now().toString(),
+                            status:'not active', // <-- Added status field
                           ),
                         );
                         final reviewerPic = reviewer?.profilePicUrl ?? '';

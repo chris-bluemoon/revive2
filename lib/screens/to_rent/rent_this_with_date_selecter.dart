@@ -634,7 +634,16 @@ List<DateTime> getVacationBlackoutDates(String ownerId) {
       address: '',
       followers: [],
       following: [],
-      vacations: [], type: '', size: 0, countryCode: '', favourites: [], verified: '', creationDate: '', location: '', bio: '',
+      vacations: [], 
+      type: '', 
+      size: 0, 
+      countryCode: '', 
+      favourites: [], 
+      verified: '', 
+      creationDate: '', 
+      location: '', 
+      bio: '',
+      status: 'not active', // <-- Added status field
       // Add any other required fields with default values here
     ),
   );

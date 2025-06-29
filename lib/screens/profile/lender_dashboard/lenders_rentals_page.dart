@@ -145,7 +145,12 @@ class _LendersRentalsPageState extends State<LendersRentalsPage> {
                             location: '',
                             bio: '',
                             followers: [],
-                            following: []), // Provide a default Renter
+                            following: [],
+                            avgReview: 0.0,
+                            lastLogin: null,
+                            vacations: [],
+                            status: 'not active'
+                            ), // Provide a default Renter
                       );
                       final renterName = renter.name;
 

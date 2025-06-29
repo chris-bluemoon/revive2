@@ -94,6 +94,10 @@ class ItemStoreProvider extends ChangeNotifier {
     bio: '',
     followers: [],
     following: [],
+    avgReview: 0.0,
+    lastLogin: null,
+    vacations: [],
+    status: 'not active', // <-- Added status field
   );
   bool _loggedIn = false;
   // String _region = 'BANGKOK';
@@ -324,6 +328,10 @@ class ItemStoreProvider extends ChangeNotifier {
         bio: '',
         following: [],
         followers: [],
+        vacations: [],
+        avgReview: 0.0,
+        lastLogin: null,
+        status: 'not active'
       );
       notifyListeners();
     } 

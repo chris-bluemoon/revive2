@@ -11,16 +11,17 @@ class Renter {
     required this.countryCode,
     required this.phoneNum,
     required this.favourites,
-    required this.verified, // now a String
+    required this.verified, // String
     required this.imagePath,
     required this.creationDate,
     required this.location,
     required this.bio,
     required this.followers,
     required this.following,
-    this.avgReview = 0.0,
-    this.lastLogin,
-    this.vacations = const [],
+    required this.avgReview,
+    required this.lastLogin,
+    required this.vacations,
+    required this.status,
   });
 
   String id;
@@ -32,7 +33,7 @@ class Renter {
   String countryCode;
   String phoneNum;
   List favourites;
-  String verified; // changed back to String
+  String verified;
   String imagePath;
   String creationDate;
   String location;
@@ -41,13 +42,13 @@ class Renter {
   List<String> following;
   double avgReview;
   DateTime? lastLogin;
-
-  /// List of vacation periods, each as a map with 'startDate' and 'endDate' DateTime values.
   List<Map<String, DateTime>> vacations;
+  String status; // <-- Added status field
 
   Renter copyWith({
     List<Map<String, DateTime>>? vacations,
-    String? verified, // changed back to String
+    String? verified,
+    required String status, // <-- Added status field
     // add other fields here if needed
   }) {
     return Renter(
@@ -60,7 +61,7 @@ class Renter {
       countryCode: countryCode,
       phoneNum: phoneNum,
       favourites: favourites,
-      verified: verified ?? this.verified, // changed back to String
+      verified: verified ?? this.verified,
       imagePath: imagePath,
       creationDate: creationDate,
       location: location,
@@ -70,10 +71,10 @@ class Renter {
       avgReview: avgReview,
       lastLogin: lastLogin,
       vacations: vacations ?? this.vacations,
+      status: status,
     );
   }
 
-  // item to firestore (map)
   Map<String, dynamic> toFirestore() {
     return {
       'email': email,
@@ -84,7 +85,7 @@ class Renter {
       'countryCode': countryCode,
       'phoneNum': phoneNum,
       'favourites': favourites,
-      'verified': verified, // now a String
+      'verified': verified,
       'imagePath': imagePath,
       'creationDate': creationDate,
       'location': location,
@@ -99,10 +100,10 @@ class Renter {
                 'endDate': v['endDate']?.toIso8601String(),
               })
           .toList(),
+      'status': status, // <-- Added status field
     };
   }
 
-  // character from firestore
   factory Renter.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
@@ -119,17 +120,17 @@ class Renter {
     }
     Renter renter = Renter(
       id: snapshot.id,
-      email: data['email'],
-      name: data['name'],
+      email: data['email'] ?? '',
+      name: data['name'] ?? '',
       type: data['type'] ?? 'USER',
-      size: data['size'],
-      address: data['address'],
-      countryCode: data['countryCode'],
-      phoneNum: data['phoneNum'],
-      favourites: data['favourites'],
-      verified: data['verified'].toString(), // always as String
-      imagePath: data['imagePath'],
-      creationDate: data['creationDate'],
+      size: data['size'] ?? 0,
+      address: data['address'] ?? '',
+      countryCode: data['countryCode'] ?? '',
+      phoneNum: data['phoneNum'] ?? '',
+      favourites: data['favourites'] ?? [],
+      verified: data['verified']?.toString() ?? '',
+      imagePath: data['imagePath'] ?? '',
+      creationDate: data['creationDate'] ?? '',
       location: data['location'] ?? '',
       bio: data['bio'] ?? '',
       followers: List<String>.from(data['followers'] ?? []),
@@ -141,6 +142,7 @@ class Renter {
               : DateTime.tryParse(data['lastLogin'].toString()))
           : null,
       vacations: vacationsList,
+      status: data['status']?.toString() ?? '', // <-- especially here!
     );
 
     return renter;

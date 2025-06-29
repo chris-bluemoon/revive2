@@ -110,7 +110,8 @@ class _RentersRentalsPageState extends State<RentersRentalsPage> {
                             imageId: [],
                             status: '',
                             minDays: 1,
-                            hashtags: []), // Provide a default Item
+                            hashtags: [],
+                            ), // Provide a default Item
                       );
 
                       // Format endDate using intl package for better readability
@@ -145,7 +146,8 @@ class _RentersRentalsPageState extends State<RentersRentalsPage> {
                             location: '',
                             bio: '',
                             followers: [],
-                            following: []), // Provide a default Renter
+                            following: [],
+                            status: 'not active'), // Provide a default Renter
                       );
 
                       final String ownerName = owner.name;
