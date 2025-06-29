@@ -239,6 +239,8 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
   @override
   Widget build(BuildContext context) {
     final formattedPrice = NumberFormat("#,##0", "en_US").format(widget.price);
+    final DateTime rentalStartDate = DateTime.parse(widget.itemRenter.startDate);
+    final bool canCancel = rentalStartDate.isAfter(DateTime.now().add(const Duration(hours: 48)));
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
@@ -379,14 +381,22 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     child: const Text('MAKE PAYMENT'),
                   ),
                   const SizedBox(width: 12),
+                ],
+              ),
+            if (canCancel && (widget.itemRenter.status == "accepted" || widget.itemRenter.status == "requested"))
+              Row(
+                children: [
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
                         widget.itemRenter.status = "cancelled";
+                        widget.status = "cancelled";
                       });
+                      Provider.of<ItemStoreProvider>(context, listen: false)
+                          .saveItemRenter(widget.itemRenter);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
+                      backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
                     ),
                     child: const Text('CANCEL'),
