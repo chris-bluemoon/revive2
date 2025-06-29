@@ -8,6 +8,7 @@ import 'package:revivals/models/item_renter.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/models/review.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
 
@@ -158,6 +159,7 @@ class _LendersRentalsPageState extends State<LendersRentalsPage> {
                         status: status,
                         renterName: renterName,
                         price: rental.price,
+                        renterId: renter.id,
                       );
                     },
                   ),
@@ -194,6 +196,7 @@ class ItemRenterCard extends StatefulWidget {
   final String startDate;
   final String endDate;
   final String renterName;
+  final String renterId;
   final int price;
   // Add more fields as needed
 
@@ -207,6 +210,7 @@ class ItemRenterCard extends StatefulWidget {
     required this.endDate,
     required this.renterName,
     required this.price,
+    required this.renterId,
     // Add more required parameters as needed
   });
 
@@ -333,6 +337,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                           Provider.of<ItemStoreProvider>(context,
                               listen: false);
                       itemStore.saveItemRenter(widget.itemRenter);
+                      NotificationService.sendNotification(notiType: NotiType.accept, item: widget.itemName, notiReceiverId:widget.renterId);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,

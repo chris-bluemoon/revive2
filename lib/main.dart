@@ -17,6 +17,7 @@ import 'package:revivals/screens/help_centre/sizing_guide.dart';
 import 'package:revivals/screens/help_centre/who_are_we.dart';
 import 'package:revivals/screens/home_page.dart';
 import 'package:revivals/screens/sign_up/google_sign_in.dart';
+import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/theme.dart';
 
 import 'firebase_options.dart';
@@ -37,6 +38,10 @@ Future main() async {
     // name: "revivals dev project",
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await NotificationService.requestPermission();
+  NotificationService.initializeNotifications();
+  NotificationService.init();
 
   // await FirebaseAppCheck.instance.activate(
   //   androidProvider: AndroidProvider.debug,

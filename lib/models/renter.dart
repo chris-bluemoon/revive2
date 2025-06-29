@@ -18,6 +18,7 @@ class Renter {
     required this.bio,
     required this.followers,
     required this.following,
+    this.fcmToken = '',
     this.avgReview = 0.0,
     this.lastLogin,
     this.vacations = const [],
@@ -41,6 +42,7 @@ class Renter {
   List<String> following;
   double avgReview;
   DateTime? lastLogin;
+  String? fcmToken;
 
   /// List of vacation periods, each as a map with 'startDate' and 'endDate' DateTime values.
   List<Map<String, DateTime>> vacations;
@@ -69,6 +71,7 @@ class Renter {
       avgReview: avgReview,
       lastLogin: lastLogin,
       vacations: vacations ?? this.vacations,
+      fcmToken: fcmToken
     );
   }
 
@@ -98,6 +101,7 @@ class Renter {
                 'endDate': v['endDate']?.toIso8601String(),
               })
           .toList(),
+      'fcmToken' : fcmToken
     };
   }
 
@@ -140,6 +144,7 @@ class Renter {
               : DateTime.tryParse(data['lastLogin'].toString()))
           : null,
       vacations: vacationsList,
+      fcmToken: data['fcmToken'],
     );
 
     return renter;

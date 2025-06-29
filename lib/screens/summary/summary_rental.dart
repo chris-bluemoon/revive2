@@ -7,6 +7,7 @@ import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/summary/rental_price_summary.dart';
 import 'package:revivals/screens/summary/summary_image_widget.dart';
+import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
 
@@ -236,7 +237,11 @@ class _SummaryRentalState extends State<SummaryRental> {
                         ownerId = r.id;
                       }
                     }
-
+                    NotificationService.sendNotification(
+                      notiType: NotiType.request,
+                      item: widget.item.name,
+                      notiReceiverId: ownerId,
+                    );
                     await handleSubmit(
                         renterId,
                         ownerId,
