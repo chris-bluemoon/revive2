@@ -55,7 +55,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         type: 'USER',
         size: 0,
         address: '',
-        countryCode: '+66',
+        countryCode: '',
         phoneNum: '',
         favourites: [''],
         verified: 'not started',
@@ -65,7 +65,10 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         bio: '',
         followers: [],
         following: [],
-        status: 'not active', // <-- Added status field
+        status: 'active', 
+        avgReview: 0, 
+        lastLogin: DateTime.now(), 
+        vacations: [], // <-- Added status field
       ));
 
       // userLoggedIn = true;
@@ -76,7 +79,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         type: 'USER',
         size: 0,
         address: '',
-        countryCode: '+66',
+        countryCode: '',
         phoneNum: '',
         favourites: [''],
         verified: 'not started',
@@ -86,7 +89,10 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         bio: '',
         followers: [],
         following: [],
-        status: 'not active', // <-- Added status field
+        status: 'not active', 
+        avgReview: 0, 
+        lastLogin: DateTime.now(),
+        vacations: [], // <-- Added status field
       ));
     }
 

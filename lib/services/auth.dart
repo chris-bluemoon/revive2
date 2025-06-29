@@ -26,7 +26,10 @@ class AuthService {
             bio: '',
             followers: [],
             following: [],
-            status: 'not active', // <-- Added status field
+            status: 'not active', 
+            avgReview: 0, 
+            lastLogin: DateTime.now(), 
+            vacations: [], // <-- Added status field
           )
         : null;
   }

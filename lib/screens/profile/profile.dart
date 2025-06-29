@@ -415,18 +415,17 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 if (profileOwner.location.isNotEmpty)
                   const SizedBox(height: 6), // <-- Add this gap
               // --- Add Last seen row here ---
-              if (profileOwner.lastLogin != null)
-                Row(
-                  children: [
-                    Icon(Icons.access_time, color: Colors.grey[700] ?? Colors.grey, size: width * 0.05),
-                    const SizedBox(width: 6),
-                    StyledBody(
-                      'Last seen: ${formatLastSeen(profileOwner.lastLogin!)}',
-                      color: Colors.grey[700] ?? Colors.grey,
-                      weight: FontWeight.normal,
-                    ),
-                  ],
-                ),
+              Row(
+                children: [
+                  Icon(Icons.access_time, color: Colors.grey[700] ?? Colors.grey, size: width * 0.05),
+                  const SizedBox(width: 6),
+                  StyledBody(
+                    'Last seen: ${formatLastSeen(profileOwner.lastLogin)}',
+                    color: Colors.grey[700] ?? Colors.grey,
+                    weight: FontWeight.normal,
+                  ),
+                ],
+              ),
               // --- End Last seen row ---
               // --- Add avgReview display here ---
               const SizedBox(height: 6),
@@ -833,7 +832,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             favourites: [],
                             verified: 'false',
                             creationDate: DateTime.now().toString(),
-                            status:'not active', // <-- Added status field
+                            status:'not active', 
+                            lastLogin: DateTime.now(), 
+                            vacations: [], // <-- Added status field
                           ),
                         );
                         final reviewerPic = reviewer?.profilePicUrl ?? '';

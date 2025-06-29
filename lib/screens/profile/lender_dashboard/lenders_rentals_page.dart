@@ -147,7 +147,7 @@ class _LendersRentalsPageState extends State<LendersRentalsPage> {
                             followers: [],
                             following: [],
                             avgReview: 0.0,
-                            lastLogin: null,
+                            lastLogin: DateTime.now(),
                             vacations: [],
                             status: 'not active'
                             ), // Provide a default Renter

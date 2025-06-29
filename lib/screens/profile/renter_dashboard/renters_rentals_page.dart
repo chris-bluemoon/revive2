@@ -147,7 +147,10 @@ class _RentersRentalsPageState extends State<RentersRentalsPage> {
                             bio: '',
                             followers: [],
                             following: [],
-                            status: 'not active'), // Provide a default Renter
+                            status: 'not active', 
+                            avgReview: 0, 
+                            lastLogin: DateTime.now(), 
+                            vacations: []), // Provide a default Renter
                       );
 
                       final String ownerName = owner.name;

@@ -95,7 +95,7 @@ class ItemStoreProvider extends ChangeNotifier {
     followers: [],
     following: [],
     avgReview: 0.0,
-    lastLogin: null,
+    lastLogin: DateTime.now(),
     vacations: [],
     status: 'not active', // <-- Added status field
   );
@@ -330,7 +330,7 @@ class ItemStoreProvider extends ChangeNotifier {
         followers: [],
         vacations: [],
         avgReview: 0.0,
-        lastLogin: null,
+        lastLogin: DateTime.now(),
         status: 'not active'
       );
       notifyListeners();

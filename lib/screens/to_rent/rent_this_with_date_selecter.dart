@@ -643,7 +643,9 @@ List<DateTime> getVacationBlackoutDates(String ownerId) {
       creationDate: '', 
       location: '', 
       bio: '',
-      status: 'not active', // <-- Added status field
+      status: 'not active', 
+      avgReview: 0, 
+      lastLogin: DateTime.now(), // <-- Added status field
       // Add any other required fields with default values here
     ),
   );

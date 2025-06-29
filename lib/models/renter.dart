@@ -41,7 +41,7 @@ class Renter {
   List<String> followers;
   List<String> following;
   double avgReview;
-  DateTime? lastLogin;
+  DateTime lastLogin;
   List<Map<String, DateTime>> vacations;
   String status; // <-- Added status field
 
@@ -93,7 +93,7 @@ class Renter {
       'followers': followers,
       'following': following,
       'avgReview': avgReview,
-      'lastLogin': lastLogin?.toIso8601String(),
+      'lastLogin': lastLogin.toIso8601String(),
       'vacations': vacations
           .map((v) => {
                 'startDate': v['startDate']?.toIso8601String(),
@@ -139,8 +139,8 @@ class Renter {
       lastLogin: data['lastLogin'] != null
           ? (data['lastLogin'] is Timestamp
               ? (data['lastLogin'] as Timestamp).toDate()
-              : DateTime.tryParse(data['lastLogin'].toString()))
-          : null,
+              : (DateTime.tryParse(data['lastLogin'].toString()) ?? DateTime.fromMillisecondsSinceEpoch(0)))
+          : DateTime.fromMillisecondsSinceEpoch(0),
       vacations: vacationsList,
       status: data['status']?.toString() ?? '', // <-- especially here!
     );
