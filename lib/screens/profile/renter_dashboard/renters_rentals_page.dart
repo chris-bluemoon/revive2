@@ -389,8 +389,8 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        widget.itemRenter.status = "cancelled";
-                        widget.status = "cancelled";
+                        widget.itemRenter.status = "cancelledRenter";
+                        widget.status = "cancelledRenter";
                       });
                       Provider.of<ItemStoreProvider>(context, listen: false)
                           .saveItemRenter(widget.itemRenter);

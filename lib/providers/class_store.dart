@@ -471,12 +471,6 @@ class ItemStoreProvider extends ChangeNotifier {
     return;
   }
 
-  void saveFittingRenter(FittingRenter fittingRenter) async {
-    await FirestoreService.updateFittingRenter(fittingRenter);
-    notifyListeners();
-    return;
-  }
-
   void saveItem(Item item) async {
     log('Saving item: ${item.name} with status: ${item.status}');
     await FirestoreService.updateItem(item);
