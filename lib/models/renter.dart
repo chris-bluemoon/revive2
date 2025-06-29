@@ -18,6 +18,7 @@ class Renter {
     required this.bio,
     required this.followers,
     required this.following,
+    this.fcmToken = '',
     required this.avgReview,
     required this.lastLogin,
     required this.vacations,
@@ -42,6 +43,7 @@ class Renter {
   List<String> following;
   double avgReview;
   DateTime lastLogin;
+  String? fcmToken;
   List<Map<String, DateTime>> vacations;
   String status; // <-- Added status field
 
@@ -71,6 +73,7 @@ class Renter {
       avgReview: avgReview,
       lastLogin: lastLogin,
       vacations: vacations ?? this.vacations,
+      fcmToken: fcmToken
       status: status,
     );
   }
@@ -101,6 +104,7 @@ class Renter {
               })
           .toList(),
       'status': status, // <-- Added status field
+      'fcmToken' : fcmToken
     };
   }
 
@@ -142,6 +146,7 @@ class Renter {
               : (DateTime.tryParse(data['lastLogin'].toString()) ?? DateTime.fromMillisecondsSinceEpoch(0)))
           : DateTime.fromMillisecondsSinceEpoch(0),
       vacations: vacationsList,
+      fcmToken: data['fcmToken'],
       status: data['status']?.toString() ?? '', // <-- especially here!
     );
 

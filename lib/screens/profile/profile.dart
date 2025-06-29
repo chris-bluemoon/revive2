@@ -16,6 +16,7 @@ import 'package:revivals/screens/profile/lender_dashboard/lender_dashboard.dart'
 import 'package:revivals/screens/profile/notifications/notifications_page.dart';
 import 'package:revivals/screens/profile/renter_dashboard/renter_dashboard.dart';
 import 'package:revivals/screens/to_rent/to_rent.dart';
+import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/settings.dart';
 import 'package:revivals/shared/item_results.dart';
 import 'package:revivals/shared/line.dart';
@@ -988,10 +989,25 @@ Future<void> chatWithUsLine(BuildContext context) async {
 
 // Add this function to your file if not already present:
 Future<void> logOut(BuildContext context) async {
-  // Example for Firebase Auth:
-  log('Logging out user - status: ${Provider.of<ItemStoreProvider>(context, listen: false).renter.type}');
-  Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
-  await FirebaseAuth.instance.signOut();
+  if (!context.mounted) return;
 
-  Navigator.of(context).pushReplacementNamed('/sign_in');
+  final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+  final renter = itemStore.renter;
+
+  try {
+    log('Logging out user - status: ${renter.type}');
+
+    itemStore.setLoggedIn(false);
+
+    NotificationService.deleteFCMToken(
+      userId: renter.id,
+    );
+
+    await FirebaseAuth.instance.signOut();
+
+    if (!context.mounted) return;
+    Navigator.of(context).pushReplacementNamed('/sign_in');
+  } catch (e) {
+    log(' Logout failed: $e');
+  }
 }

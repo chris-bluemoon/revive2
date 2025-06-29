@@ -7,6 +7,7 @@ import 'package:revivals/models/ledger.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/models/review.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/services/stripe_sevice.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
@@ -340,7 +341,12 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                       bool success = await StripeService.instance
                           .makePayment(widget.price);
                       if (success) {
-                        if (!context.mounted) return;
+                        NotificationService.sendNotification(
+                        notiType: NotiType.payment,
+                        item: widget.itemName,
+                        notiReceiverId: widget.itemRenter.ownerId,
+                      );
+                      if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Payment successful!'),

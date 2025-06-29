@@ -8,6 +8,7 @@ import 'package:revivals/models/ledger.dart';
 import 'package:revivals/models/message.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/models/review.dart';
+import 'package:revivals/services/notification_service.dart';
 
 class FirestoreService {
   static final refLedger = FirebaseFirestore.instance
@@ -69,12 +70,15 @@ class FirestoreService {
 
   // add a new renter
   static Future<void> addRenter(Renter renter) async {
+    
+    if( renter.fcmToken == null || renter.fcmToken == '') renter.fcmToken = await NotificationService.getFCMToken();
     await refRenter.doc(renter.id).set(renter);
     log('Renter (assigning) added in Firestore: ${renter.id} - ${renter.name}');
   }
 
   // Update renter
   static Future<void> updateRenter(Renter renter) async {
+    final String fcmToken = await NotificationService.getFCMToken();  // for firebase messaging
     await refRenter.doc(renter.id).update({
       'email': renter.email,
       'name': renter.name,
@@ -98,6 +102,7 @@ class FirestoreService {
           'endDate': v['endDate']?.toIso8601String(),
         };
       }).toList(),
+      'fcmToken' : fcmToken
     });
   }
 
