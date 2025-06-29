@@ -615,7 +615,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 // ITEMS tab
                 Builder(
                   builder: (context) {
-                    final myItems = items.where((item) => item.owner == profileOwner.id && (item.status == 'submitted' || item.status == 'accepted')).toList();
+                    final myItems = items.where((item) {
+                      final isOwner = isOwnProfile;
+                      if (item.owner != profileOwner.id) return false;
+                      if (item.status == 'accepted') return true;
+                      if (item.status == 'submitted' && isOwner) return true;
+                      return false;
+                    }).toList();
                     if (myItems.isEmpty) {
                       return const Center(
                         child: StyledBody(
