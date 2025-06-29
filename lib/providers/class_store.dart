@@ -640,12 +640,14 @@ class ItemStoreProvider extends ChangeNotifier {
   }
 
   void deleteItemById(String itemId) async {
-  // Remove from local list
-  _items.removeWhere((item) => item.id == itemId);
-
-  // Delete from Firestore
-  await FirestoreService.deleteItemById(itemId);
-
-  notifyListeners();
+  // Find the item in the local list
+  final index = _items.indexWhere((item) => item.id == itemId);
+  if (index != -1) {
+    // Set status to "deleted"
+    _items[index].status = "deleted";
+    // Update in Firestore
+    await FirestoreService.updateItem(_items[index]);
+    notifyListeners();
+  }
 }
 }
