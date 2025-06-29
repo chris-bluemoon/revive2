@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:revivals/models/item.dart';
 import 'package:revivals/models/item_renter.dart';
 import 'package:revivals/models/renter.dart';
-import 'package:revivals/models/review.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
@@ -274,7 +273,9 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    widget.status.toUpperCase(),
+                    widget.status.toLowerCase() == "cancelledlender"
+                        ? "CANCELLED"
+                        : widget.status.toUpperCase(),
                     style: TextStyle(
                       color: _statusColor(widget.status),
                       fontWeight: FontWeight.bold,
@@ -371,126 +372,29 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                   ),
                 ],
               ),
-              if (DateTime.parse(widget.itemRenter.endDate).isBefore(DateTime.now()) &&
-                  (widget.status == "paid") &&
-                  !Provider.of<ItemStoreProvider>(context, listen: false).reviews.any((review) =>
-                    review.itemRenterId == widget.itemRenter.id &&
-                    review.reviewerId == Provider.of<ItemStoreProvider>(context, listen: false).renter.id))
-              ElevatedButton(
-                onPressed: () async {
-                  await showDialog(
-                    context: context,
-                    builder: (context) {
-                      int selectedStars = 0;
-                      final reviewController = TextEditingController();
-                      return StatefulBuilder(
-                        builder: (context, setState) => AlertDialog(
-                          backgroundColor: Colors.white, // Set dialog background to white
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(0)), // Square corners
-                          ),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: List.generate(5, (index) {
-                                  return IconButton(
-                                    icon: Icon(
-                                      index < selectedStars
-                                          ? Icons.star
-                                          : Icons.star_border,
-                                      color: Colors.amber,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        selectedStars = index + 1;
-                                      });
-                                    },
-                                  );
-                                }),
-                              ),
-                              const SizedBox(height: 12),
-                              TextField(
-                                controller: reviewController,
-                                maxLines: 4,
-                                decoration: const InputDecoration(
-                                  hintText: 'Write your review here...',
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                            ],
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text(
-                                'Cancel',
-                                style: TextStyle(color: Colors.black),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                if (selectedStars == 0) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Please select a star rating.')),
-                                  );
-                                  return;
-                                }
-                                Provider.of<ItemStoreProvider>(context, listen: false).addReview(Review(
-                                  id: uuid.v4(),
-                                  reviewerId: Provider.of<ItemStoreProvider>(context, listen: false).renter.id,
-                                  reviewedUserId: widget.itemRenter.ownerId,
-                                  itemRenterId: widget.itemRenter.id,
-                                  itemId: widget.itemRenter.itemId,
-                                  rating: selectedStars,
-                                  text: reviewController.text,
-                                  date: DateTime.now(),
-                                ));
-                                Navigator.of(context).pop();
-                                setState(() {});
-                              },
-                              child: const Text(
-                                'Submit',
-                                style: TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('LEAVE REVIEW'),
-              ),
-            if (canCancel && (widget.itemRenter.status == "accepted" || widget.itemRenter.status == "requested"))
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        widget.itemRenter.status = "cancelledLender";
-                        widget.status = "cancelledLender";
-                      });
-                      Provider.of<ItemStoreProvider>(context, listen: false)
-                          .saveItemRenter(widget.itemRenter);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
+              // Only show CANCEL if showAcceptReject is false
+              if (!showAcceptReject && canCancel && (widget.itemRenter.status == "accepted" || widget.itemRenter.status == "requested"))
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.itemRenter.status = "cancelledLender";
+                          widget.status = "cancelledLender";
+                        });
+                        Provider.of<ItemStoreProvider>(context, listen: false)
+                            .saveItemRenter(widget.itemRenter);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('CANCEL'),
                     ),
-                    child: const Text('CANCEL'),
-                  ),
-                ],
-              ),
-            // Add more fields here as needed
+                  ],
+                ),
+            // Add this to show CANCELLED status
           ],
         ),
       ),

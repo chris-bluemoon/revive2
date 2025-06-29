@@ -59,12 +59,15 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
   }
 
   List<DateTime> getBlackoutDates(String itemId, int daysToRent) {
-    //
     List<ItemRenter> itemRenters =
         Provider.of<ItemStoreProvider>(context, listen: false).itemRenters;
     List<DateTime> tempList = [];
 
     for (int i = 0; i < itemRenters.length; i++) {
+      // Skip cancelled rentals
+      if (itemRenters[i].status == "cancelledLender" || itemRenters[i].status == "cancelledRenter") {
+        continue;
+      }
       DateTime startDate =
           DateFormat("yyyy-MM-dd").parse(itemRenters[i].startDate);
       DateTime endDate = DateFormat("yyyy-MM-dd").parse(itemRenters[i].endDate);

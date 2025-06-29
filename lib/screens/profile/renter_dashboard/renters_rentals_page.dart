@@ -273,7 +273,9 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    widget.status.toUpperCase(),
+                    widget.status.toLowerCase() == "cancelledrenter"
+                        ? "CANCELLED"
+                        : widget.status.toUpperCase(),
                     style: TextStyle(
                       color: _statusColor(widget.status),
                       fontWeight: FontWeight.bold,
