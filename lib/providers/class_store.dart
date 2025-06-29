@@ -639,4 +639,13 @@ class ItemStoreProvider extends ChangeNotifier {
     }
   }
 
+  void deleteItemById(String itemId) async {
+  // Remove from local list
+  _items.removeWhere((item) => item.id == itemId);
+
+  // Delete from Firestore
+  await FirestoreService.deleteItemById(itemId);
+
+  notifyListeners();
+}
 }

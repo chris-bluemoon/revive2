@@ -260,4 +260,8 @@ class FirestoreService {
       }
     }
   }
+
+  static Future<void> deleteItemById(String itemId) async {
+    await FirebaseFirestore.instance.collection('item').doc(itemId).delete();
+  }
 }
