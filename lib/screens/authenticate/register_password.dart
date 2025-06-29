@@ -99,7 +99,7 @@ class _RegisterPassword extends State<RegisterPassword> {
           countryCode: '+66',
           phoneNum: '',
           favourites: [''],
-          verified: 'not started',
+          verified: 'not stated',
           imagePath: '',
           creationDate: DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now()),
           location: widget.location,

@@ -11,7 +11,7 @@ class Renter {
     required this.countryCode,
     required this.phoneNum,
     required this.favourites,
-    required this.verified,
+    required this.verified, // now a String
     required this.imagePath,
     required this.creationDate,
     required this.location,
@@ -32,7 +32,7 @@ class Renter {
   String countryCode;
   String phoneNum;
   List favourites;
-  String verified;
+  String verified; // changed back to String
   String imagePath;
   String creationDate;
   String location;
@@ -47,6 +47,7 @@ class Renter {
 
   Renter copyWith({
     List<Map<String, DateTime>>? vacations,
+    String? verified, // changed back to String
     // add other fields here if needed
   }) {
     return Renter(
@@ -59,7 +60,7 @@ class Renter {
       countryCode: countryCode,
       phoneNum: phoneNum,
       favourites: favourites,
-      verified: verified,
+      verified: verified ?? this.verified, // changed back to String
       imagePath: imagePath,
       creationDate: creationDate,
       location: location,
@@ -83,7 +84,7 @@ class Renter {
       'countryCode': countryCode,
       'phoneNum': phoneNum,
       'favourites': favourites,
-      'verified': verified,
+      'verified': verified, // now a String
       'imagePath': imagePath,
       'creationDate': creationDate,
       'location': location,
@@ -126,7 +127,7 @@ class Renter {
       countryCode: data['countryCode'],
       phoneNum: data['phoneNum'],
       favourites: data['favourites'],
-      verified: data['verified'],
+      verified: data['verified'].toString(), // always as String
       imagePath: data['imagePath'],
       creationDate: data['creationDate'],
       location: data['location'] ?? '',

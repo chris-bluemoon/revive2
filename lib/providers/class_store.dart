@@ -87,7 +87,7 @@ class ItemStoreProvider extends ChangeNotifier {
     countryCode: '',
     phoneNum: '',
     favourites: [],
-    verified: '',
+    verified: 'not started',
     imagePath: '',
     creationDate: '',
     location: '', // <-- Add this line
@@ -317,7 +317,7 @@ class ItemStoreProvider extends ChangeNotifier {
         address: '',
         phoneNum: '',
         favourites: [],
-        verified: '',
+        verified: 'not started',
         imagePath: '',
         creationDate: '',
         location: '', // <-- Add this line
