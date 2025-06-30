@@ -212,6 +212,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
             TextField(
               controller: nameController,
+              maxLength: 20,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black),
@@ -226,6 +227,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 fillColor: Colors.white,
                 hintText: "Enter your name",
                 contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                counterText: "", // Hide the character counter
               ),
             ),
             const SizedBox(height: 24),
