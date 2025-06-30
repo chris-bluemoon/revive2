@@ -41,21 +41,28 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
   bool showConfirm = false;
 
   int getPricePerDay(noOfDays) {
-
-    if (noOfDays < 7) {
-        return widget.item.rentPriceDaily;
+    // Use the new rental pricing structure
+    if (noOfDays <= 3) {
+      return widget.item.rentPriceDaily;
+    }
+    
+    if (noOfDays <= 5) {
+      return widget.item.rentPrice3 ~/ 3;
+    }
+    
+    if (noOfDays <= 7) {
+      return widget.item.rentPrice5 ~/ 5;
+    }
+    
+    if (noOfDays <= 14) {
+      return widget.item.rentPrice7 ~/ 7;
+    }
+    
+    if (noOfDays >= 14) {
+      return widget.item.rentPrice14 ~/ 14;
     }
 
-    if (noOfDays < 30) {
-      return widget.item.rentPriceWeekly ~/ 7;
-    }
-
-    if (noOfDays >= 30) {
-      return widget.item.rentPriceMonthly ~/ 30;
-    }
-
-    return 0;
-
+    return widget.item.rentPriceDaily;
   }
 
   List<DateTime> getBlackoutDates(String itemId, int daysToRent) {
@@ -124,7 +131,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const StyledTitle('SELECT MIN DAYS', weight: FontWeight.bold),
+        title: const StyledTitle('SELECT RENTAL PERIOD', weight: FontWeight.bold),
         leading: IconButton(
           icon: Icon(Icons.chevron_left, size: width * 0.08, color: Colors.black),
           onPressed: () {
@@ -170,17 +177,28 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                         double chipWidth = (MediaQuery.of(context).size.width * 0.7).clamp(220, 400);
                         return Column(
                           children: [
-                            // Only show the first radio if minDays <= 6
-                            if (widget.item.minDays <= 6)
+                            // Show 3-day option if minDays <= 3
+                            if (widget.item.minDays <= 3)
                               SizedBox(
                                 width: chipWidth,
                                 child: RadioListTile<int>(
-                                  value: widget.item.minDays,
+                                  value: 3,
                                   groupValue: selectedOption,
                                   onChanged: (val) {
                                     setState(() {
                                       selectedOption = val!;
-                                      noOfDays = widget.item.minDays;
+                                      noOfDays = 3;
+                                      // Reset date selection when changing rental period or if current range doesn't meet new minimum
+                                      if (startDate != null && endDate != null) {
+                                        int currentDays = endDate!.difference(startDate!).inDays + 1;
+                                        if (currentDays < 3) {
+                                          dateRange = null;
+                                          startDate = null;
+                                          endDate = null;
+                                          showConfirm = false;
+                                          controller.selectedRange = null; // Clear the controller
+                                        }
+                                      }
                                     });
                                   },
                                   title: RichText(
@@ -190,8 +208,8 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                         color: Colors.black,
                                       ),
                                       children: [
-                                        TextSpan(
-                                          text: '${widget.item.minDays}+ days @ ',
+                                        const TextSpan(
+                                          text: '3 days @ ',
                                         ),
                                         TextSpan(
                                           text: '${getPricePerDay(3)}$symbol',
@@ -208,7 +226,68 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                   dense: true,
                                 ),
                               ),
-                            if (widget.item.minDays <= 29)
+                            // Show 5-day option if minDays <= 5
+                            if (widget.item.minDays <= 5)
+                              Column(
+                                children: [
+                                  if (widget.item.minDays <= 3)
+                                    const Divider(
+                                      height: 1,
+                                      thickness: 2,
+                                      color: Color(0xFF444444),
+                                    ),
+                                  const SizedBox(height: 10),
+                                  SizedBox(
+                                    width: chipWidth,
+                                    child: RadioListTile<int>(
+                                      value: 5,
+                                      groupValue: selectedOption,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          selectedOption = val!;
+                                          noOfDays = 5;
+                                          // Reset date selection when changing rental period or if current range doesn't meet new minimum
+                                          if (startDate != null && endDate != null) {
+                                            int currentDays = endDate!.difference(startDate!).inDays + 1;
+                                            if (currentDays < 5) {
+                                              dateRange = null;
+                                              startDate = null;
+                                              endDate = null;
+                                              showConfirm = false;
+                                              controller.selectedRange = null; // Clear the controller
+                                            }
+                                          }
+                                        });
+                                      },
+                                      title: RichText(
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            fontSize: width * 0.042,
+                                            color: Colors.black,
+                                          ),
+                                          children: [
+                                            const TextSpan(
+                                              text: '5 days @ ',
+                                            ),
+                                            TextSpan(
+                                              text: '${getPricePerDay(5)}$symbol',
+                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            const TextSpan(
+                                              text: ' per day',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      activeColor: Colors.black,
+                                      contentPadding: EdgeInsets.zero,
+                                      dense: true,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            // Show 7-day option if minDays <= 7
+                            if (widget.item.minDays <= 7)
                               Column(
                                 children: [
                                   const Divider(
@@ -226,6 +305,17 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                         setState(() {
                                           selectedOption = val!;
                                           noOfDays = 7;
+                                          // Reset date selection when changing rental period or if current range doesn't meet new minimum
+                                          if (startDate != null && endDate != null) {
+                                            int currentDays = endDate!.difference(startDate!).inDays + 1;
+                                            if (currentDays < 7) {
+                                              dateRange = null;
+                                              startDate = null;
+                                              endDate = null;
+                                              showConfirm = false;
+                                              controller.selectedRange = null; // Clear the controller
+                                            }
+                                          }
                                         });
                                       },
                                       title: RichText(
@@ -236,7 +326,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                           ),
                                           children: [
                                             const TextSpan(
-                                              text: '7+ days @ ',
+                                              text: '7 days @ ',
                                             ),
                                             TextSpan(
                                               text: '${getPricePerDay(7)}$symbol',
@@ -255,7 +345,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                   ),
                                 ],
                               ),
-                            // Always show the 30+ days option
+                            // Always show the 14+ days option
                             const Divider(
                               height: 1,
                               thickness: 2,
@@ -265,12 +355,23 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                             SizedBox(
                               width: chipWidth,
                               child: RadioListTile<int>(
-                                value: 30,
+                                value: 14,
                                 groupValue: selectedOption,
                                 onChanged: (val) {
                                   setState(() {
                                     selectedOption = val!;
-                                    noOfDays = 30;
+                                    noOfDays = 14;
+                                    // Reset date selection when changing rental period or if current range doesn't meet new minimum
+                                    if (startDate != null && endDate != null) {
+                                      int currentDays = endDate!.difference(startDate!).inDays + 1;
+                                      if (currentDays < 14) {
+                                        dateRange = null;
+                                        startDate = null;
+                                        endDate = null;
+                                        showConfirm = false;
+                                        controller.selectedRange = null; // Clear the controller
+                                      }
+                                    }
                                   });
                                 },
                                 title: RichText(
@@ -281,10 +382,10 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                     ),
                                     children: [
                                       const TextSpan(
-                                        text: '30+ days @ ',
+                                        text: '14+ days @ ',
                                       ),
                                       TextSpan(
-                                        text: '${getPricePerDay(30)}$symbol',
+                                        text: '${getPricePerDay(14)}$symbol',
                                         style: const TextStyle(fontWeight: FontWeight.bold),
                                       ),
                                       const TextSpan(
@@ -386,6 +487,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                             startDate = null;
                             endDate = null;
                             showConfirm = false;
+                            controller.selectedRange = null; // Clear the controller
                           });
                           return;
                         }
@@ -395,6 +497,15 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                           endDate = picked.end;
                           noOfDays = selectedDays;
                           showConfirm = true;
+                        });
+                      } else {
+                        // User cancelled - reset the date selection to ensure consistency
+                        setState(() {
+                          dateRange = null;
+                          startDate = null;
+                          endDate = null;
+                          showConfirm = false;
+                          controller.selectedRange = null; // Clear the controller
                         });
                       }
                     },
@@ -486,12 +597,9 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
   DateTime? start = initialRange.start;
   DateTime? end = initialRange.end;
   Set<DateTime> dynamicBlackoutDates = {...blackoutDates};
-  int minDays = selectedOption > 0 ? selectedOption : 3;
-
-  await showDialog(
+  int minDays = selectedOption > 0 ? selectedOption : widget.item.minDays;    await showDialog(
     context: context,
     builder: (context) {
-      PickerDateRange selectedRange = PickerDateRange(start, end);
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
@@ -564,9 +672,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                       if (!hasBlackout && selectedDays < minDays) {
                         end = start!.add(Duration(days: minDays - 1));
                         controller.selectedRange = PickerDateRange(start, end);
-                        setState(() {
-                          selectedRange = PickerDateRange(start, end);
-                        });
+                        setState(() {});
                         return;
                       }
 
@@ -574,18 +680,12 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                         // Reset selection to single day (end date)
                         start = end;
                         controller.selectedRange = PickerDateRange(start, end);
-                        setState(() {
-                          selectedRange = PickerDateRange(start, end);
-                        });
+                        setState(() {});
                       } else {
-                        setState(() {
-                          selectedRange = PickerDateRange(start, end);
-                        });
+                        setState(() {});
                       }
                     } else {
-                      setState(() {
-                        selectedRange = PickerDateRange(start, start);
-                      });
+                      setState(() {});
                     }
                   }
                 },
@@ -625,54 +725,24 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
 // Add this helper to get all vacation blackout dates for the owner
 List<DateTime> getVacationBlackoutDates(String ownerId) {
   final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
-  // Find the owner by ID
+  // Find the owner by ID - use nullable approach
   log('Owner ID: $ownerId');
-  final owner = itemStore.renters.firstWhere(
-    (user) => user.id == ownerId,
-    orElse: () => Renter(
-      id: '',
-      name: '',
-      email: '',
-      phoneNum: '',
-      imagePath: '',
-      address: '',
-      followers: [],
-      following: [],
-      vacations: [], 
-      type: '', 
-      size: 0, 
-      countryCode: '', 
-      favourites: [], 
-      verified: '', 
-      creationDate: '', 
-      location: '', 
-      bio: '',
-      status: 'not active', 
-      avgReview: 0, 
-      lastLogin: DateTime.now(), // <-- Added status field
-      // Add any other required fields with default values here
-    ),
+  final Renter? owner = itemStore.renters.cast<Renter?>().firstWhere(
+    (user) => user?.id == ownerId,
+    orElse: () => null,
   );
-  log('Owner: ${owner.name}, Vacations: ${owner.vacations}');
-  if (owner.vacations == null) return [];
-  final vacations = owner.vacations;
+  
+  log('Owner: ${owner?.name ?? 'Unknown'}, Vacations: ${owner?.vacations ?? []}');
+  if (owner?.vacations == null) return [];
+  
+  final vacations = owner!.vacations;
   List<DateTime> vacationDates = [];
   for (final vacation in vacations) {
     final startRaw = vacation['startDate'];
     final endRaw = vacation['endDate'];
     if (startRaw != null && endRaw != null) {
-      DateTime start;
-      DateTime end;
-      if (startRaw is DateTime) {
-        start = startRaw;
-      } else {
-        start = DateTime.parse(startRaw.toString());
-      }
-      if (endRaw is DateTime) {
-        end = endRaw;
-      } else {
-        end = DateTime.parse(endRaw.toString());
-      }
+      DateTime start = startRaw;
+      DateTime end = endRaw;
       for (DateTime d = start; !d.isAfter(end); d = d.add(const Duration(days: 1))) {
         vacationDates.add(DateTime(d.year, d.month, d.day));
       }

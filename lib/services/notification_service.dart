@@ -44,14 +44,36 @@ class NotificationService {
   }
 
   ///call when user login to update FCM token at firebase
-  static Future<String> getFCMToken() async {
-    try {
-      final fcmToken = await FirebaseMessaging.instance.getToken();
-      return fcmToken.toString();
-    } on Exception catch (e) {
-      log('Error getting FCM token: $e');
-      return '';
+  static Future<String> getFCMToken({int maxRetries = 3}) async {
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+        if (fcmToken != null) {
+          log('FCM token retrieved successfully on attempt $attempt');
+          return fcmToken.toString();
+        }
+      } on Exception catch (e) {
+        final errorMessage = e.toString().toLowerCase();
+        
+        if (errorMessage.contains('service_not_available')) {
+          log('FCM Service temporarily unavailable (attempt $attempt/$maxRetries). This is a transient network/Firebase issue, not a code bug.');
+        } else if (errorMessage.contains('network') || errorMessage.contains('timeout')) {
+          log('Network connectivity issue when getting FCM token (attempt $attempt/$maxRetries)');
+        } else {
+          log('Unknown FCM token error (attempt $attempt/$maxRetries): $e');
+        }
+        
+        // If this is the last attempt, return empty string
+        if (attempt == maxRetries) {
+          log('Failed to get FCM token after $maxRetries attempts. App will continue to function normally without push notifications.');
+          return '';
+        }
+        
+        // Wait before retrying (exponential backoff)
+        await Future.delayed(Duration(seconds: attempt * 2));
+      }
     }
+    return '';
   }
 
   ///call when user logout to delete FCM token at firebase

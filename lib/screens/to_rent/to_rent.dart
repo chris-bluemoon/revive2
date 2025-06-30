@@ -389,13 +389,13 @@ class _ToRentState extends State<ToRent> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   StyledBody(
-                                    "Weekly Price",
+                                    "7 Day Price",
                                     weight: FontWeight.bold,
                                     color: Colors.grey,
                                     fontSize: width * 0.042,
                                   ),
                                   StyledBody(
-                                    "${NumberFormat('#,###').format(widget.item.rentPriceWeekly)}$symbol",
+                                    "${NumberFormat('#,###').format(widget.item.rentPrice7)}$symbol",
                                     weight: FontWeight.bold, // <-- Make value bold
                                     color: Colors.black,
                                     fontSize: width * 0.042,
@@ -522,18 +522,18 @@ class _ToRentState extends State<ToRent> {
                                   ),
                                   const SizedBox(height: 4),
                                   const StyledBody(
-                                    "Weekly",
+                                    "7 Days",
                                     weight: FontWeight.bold,
                                   ),
                                   const SizedBox(height: 6),
-                                  // Per day price uses rentPriceWeekly / 7
+                                  // Per day price uses rentPrice7 / 7
                                   StyledBody(
-                                    "${NumberFormat('#,###').format((widget.item.rentPriceWeekly / 7).floor())}$symbol / day",
+                                    "${NumberFormat('#,###').format((widget.item.rentPrice7 / 7).floor())}$symbol / day",
                                     weight: FontWeight.normal,
                                   ),
                                   const SizedBox(height: 6),
                                   StyledBody(
-                                    "${NumberFormat('#,###').format(widget.item.rentPriceWeekly)}$symbol total",
+                                    "${NumberFormat('#,###').format(widget.item.rentPrice7)}$symbol total",
                                     weight: FontWeight.normal,
                                   ),
                                 ],
@@ -555,18 +555,18 @@ class _ToRentState extends State<ToRent> {
                               child: Column(
                                 children: [
                                   const StyledBody(
-                                    "Monthly",
+                                    "14 Days",
                                     weight: FontWeight.bold,
                                   ),
                                   const SizedBox(height: 6),
-                                  // Per day price uses rentPriceMonthly / 30
+                                  // Per day price uses rentPrice14 / 14
                                   StyledBody(
-                                    "${NumberFormat('#,###').format((widget.item.rentPriceMonthly / 30).floor())}$symbol / day",
+                                    "${NumberFormat('#,###').format((widget.item.rentPrice14 / 14).floor())}$symbol / day",
                                     weight: FontWeight.normal,
                                   ),
                                   const SizedBox(height: 6),
                                   StyledBody(
-                                    "${NumberFormat('#,###').format(widget.item.rentPriceMonthly)}$symbol total",
+                                    "${NumberFormat('#,###').format(widget.item.rentPrice14)}$symbol total",
                                     weight: FontWeight.normal,
                                   ),
                                 ],

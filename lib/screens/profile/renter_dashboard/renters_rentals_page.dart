@@ -88,31 +88,10 @@ class _RentersRentalsPageState extends State<RentersRentalsPage> {
                     separatorBuilder: (context, index) => const Divider(),
                     itemBuilder: (context, index) {
                       final rental = rentals[index];
-                      // Find the item by ID
-                      final item = items.firstWhere(
-                        (it) => it.id == rental.itemId,
-                        orElse: () => Item(
-                            id: '',
-                            name: 'Unknown Item',
-                            owner: '',
-                            type: '',
-                            bookingType: '',
-                            dateAdded: '',
-                            brand: '',
-                            colour: '',
-                            size: '',
-                            rentPriceDaily: 0,
-                            rentPriceWeekly: 0,
-                            rentPriceMonthly: 0,
-                            buyPrice: 0,
-                            rrp: 0,
-                            description: '',
-                            longDescription: '',
-                            imageId: [],
-                            status: '',
-                            minDays: 1,
-                            hashtags: [],
-                            ), // Provide a default Item
+                      // Find the item by ID - use nullable approach
+                      final Item? item = items.cast<Item?>().firstWhere(
+                        (it) => it?.id == rental.itemId,
+                        orElse: () => null,
                       );
 
                       // Format endDate using intl package for better readability
@@ -124,37 +103,17 @@ class _RentersRentalsPageState extends State<RentersRentalsPage> {
                       final formattedEndDate =
                           DateFormat('d MMM yyyy').format(endDate);
                       final status = rental.status;
-                      final itemType = item.type;
-                      final itemName =
-                          item != null ? item.name : 'Unknown Item';
+                      // Handle null item gracefully
+                      final itemType = item?.type ?? 'Unknown Type';
+                      final itemName = item?.name ?? 'Unknown Item';
 
-                      // Assuming you have a renters table/list in itemStore and itemRenter.owner is the renter's id
-                      final Renter owner = itemStore.renters.firstWhere(
-                        (r) => r.id == rental.ownerId,
-                        orElse: () => Renter(
-                            id: '',
-                            name: 'Unknown Renter',
-                            email: '',
-                            type: '',
-                            size: 0,
-                            address: '',
-                            countryCode: '',
-                            phoneNum: '',
-                            favourites: [],
-                            verified: '',
-                            imagePath: '',
-                            creationDate: '',
-                            location: '',
-                            bio: '',
-                            followers: [],
-                            following: [],
-                            status: 'not active', 
-                            avgReview: 0, 
-                            lastLogin: DateTime.now(), 
-                            vacations: []), // Provide a default Renter
+                      // Find the owner by ID - use nullable approach
+                      final Renter? owner = itemStore.renters.cast<Renter?>().firstWhere(
+                        (r) => r?.id == rental.ownerId,
+                        orElse: () => null,
                       );
 
-                      final String ownerName = owner.name;
+                      final String ownerName = owner?.name ?? 'Unknown Owner';
 
                       return ItemRenterCard(
                         itemRenter: rental,
@@ -197,13 +156,13 @@ class ItemRenterCard extends StatefulWidget {
   final ItemRenter itemRenter;
   final String itemName;
   final String itemType;
-  String status;
+  final String status;
   final String startDate;
   final String endDate;
   final String ownerName;
   final int price;
 
-  ItemRenterCard({
+  const ItemRenterCard({
     super.key,
     required this.itemRenter,
     required this.itemName,
@@ -270,15 +229,15 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: _statusColor(widget.status).withOpacity(0.13),
+                    color: _statusColor(widget.itemRenter.status).withOpacity(0.13),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    widget.status.toLowerCase() == "cancelledrenter"
+                    widget.itemRenter.status.toLowerCase() == "cancelledrenter"
                         ? "CANCELLED"
-                        : widget.status.toUpperCase(),
+                        : widget.itemRenter.status.toUpperCase(),
                     style: TextStyle(
-                      color: _statusColor(widget.status),
+                      color: _statusColor(widget.itemRenter.status),
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       letterSpacing: 1,
@@ -355,7 +314,6 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                         setState(() {
                           widget.itemRenter.status = "paid";
                         });
-                        widget.status = "paid";
                         ItemStoreProvider itemStore =
                             Provider.of<ItemStoreProvider>(context,
                                 listen: false);
@@ -398,7 +356,6 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     onPressed: () {
                       setState(() {
                         widget.itemRenter.status = "cancelledRenter";
-                        widget.status = "cancelledRenter";
                       });
                       Provider.of<ItemStoreProvider>(context, listen: false)
                           .saveItemRenter(widget.itemRenter);
@@ -413,12 +370,11 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
               ),
             if (DateTime.parse(widget.itemRenter.endDate)
                     .isBefore(DateTime.now()) &&
-                widget.status != "reviewed")
+                widget.itemRenter.status != "reviewed")
               ElevatedButton(
                 onPressed: () async {
                   setState(() {
                     widget.itemRenter.status = "reviewed";
-                    widget.status = "reviewed";
                   });
                   // Update in itemStore (if using Provider or similar)
                   Provider.of<ItemStoreProvider>(context, listen: false)

@@ -26,8 +26,10 @@ class SetPricing extends StatefulWidget {
   final List<String> existingImagePaths;
   final List<XFile> imageFiles;
   final String? dailyPrice;
-  final String? weeklyPrice;
-  final String? monthlyPrice;
+  final String? rentPrice3;
+  final String? rentPrice5;
+  final String? rentPrice7;
+  final String? rentPrice14;
   final String? minRentalPeriod;
   final List<String> hashtags;
   final String? id;
@@ -45,8 +47,10 @@ class SetPricing extends StatefulWidget {
     required this.existingImagePaths,
     required this.imageFiles,
     this.dailyPrice,
-    this.weeklyPrice,
-    this.monthlyPrice,
+    this.rentPrice3,
+    this.rentPrice5,
+    this.rentPrice7,
+    this.rentPrice14,
     this.minRentalPeriod,
     required this.hashtags,
     this.id,
@@ -57,7 +61,11 @@ class SetPricing extends StatefulWidget {
 }
 
 class _SetPricingState extends State<SetPricing> {
-  bool _isUploading = false; // Add this line
+  bool _isUploading = false;
+  
+  // Controllers for the new pricing fields
+  final TextEditingController _price7Controller = TextEditingController();
+  final TextEditingController _price14Controller = TextEditingController();
 
   @override
   void initState() {
@@ -66,11 +74,17 @@ class _SetPricingState extends State<SetPricing> {
     if (widget.dailyPrice != null) {
       spp.dailyPriceController.text = widget.dailyPrice!;
     }
-    if (widget.weeklyPrice != null) {
-      spp.weeklyPriceController.text = widget.weeklyPrice!;
+    if (widget.rentPrice3 != null) {
+      spp.weeklyPriceController.text = widget.rentPrice3!;
     }
-    if (widget.monthlyPrice != null) {
-      spp.monthlyPriceController.text = widget.monthlyPrice!;
+    if (widget.rentPrice5 != null) {
+      spp.monthlyPriceController.text = widget.rentPrice5!;
+    }
+    if (widget.rentPrice7 != null) {
+      _price7Controller.text = widget.rentPrice7!;
+    }
+    if (widget.rentPrice14 != null) {
+      _price14Controller.text = widget.rentPrice14!;
     }
     if (widget.minRentalPeriod != null) {
       spp.minimalRentalPeriodController.text = widget.minRentalPeriod!;
@@ -173,9 +187,9 @@ class _SetPricingState extends State<SetPricing> {
                             fillColor: Colors.white70,
                           ),
                         ),
-                        const StyledBody('Weekly Price'),
+                        const StyledBody('3 Day Price'),
                         const StyledBody(
-                            'In order to facilitate longer rentals such as holidays, we recommend offering weekly and/or monthly rental prices',
+                            'In order to facilitate longer rentals such as holidays, we recommend offering multi-day rental prices',
                             weight: FontWeight.normal),
                         SizedBox(height: width * 0.03),
                         TextField(
@@ -207,7 +221,7 @@ class _SetPricingState extends State<SetPricing> {
                               // Remove any currency symbol and commas, then parse
                               String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^\d.]'), '');
                               int retail = int.tryParse(priceStr) ?? 0;
-                              if (retail == 0) return "Weekly Price";
+                              if (retail == 0) return "3 Day Price";
                               // Calculate suggested price: retail/6, rounded up to nearest 10
                               int suggested = ((retail / 6).ceil());
                               if (suggested % 10 != 0) {
@@ -218,7 +232,7 @@ class _SetPricingState extends State<SetPricing> {
                             fillColor: Colors.white70,
                           ),
                         ),
-                        const StyledBody('Monthly Price'),
+                        const StyledBody('5 Day Price'),
                         SizedBox(height: width * 0.03),
                         TextField(
                           keyboardType: TextInputType.number,
@@ -249,9 +263,91 @@ class _SetPricingState extends State<SetPricing> {
                               // Remove any currency symbol and commas, then parse
                               String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^\d.]'), '');
                               int retail = int.tryParse(priceStr) ?? 0;
-                              if (retail == 0) return "Monthly Price";
+                              if (retail == 0) return "5 Day Price";
                               // Calculate suggested price: retail/2.2, rounded up to nearest 10
                               int suggested = (retail / 2.2).ceil();
+                              if (suggested % 10 != 0) {
+                                suggested = ((suggested / 10).ceil()) * 10;
+                              }
+                              return "e.g. $suggested";
+                            })(),
+                            fillColor: Colors.white70,
+                          ),
+                        ),
+                        const StyledBody('7 Day Price'),
+                        SizedBox(height: width * 0.03),
+                        TextField(
+                          keyboardType: TextInputType.number,
+                          maxLines: null,
+                          maxLength: 6,
+                          controller: _price7Controller,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          onChanged: (text) {
+                            // Note: This is optional field, not required for form completion
+                          },
+                          decoration: InputDecoration(
+                            isDense: true,
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Colors.black),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Colors.black),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: const BorderSide(color: Colors.black)),
+                            filled: true,
+                            hintStyle: TextStyle(color: Colors.grey[800], fontSize: width * 0.03),
+                            hintText: (() {
+                              // Remove any currency symbol and commas, then parse
+                              String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^\d.]'), '');
+                              int retail = int.tryParse(priceStr) ?? 0;
+                              if (retail == 0) return "7 Day Price (Optional)";
+                              // Calculate suggested price: retail/1.8, rounded up to nearest 10
+                              int suggested = (retail / 1.8).ceil();
+                              if (suggested % 10 != 0) {
+                                suggested = ((suggested / 10).ceil()) * 10;
+                              }
+                              return "e.g. $suggested";
+                            })(),
+                            fillColor: Colors.white70,
+                          ),
+                        ),
+                        const StyledBody('14 Day Price'),
+                        SizedBox(height: width * 0.03),
+                        TextField(
+                          keyboardType: TextInputType.number,
+                          maxLines: null,
+                          maxLength: 6,
+                          controller: _price14Controller,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          onChanged: (text) {
+                            // Note: This is optional field, not required for form completion
+                          },
+                          decoration: InputDecoration(
+                            isDense: true,
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Colors.black),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Colors.black),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: const BorderSide(color: Colors.black)),
+                            filled: true,
+                            hintStyle: TextStyle(color: Colors.grey[800], fontSize: width * 0.03),
+                            hintText: (() {
+                              // Remove any currency symbol and commas, then parse
+                              String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^\d.]'), '');
+                              int retail = int.tryParse(priceStr) ?? 0;
+                              if (retail == 0) return "14 Day Price (Optional)";
+                              // Calculate suggested price: retail/1.5, rounded up to nearest 10
+                              int suggested = (retail / 1.5).ceil();
                               if (suggested % 10 != 0) {
                                 suggested = ((suggested / 10).ceil()) * 10;
                               }
@@ -419,7 +515,7 @@ class _SetPricingState extends State<SetPricing> {
     }
 
     final item = Item(
-      id: widget.dailyPrice != null && widget.weeklyPrice != null && widget.monthlyPrice != null && widget.minRentalPeriod != null && widget.title.isNotEmpty
+      id: widget.dailyPrice != null && widget.rentPrice3 != null && widget.rentPrice5 != null && widget.minRentalPeriod != null && widget.title.isNotEmpty
           ? (widget as dynamic).id ?? uuid.v4() // Use existing id if editing, else new
           : uuid.v4(),
       owner: ownerId,
@@ -431,8 +527,10 @@ class _SetPricingState extends State<SetPricing> {
       colour: widget.colour,
       size: widget.size,
       rentPriceDaily: int.parse(spp.dailyPriceController.text),
-      rentPriceWeekly: int.parse(spp.weeklyPriceController.text),
-      rentPriceMonthly: int.parse(spp.monthlyPriceController.text),
+      rentPrice3: int.parse(spp.weeklyPriceController.text),
+      rentPrice5: int.parse(spp.monthlyPriceController.text),
+      rentPrice7: _price7Controller.text.isNotEmpty ? int.parse(_price7Controller.text) : 0,
+      rentPrice14: _price14Controller.text.isNotEmpty ? int.parse(_price14Controller.text) : 0,
       buyPrice: 0,
       rrp: int.tryParse(widget.retailPrice.replaceAll(RegExp(r'[^\d]'), '')) ?? 0,
       description: widget.shortDesc,
@@ -446,7 +544,7 @@ class _SetPricingState extends State<SetPricing> {
     final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
 
     // If editing, call updateItem, else addItem
-    if (widget.dailyPrice != null && widget.weeklyPrice != null && widget.monthlyPrice != null && widget.minRentalPeriod != null && widget.title.isNotEmpty && (widget as dynamic).id != null) {
+    if (widget.dailyPrice != null && widget.rentPrice3 != null && widget.rentPrice5 != null && widget.minRentalPeriod != null && widget.title.isNotEmpty && (widget as dynamic).id != null) {
       itemStore.updateItem(item);
     } else {
       itemStore.addItem(item);
