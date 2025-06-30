@@ -204,11 +204,13 @@ class ItemStoreProvider extends ChangeNotifier {
   }
 
   void addRenter(Renter renter) async {
-    _renters.add(renter);
-    await FirestoreService.addRenter(renter);
-    setCurrentUser(); // Set the current user to the newly added renter
-    setLoggedIn(true);
-    notifyListeners();
+    if (renter.status != 'deleted') {
+      _renters.add(renter);
+      await FirestoreService.addRenter(renter);
+      setCurrentUser(); // Set the current user to the newly added renter
+      setLoggedIn(true);
+      notifyListeners();
+    }
   }
 
   void saveRenterLocal(Renter updated) {

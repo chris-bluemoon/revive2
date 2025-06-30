@@ -37,7 +37,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         Provider.of<ItemStoreProvider>(context, listen: false).renters;
 
     for (Renter r in renters) {
-      if (r.email == email) {
+      if (r.email == email && r.status != 'deleted') {
         found = true;
 
         Provider.of<ItemStoreProvider>(context, listen: false).setCurrentUser();

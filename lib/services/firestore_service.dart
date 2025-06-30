@@ -102,7 +102,8 @@ class FirestoreService {
           'endDate': v['endDate']?.toIso8601String(),
         };
       }).toList(),
-      'fcmToken' : fcmToken
+      'fcmToken' : fcmToken,
+      'status': renter.status,
     });
   }
 

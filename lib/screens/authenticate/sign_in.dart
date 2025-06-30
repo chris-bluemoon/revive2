@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/renter.dart';
@@ -32,57 +34,91 @@ class _SignIn extends State<SignIn> {
 
   bool ready = false;
 
+  void handleFoundLogIn(String email) {
+    Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(true);
+    List<Renter> renters =
+        Provider.of<ItemStoreProvider>(context, listen: false).renters;
+    found = false;
+
+    for (Renter r in renters) {
+      log('Checking renter: ${r.email} against ${r.status}');
+      if (r.email == email && r.status != 'deleted') {
+        found = true;
+
+        Provider.of<ItemStoreProvider>(context, listen: false)
+            .setCurrentUser();
+      }
+    }
+    if (found == false) {
+      log('Checking - Found is false for email: $email');
+      Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
+      log('Checking - showDialog');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Login Error'),
+            content: const Text('Error logging in, please contact support'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/', // Navigate to home page
+                    (route) => false,
+                  );
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // User found and logged in successfully, navigate to home
+      if (context.mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/', // Replace with your HomePage route name
+          (route) => false,
+        );
+      }
+    }
+    // if (found == false) {
+    //
+    //   String jointUuid = uuid.v4();
+    //   Provider.of<ItemStoreProvider>(context, listen: false).addRenter(Renter(
+    //     id: jointUuid,
+    //     email: email,
+    //     name: 'CHRIS',
+    //     size: 0,
+    //     address: '',
+    //     countryCode: '+66',
+    //     phoneNum: '',
+    //     favourites: [''],
+    //     fittings: [],
+    //     settings: ['BANGKOK', 'CM', 'CM', 'KG'],
+    //   ));
+    //   Provider.of<ItemStoreProvider>(context, listen: false).assignUser(Renter(
+    //     id: jointUuid,
+    //     email: email,
+    //     name: 'CHRIS',
+    //     size: 0,
+    //     address: '',
+    //     countryCode: '+66',
+    //     phoneNum: '',
+    //     favourites: [''],
+    //     fittings: [],
+    //     settings: ['BANGKOK', 'CM', 'CM', 'KG'],
+    //   ));
+    // }
+    Provider.of<ItemStoreProvider>(context, listen: false)
+        .populateFavourites();
+    // Provider.of<ItemStoreProvider>(context, listen: false).populateFittings();
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-
-    void handleFoundLogIn(String email) {
-      Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(true);
-      List<Renter> renters =
-          Provider.of<ItemStoreProvider>(context, listen: false).renters;
-      found = false;
-
-      for (Renter r in renters) {
-        if (r.email == email) {
-          found = true;
-
-          Provider.of<ItemStoreProvider>(context, listen: false)
-              .setCurrentUser();
-        }
-      }
-      if (found == false) {}
-      // if (found == false) {
-      //
-      //   String jointUuid = uuid.v4();
-      //   Provider.of<ItemStoreProvider>(context, listen: false).addRenter(Renter(
-      //     id: jointUuid,
-      //     email: email,
-      //     name: 'CHRIS',
-      //     size: 0,
-      //     address: '',
-      //     countryCode: '+66',
-      //     phoneNum: '',
-      //     favourites: [''],
-      //     fittings: [],
-      //     settings: ['BANGKOK', 'CM', 'CM', 'KG'],
-      //   ));
-      //   Provider.of<ItemStoreProvider>(context, listen: false).assignUser(Renter(
-      //     id: jointUuid,
-      //     email: email,
-      //     name: 'CHRIS',
-      //     size: 0,
-      //     address: '',
-      //     countryCode: '+66',
-      //     phoneNum: '',
-      //     favourites: [''],
-      //     fittings: [],
-      //     settings: ['BANGKOK', 'CM', 'CM', 'KG'],
-      //   ));
-      // }
-      Provider.of<ItemStoreProvider>(context, listen: false)
-          .populateFavourites();
-      // Provider.of<ItemStoreProvider>(context, listen: false).populateFittings();
-    }
 
     return loading
         ? const Loading()
@@ -292,14 +328,6 @@ class _SignIn extends State<SignIn> {
                               });
                             } else {
                               handleFoundLogIn(email);
-                             if(context.mounted){ 
-                              
-                                  Navigator.of(context).pushNamedAndRemoveUntil(
-      '/', // Replace with your HomePage route name
-      (route) => false,);
-                              // Navigator.of(context)
-                                  // .popUntil((route) => route.isFirst);
-                             }
                             }
                           }
                           ready = false;
