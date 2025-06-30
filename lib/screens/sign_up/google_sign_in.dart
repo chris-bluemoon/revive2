@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
@@ -47,53 +46,31 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
       }
     }
     if (found == false) {
-      String jointUuid = uuid.v4();
-      Provider.of<ItemStoreProvider>(context, listen: false).addRenter(Renter(
-        id: jointUuid,
-        email: email,
-        name: name,
-        type: 'USER',
-        size: 0,
-        address: '',
-        countryCode: '',
-        phoneNum: '',
-        favourites: [''],
-        verified: 'not started',
-        imagePath: '',
-        creationDate: DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now()),
-        location: '', // <-- Add this line
-        bio: '',
-        followers: [],
-        following: [],
-        status: 'active', 
-        avgReview: 0, 
-        lastLogin: DateTime.now(), 
-        vacations: [], // <-- Added status field
-      ));
-
-      // userLoggedIn = true;
-      Provider.of<ItemStoreProvider>(context, listen: false).assignUser(Renter(
-        id: jointUuid,
-        email: email,
-        name: name,
-        type: 'USER',
-        size: 0,
-        address: '',
-        countryCode: '',
-        phoneNum: '',
-        favourites: [''],
-        verified: 'not started',
-        imagePath: '',
-        creationDate: DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now()),
-        location: '', // <-- Add this line
-        bio: '',
-        followers: [],
-        following: [],
-        status: 'not active', 
-        avgReview: 0, 
-        lastLogin: DateTime.now(),
-        vacations: [], // <-- Added status field
-      ));
+      Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Login Error'),
+            content: const Text('Error logging in, please contact support'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/', // Navigate to home page
+                    (route) => false,
+                  );
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // User found and logged in successfully
+      // Navigation will be handled by the success dialog
     }
 
     Provider.of<ItemStoreProvider>(context, listen: false).populateFavourites();
@@ -146,60 +123,82 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                         onPressed: () async {
                           showDialogue(context);
                           userCredential.value = await signInWithGoogle();
+                          hideProgressDialogue(context);
+                          
                           if (userCredential.value != null && context.mounted) {
-                            hideProgressDialogue(context);
-
                             handleNewLogIn(userCredential.value.user!.email,
                                 userCredential.value.user!.displayName);
-                            // Navigator.pop(context);
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (_) => AlertDialog(
-                                shape: const RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(0))),
-                                actions: [
-                                  // ElevatedButton(
-                                  // onPressed: () {cancelLogOut(context);},
-                                  // child: const Text('CANCEL', style: TextStyle(color: Colors.black)),),
-                                  ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            const WidgetStatePropertyAll<Color>(
-                                                Colors.black),
-                                        shape: WidgetStateProperty.all<
-                                                RoundedRectangleBorder>(
-                                            const RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(0)),
-                                                side: BorderSide(
-                                                    color: Colors.black)))),
-                                    onPressed: () {
-                                      // Navigator.pop(context);
-                                      Navigator.of(context)
-                                          .popUntil((route) => route.isFirst);
-                                      // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const Profile()));
-                                    },
-                                    child: const StyledHeading('OK',
-                                        weight: FontWeight.normal,
-                                        color: Colors.white),
-                                  ),
-                                ],
-                                backgroundColor: Colors.white,
-                                title: const Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    // Flexible(child: Text("Successfully logged in", style: TextStyle(fontSize: 22, color: Colors.black))),
-                                    Flexible(
-                                        child: StyledHeading(
-                                            "Successfully logged in",
-                                            weight: FontWeight.normal)),
+                            
+                            // Only show success dialog if user was found (found == true)
+                            if (found == true) {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(0))),
+                                  actions: [
+                                    ElevatedButton(
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              const WidgetStatePropertyAll<Color>(
+                                                  Colors.black),
+                                          shape: WidgetStateProperty.all<
+                                                  RoundedRectangleBorder>(
+                                              const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(0)),
+                                                  side: BorderSide(
+                                                      color: Colors.black)))),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // Close dialog
+                                        Navigator.of(context).pushNamedAndRemoveUntil(
+                                          '/', // Navigate to home page
+                                          (route) => false,
+                                        );
+                                      },
+                                      child: const StyledHeading('OK',
+                                          weight: FontWeight.normal,
+                                          color: Colors.white),
+                                    ),
                                   ],
+                                  backgroundColor: Colors.white,
+                                  title: const Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Flexible(
+                                          child: StyledHeading(
+                                              "Successfully logged in",
+                                              weight: FontWeight.normal)),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            }
+                          } else {
+                            // Sign-in was cancelled or failed
+                            print('Google Sign-In was cancelled or failed');
+                            if (context.mounted) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Sign-In Failed'),
+                                    content: const Text('Google Sign-In failed. Please check your internet connection and try again.'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
                           }
                         },
                       ),
@@ -222,23 +221,48 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
 // }
 Future<dynamic> signInWithGoogle() async {
   try {
-    // Commented out below 2 lines and replaced with profile/email googleAuth, seems to work and no longer getting platform exception
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
-    // GoogleSignInAuthentication? googleAuth = await (await GoogleSignIn(
-    //   scopes: ["profile", "email"],
-    // ).signIn())
-    //     ?.authentication;
+    // Initialize GoogleSignIn with proper iOS configuration
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      scopes: ['email', 'profile'],
+      // Use the client ID from Info.plist for iOS
+      clientId: '973384003437-2vuflvrrv8j2n17ug63vn36c5ka8bodt.apps.googleusercontent.com',
+    );
+    
+    // Sign out first to ensure clean state
+    await googleSignIn.signOut();
+    
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    
+    // Check if user cancelled the sign-in
+    if (googleUser == null) {
+      print('Google Sign-In was cancelled by user');
+      return null;
+    }
+    
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    
+    // Check if authentication tokens are available
+    if (googleAuth.accessToken == null && googleAuth.idToken == null) {
+      print('Error: No authentication tokens received from Google');
+      return null;
+    }
+    
+    print('Access Token: ${googleAuth.accessToken != null ? "Available" : "Null"}');
+    print('ID Token: ${googleAuth.idToken != null ? "Available" : "Null"}');
+    
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
     );
 
     return await FirebaseAuth.instance.signInWithCredential(credential);
-  } on Exception catch (e) {
-    // TODO
-    print('exception->$e');
+  } catch (e) {
+    print('Google Sign-In exception: $e');
+    // Handle specific network errors
+    if (e.toString().contains('network') || e.toString().contains('connection')) {
+      print('Network error during Google Sign-In. Please check your internet connection.');
+    }
+    return null;
   }
 }
 
