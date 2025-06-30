@@ -80,13 +80,13 @@ class AccountPage extends StatelessWidget {
                       },
                     ),
                     const Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.person),
-                      title: const Text('Personal Information'),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {},
-                    ),
-                    const Divider(),
+                    // ListTile(
+                    //   leading: const Icon(Icons.person),
+                    //   title: const Text('Personal Information'),
+                    //   trailing: const Icon(Icons.chevron_right),
+                    //   onTap: () {},
+                    // ),
+                    // const Divider(),
                     ListTile(
                       leading: const Icon(Icons.beach_access),
                       title: const Text('Vacation Mode'),
