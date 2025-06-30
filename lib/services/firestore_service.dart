@@ -107,6 +107,17 @@ class FirestoreService {
     });
   }
 
+  // Optimized version for profile updates - doesn't refresh FCM token
+  static Future<void> updateRenterProfile(Renter renter) async {
+    await refRenter.doc(renter.id).update({
+      'name': renter.name,
+      'imagePath': renter.imagePath,
+      'location': renter.location,
+      'bio': renter.bio,
+      'lastLogin': renter.lastLogin,
+    });
+  }
+
   // get renters once
   static Future<QuerySnapshot<Renter>> getRentersOnce() {
     return refRenter.get();

@@ -496,7 +496,9 @@ class ItemStoreProvider extends ChangeNotifier {
     String? bio,
     String? location,
     String? imagePath,
+    String? name,
   }) async {
+    // Update local state immediately for responsive UI
     if (bio != null) {
       _user.bio = bio;
     }
@@ -506,8 +508,28 @@ class ItemStoreProvider extends ChangeNotifier {
     if (imagePath != null) {
       _user.imagePath = imagePath;
     }
-    await saveRenter(_user);
+    if (name != null) {
+      _user.name = name;
+    }
+    
+    // Update the user in the local renters list immediately
+    final renterIndex = _renters.indexWhere((r) => r.id == _user.id);
+    if (renterIndex != -1) {
+      _renters[renterIndex] = _user;
+    }
+    
+    // Notify listeners immediately for responsive UI
     notifyListeners();
+    
+    // Then update the database in the background
+    await saveRenterOptimized(_user);
+  }
+
+  // Optimized version that doesn't refresh FCM token
+  Future<void> saveRenterOptimized(Renter renter) async {
+    log('Updating renter profile: ${renter.name}');
+    await FirestoreService.updateRenterProfile(renter);
+    return;
   }
 
   // Add this method to your ItemStoreProvider class:

@@ -20,8 +20,10 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController bioController;
+  late TextEditingController nameController;
   String? imagePath;
   bool _isUploading = false; // <-- Add this line
+  bool _isSaving = false; // <-- Add this line for save loading state
 
   // Add this list at the top of your _EditProfilePageState class:
   final List<String> thailandCities = [
@@ -44,6 +46,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void initState() {
     super.initState();
     bioController = TextEditingController(text: widget.renter.bio);
+    nameController = TextEditingController(text: widget.renter.name);
     // Use renter.location directly, default to 'Bangkok' if empty or not in list
     String initialCity = (widget.renter.location.isNotEmpty)
         ? widget.renter.location
@@ -55,6 +58,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void dispose() {
     bioController.dispose();
+    nameController.dispose();
     super.dispose();
   }
 
@@ -93,16 +97,53 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  void saveProfile() {
-    // Save bio, location, and imagePath to your backend or state management
-    // Example for Provider:
-    final provider = Provider.of<ItemStoreProvider>(context, listen: false);
-    provider.updateRenterProfile(
-      bio: bioController.text,
-      location: selectedCity,
-      imagePath: imagePath,
-    );
-    Navigator.pop(context);
+  Future<void> saveProfile() async {
+    setState(() {
+      _isSaving = true; // Show spinner
+    });
+    
+    try {
+      // Save bio, location, name, and imagePath to your backend or state management
+      final provider = Provider.of<ItemStoreProvider>(context, listen: false);
+      
+      // Update the local renter object immediately for responsive UI
+      provider.renter.bio = bioController.text;
+      provider.renter.location = selectedCity ?? 'Bangkok';
+      provider.renter.name = nameController.text;
+      if (imagePath != null) {
+        provider.renter.imagePath = imagePath!;
+      }
+      
+      // Call the optimized update method
+      await provider.updateRenterProfile(
+        bio: bioController.text,
+        location: selectedCity,
+        imagePath: imagePath,
+        name: nameController.text,
+      );
+      
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      // Handle error if needed
+      print('Error saving profile: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error updating profile: $e'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false; // Hide spinner
+        });
+      }
+    }
   }
 
   @override
@@ -158,6 +199,33 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
                   ],
                 ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            // User Name label and text field
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsets.only(left: 4, bottom: 6),
+                child: StyledBody('User Name', color: Colors.black, weight: FontWeight.bold),
+              ),
+            ),
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black, width: 2),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                hintText: "Enter your name",
+                contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
               ),
             ),
             const SizedBox(height: 24),
@@ -242,14 +310,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: saveProfile,
+                onPressed: _isSaving ? null : saveProfile, // Disable button when saving
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: _isSaving ? Colors.grey : Colors.black,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const StyledHeading('Save', weight: FontWeight.bold, color: Colors.white),
+                child: _isSaving 
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const StyledHeading('Save', weight: FontWeight.bold, color: Colors.white),
               ),
             ),
           ],
