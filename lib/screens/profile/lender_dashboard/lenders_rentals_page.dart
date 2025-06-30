@@ -236,7 +236,8 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    widget.itemRenter.status.toLowerCase() == "cancelledlender"
+                    widget.itemRenter.status.toLowerCase() == "cancelledlender" ||
+                    widget.itemRenter.status.toLowerCase() == "cancelledrenter"
                         ? "CANCELLED"
                         : widget.itemRenter.status.toUpperCase(),
                     style: TextStyle(
@@ -299,7 +300,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       setState(() {
                         widget.itemRenter.status = "accepted";
                       });
@@ -308,6 +309,61 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                               listen: false);
                       itemStore.saveItemRenter(widget.itemRenter);
                       NotificationService.sendNotification(notiType: NotiType.accept, item: widget.itemName, notiReceiverId:widget.renterId);
+                      
+                      // Show confirmation dialog
+                      if (!context.mounted) return;
+                      await showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => AlertDialog(
+                          backgroundColor: Colors.white,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero, // Square corners
+                          ),
+                          title: const Text(
+                            "Request Accepted",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          content: const Text(
+                            "The renter has been informed and we'll notify you when payment is made.",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          actionsAlignment: MainAxisAlignment.center,
+                          actions: [
+                            SizedBox(
+                              width: 100,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  foregroundColor: Colors.white,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.zero,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Close dialog
+                                },
+                                child: const Text(
+                                  "OK",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
@@ -317,7 +373,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                   ),
                   const SizedBox(width: 12),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       setState(() {
                         widget.itemRenter.status = "rejected";
                       });
@@ -325,6 +381,61 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                           Provider.of<ItemStoreProvider>(context,
                               listen: false);
                       itemStore.saveItemRenter(widget.itemRenter);
+                      
+                      // Show confirmation dialog
+                      if (!context.mounted) return;
+                      await showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => AlertDialog(
+                          backgroundColor: Colors.white,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero, // Square corners
+                          ),
+                          title: const Text(
+                            "Request Rejected",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          content: const Text(
+                            "The renter has been informed of your decision.",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          actionsAlignment: MainAxisAlignment.center,
+                          actions: [
+                            SizedBox(
+                              width: 100,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  foregroundColor: Colors.white,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.zero,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Close dialog
+                                },
+                                child: const Text(
+                                  "OK",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,

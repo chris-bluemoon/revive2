@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/item.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/providers/create_item_provider.dart';
 import 'package:revivals/providers/set_price_provider.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
@@ -71,25 +72,76 @@ class _SetPricingState extends State<SetPricing> {
   void initState() {
     super.initState();
     final spp = Provider.of<SetPriceProvider>(context, listen: false);
-    if (widget.dailyPrice != null) {
-      spp.dailyPriceController.text = widget.dailyPrice!;
+    
+    // Check if this is a new item creation (no existing data) - clear all fields
+    bool isNewItem = widget.dailyPrice == null && 
+                     widget.rentPrice3 == null && 
+                     widget.rentPrice5 == null && 
+                     widget.rentPrice7 == null && 
+                     widget.rentPrice14 == null && 
+                     widget.minRentalPeriod == null;
+    
+    // Always clear controllers first to ensure clean state for any new item creation
+    spp.clearAllFields();
+    _price7Controller.clear();
+    _price14Controller.clear();
+    
+    if (!isNewItem) {
+      // Only populate if we have existing data (editing mode)
+      if (widget.dailyPrice != null) {
+        spp.dailyPriceController.text = widget.dailyPrice!;
+        int dailyPrice = int.tryParse(widget.dailyPrice!) ?? 0;
+        
+        // If multi-day prices aren't provided, calculate them with discounts
+        if (widget.rentPrice3 != null) {
+          spp.weeklyPriceController.text = widget.rentPrice3!;
+        } else if (dailyPrice > 0) {
+          // Calculate 3-day price with 5% discount
+          spp.weeklyPriceController.text = ((dailyPrice * 3 * 0.95).floor()).toString();
+        }
+        
+        if (widget.rentPrice5 != null) {
+          spp.monthlyPriceController.text = widget.rentPrice5!;
+        } else if (dailyPrice > 0) {
+          // Calculate 5-day price with 10% discount
+          spp.monthlyPriceController.text = ((dailyPrice * 5 * 0.90).floor()).toString();
+        }
+        
+        if (widget.rentPrice7 != null) {
+          _price7Controller.text = widget.rentPrice7!;
+        } else if (dailyPrice > 0) {
+          // Calculate 7-day price with 15% discount
+          _price7Controller.text = ((dailyPrice * 7 * 0.85).floor()).toString();
+        }
+        
+        if (widget.rentPrice14 != null) {
+          _price14Controller.text = widget.rentPrice14!;
+        } else if (dailyPrice > 0) {
+          // Calculate 14-day price with 20% discount
+          _price14Controller.text = ((dailyPrice * 14 * 0.80).floor()).toString();
+        }
+      } else {
+        // If no daily price, just populate existing values
+        if (widget.rentPrice3 != null) {
+          spp.weeklyPriceController.text = widget.rentPrice3!;
+        }
+        if (widget.rentPrice5 != null) {
+          spp.monthlyPriceController.text = widget.rentPrice5!;
+        }
+        if (widget.rentPrice7 != null) {
+          _price7Controller.text = widget.rentPrice7!;
+        }
+        if (widget.rentPrice14 != null) {
+          _price14Controller.text = widget.rentPrice14!;
+        }
+      }
+      
+      if (widget.minRentalPeriod != null) {
+        spp.minimalRentalPeriodController.text = widget.minRentalPeriod!;
+      }
     }
-    if (widget.rentPrice3 != null) {
-      spp.weeklyPriceController.text = widget.rentPrice3!;
-    }
-    if (widget.rentPrice5 != null) {
-      spp.monthlyPriceController.text = widget.rentPrice5!;
-    }
-    if (widget.rentPrice7 != null) {
-      _price7Controller.text = widget.rentPrice7!;
-    }
-    if (widget.rentPrice14 != null) {
-      _price14Controller.text = widget.rentPrice14!;
-    }
-    if (widget.minRentalPeriod != null) {
-      spp.minimalRentalPeriodController.text = widget.minRentalPeriod!;
-    }
-    // Ensure form completeness is checked after pre-population
+    
+    // Ensure form completeness is checked after initialization
     WidgetsBinding.instance.addPostFrameCallback((_) {
       spp.checkFormComplete();
     });
@@ -120,12 +172,16 @@ class _SetPricingState extends State<SetPricing> {
                 leading: IconButton(
                   icon: Icon(Icons.chevron_left, size: width * 0.08),
                   onPressed: () {
-                    // Clear all fields in SetPriceProvider before navigating back
-                    spp.dailyPriceController.clear();
-                    spp.weeklyPriceController.clear();
-                    spp.monthlyPriceController.clear();
-                    spp.minimalRentalPeriodController.clear();
-                    spp.checkFormComplete();
+                    // Clear all fields before navigating back
+                    spp.clearAllFields();
+                    // Clear local controllers too
+                    _price7Controller.clear();
+                    _price14Controller.clear();
+                    
+                    // Also clear CreateItemProvider to ensure CreateItem form is reset
+                    final cip = Provider.of<CreateItemProvider>(context, listen: false);
+                    cip.reset();
+                    
                     Navigator.pop(context);
                   },
                 ),
@@ -154,6 +210,36 @@ class _SetPricingState extends State<SetPricing> {
                           controller: spp.dailyPriceController,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: (text) {
+                            // When daily price changes, update multi-day prices with discounts
+                            // BUT only if they haven't been manually set by the user
+                            if (text.isNotEmpty) {
+                              int dailyPrice = int.tryParse(text) ?? 0;
+                              
+                              if (dailyPrice > 0) {
+                                // Only auto-calculate prices that haven't been manually set
+                                if (!spp.weeklyPriceManuallySet) {
+                                  spp.weeklyPriceController.text = ((dailyPrice * 3 * 0.95).floor()).toString();
+                                }
+                                if (!spp.monthlyPriceManuallySet) {
+                                  spp.monthlyPriceController.text = ((dailyPrice * 5 * 0.90).floor()).toString();
+                                }
+                                if (!spp.price7ManuallySet) {
+                                  _price7Controller.text = ((dailyPrice * 7 * 0.85).floor()).toString();
+                                }
+                                if (!spp.price14ManuallySet) {
+                                  _price14Controller.text = ((dailyPrice * 14 * 0.80).floor()).toString();
+                                }
+                              }
+                            } else {
+                              // If daily price is cleared, clear all multi-day prices
+                              // But reset the manual flags since we're clearing everything
+                              spp.weeklyPriceController.clear();
+                              spp.monthlyPriceController.clear();
+                              _price7Controller.clear();
+                              _price14Controller.clear();
+                              // Reset manual flags when daily price is cleared
+                              spp.resetManualFlags();
+                            }
                             spp.checkFormComplete();
                           },
                           decoration: InputDecoration(
@@ -199,7 +285,23 @@ class _SetPricingState extends State<SetPricing> {
                           controller: spp.weeklyPriceController,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: (text) {
-                            // checkContents(text);
+                            // Mark as manually set when user edits this field
+                            spp.markWeeklyPriceAsManual();
+                            
+                            // Validate that 3-day price provides a discount (lower per-day rate)
+                            if (text.isNotEmpty && spp.dailyPriceController.text.isNotEmpty) {
+                              int dailyPrice = int.tryParse(spp.dailyPriceController.text) ?? 0;
+                              int price3Day = int.tryParse(text) ?? 0;
+                              double pricePerDay = price3Day / 3.0;
+                              if (pricePerDay >= dailyPrice) {
+                                // Set to 95% of daily price * 3 to ensure discount
+                                int discountedPrice = ((dailyPrice * 3 * 0.95).floor());
+                                spp.weeklyPriceController.text = discountedPrice.toString();
+                                spp.weeklyPriceController.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: spp.weeklyPriceController.text.length),
+                                );
+                              }
+                            }
                             spp.checkFormComplete();
                           },
                           decoration: InputDecoration(
@@ -241,7 +343,23 @@ class _SetPricingState extends State<SetPricing> {
                           controller: spp.monthlyPriceController,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: (text) {
-                            // checkContents(text);
+                            // Mark as manually set when user edits this field
+                            spp.markMonthlyPriceAsManual();
+                            
+                            // Validate that 5-day price provides a discount (lower per-day rate)
+                            if (text.isNotEmpty && spp.dailyPriceController.text.isNotEmpty) {
+                              int dailyPrice = int.tryParse(spp.dailyPriceController.text) ?? 0;
+                              int price5Day = int.tryParse(text) ?? 0;
+                              double pricePerDay = price5Day / 5.0;
+                              if (pricePerDay >= dailyPrice) {
+                                // Set to 90% of daily price * 5 to ensure discount
+                                int discountedPrice = ((dailyPrice * 5 * 0.90).floor());
+                                spp.monthlyPriceController.text = discountedPrice.toString();
+                                spp.monthlyPriceController.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: spp.monthlyPriceController.text.length),
+                                );
+                              }
+                            }
                             spp.checkFormComplete();
                           },
                           decoration: InputDecoration(
@@ -283,7 +401,26 @@ class _SetPricingState extends State<SetPricing> {
                           controller: _price7Controller,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: (text) {
-                            // Note: This is optional field, not required for form completion
+                            // Mark as manually set when user edits this field
+                            final spp = Provider.of<SetPriceProvider>(context, listen: false);
+                            spp.markPrice7AsManual();
+                            
+                            // Validate that 7-day price provides a discount (lower per-day rate)
+                            if (text.isNotEmpty) {
+                              if (spp.dailyPriceController.text.isNotEmpty) {
+                                int dailyPrice = int.tryParse(spp.dailyPriceController.text) ?? 0;
+                                int price7Day = int.tryParse(text) ?? 0;
+                                double pricePerDay = price7Day / 7.0;
+                                if (pricePerDay >= dailyPrice) {
+                                  // Set to 85% of daily price * 7 to ensure discount
+                                  int discountedPrice = ((dailyPrice * 7 * 0.85).floor());
+                                  _price7Controller.text = discountedPrice.toString();
+                                  _price7Controller.selection = TextSelection.fromPosition(
+                                    TextPosition(offset: _price7Controller.text.length),
+                                  );
+                                }
+                              }
+                            }
                           },
                           decoration: InputDecoration(
                             isDense: true,
@@ -324,7 +461,26 @@ class _SetPricingState extends State<SetPricing> {
                           controller: _price14Controller,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: (text) {
-                            // Note: This is optional field, not required for form completion
+                            // Mark as manually set when user edits this field
+                            final spp = Provider.of<SetPriceProvider>(context, listen: false);
+                            spp.markPrice14AsManual();
+                            
+                            // Validate that 14-day price provides a discount (lower per-day rate)
+                            if (text.isNotEmpty) {
+                              if (spp.dailyPriceController.text.isNotEmpty) {
+                                int dailyPrice = int.tryParse(spp.dailyPriceController.text) ?? 0;
+                                int price14Day = int.tryParse(text) ?? 0;
+                                double pricePerDay = price14Day / 14.0;
+                                if (pricePerDay >= dailyPrice) {
+                                  // Set to 80% of daily price * 14 to ensure discount
+                                  int discountedPrice = ((dailyPrice * 14 * 0.80).floor());
+                                  _price14Controller.text = discountedPrice.toString();
+                                  _price14Controller.selection = TextSelection.fromPosition(
+                                    TextPosition(offset: _price14Controller.text.length),
+                                  );
+                                }
+                              }
+                            }
                           },
                           decoration: InputDecoration(
                             isDense: true,
@@ -600,6 +756,13 @@ class _SetPricingState extends State<SetPricing> {
               ),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
+                
+                // Clear both providers to ensure next item creation is clean
+                final spp = Provider.of<SetPriceProvider>(context, listen: false);
+                spp.clearAllFields();
+                final cip = Provider.of<CreateItemProvider>(context, listen: false);
+                cip.reset();
+                
                 Navigator.of(context).pushReplacementNamed('/'); // Go to home/root
               },
               child: const Text(

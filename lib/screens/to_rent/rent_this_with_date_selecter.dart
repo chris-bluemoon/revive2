@@ -209,7 +209,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                       ),
                                       children: [
                                         const TextSpan(
-                                          text: '3 days @ ',
+                                          text: '3+ days @ ',
                                         ),
                                         TextSpan(
                                           text: '${getPricePerDay(3)}$symbol',
@@ -267,7 +267,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                           ),
                                           children: [
                                             const TextSpan(
-                                              text: '5 days @ ',
+                                              text: '5+ days @ ',
                                             ),
                                             TextSpan(
                                               text: '${getPricePerDay(5)}$symbol',
@@ -326,7 +326,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                           ),
                                           children: [
                                             const TextSpan(
-                                              text: '7 days @ ',
+                                              text: '7+ days @ ',
                                             ),
                                             TextSpan(
                                               text: '${getPricePerDay(7)}$symbol',
@@ -491,11 +491,25 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                           });
                           return;
                         }
+                        
+                        // Auto-assign radio button based on selected days
+                        int newSelectedOption = selectedOption;
+                        if (selectedDays >= 14) {
+                          newSelectedOption = 14;
+                        } else if (selectedDays >= 7 && widget.item.minDays <= 7) {
+                          newSelectedOption = 7;
+                        } else if (selectedDays >= 5 && widget.item.minDays <= 5) {
+                          newSelectedOption = 5;
+                        } else if (selectedDays >= 3 && widget.item.minDays <= 3) {
+                          newSelectedOption = 3;
+                        }
+                        
                         setState(() {
                           dateRange = picked;
                           startDate = picked.start;
                           endDate = picked.end;
                           noOfDays = selectedDays;
+                          selectedOption = newSelectedOption; // Update radio button selection
                           showConfirm = true;
                         });
                       } else {

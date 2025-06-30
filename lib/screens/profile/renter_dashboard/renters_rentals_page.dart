@@ -233,7 +233,8 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    widget.itemRenter.status.toLowerCase() == "cancelledrenter"
+                    widget.itemRenter.status.toLowerCase() == "cancelledrenter" ||
+                    widget.itemRenter.status.toLowerCase() == "cancelledlender"
                         ? "CANCELLED"
                         : widget.itemRenter.status.toUpperCase(),
                     style: TextStyle(
@@ -353,12 +354,75 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
               Row(
                 children: [
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       setState(() {
                         widget.itemRenter.status = "cancelledRenter";
                       });
                       Provider.of<ItemStoreProvider>(context, listen: false)
                           .saveItemRenter(widget.itemRenter);
+                      
+                      // Send notification to the lender
+                      NotificationService.sendNotification(
+                        notiType: NotiType.cancel,
+                        item: widget.itemName,
+                        notiReceiverId: widget.itemRenter.ownerId,
+                      );
+
+                      // Show alert dialog
+                      if (!context.mounted) return;
+                      await showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => AlertDialog(
+                          backgroundColor: Colors.white,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero, // Square corners
+                          ),
+                          title: const Text(
+                            "Booking Cancelled",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          content: const Text(
+                            "Your booking has been cancelled and the lender has been notified.",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          actionsAlignment: MainAxisAlignment.center,
+                          actions: [
+                            SizedBox(
+                              width: 100,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  foregroundColor: Colors.white,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.zero,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Close dialog
+                                  Navigator.of(context).pop(); // Go back to previous page
+                                },
+                                child: const Text(
+                                  "OK",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,

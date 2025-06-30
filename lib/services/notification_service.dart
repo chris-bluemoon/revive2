@@ -5,7 +5,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-enum NotiType { request, accept, payment }
+enum NotiType { request, accept, payment, cancel }
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log('Handling a background message: ${message.messageId}');
@@ -110,6 +110,10 @@ class NotificationService {
       case NotiType.payment:
         notiTitle = 'Payment Received';
         notiBody = 'Payment for $item has been successfully received';
+        break;
+      case NotiType.cancel:
+        notiTitle = 'Booking Cancelled';
+        notiBody = 'The booking for $item has been cancelled by the renter';
         break;
     }
     String? fcmToken;

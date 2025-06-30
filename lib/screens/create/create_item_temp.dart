@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/providers/set_price_provider.dart';
 import 'package:revivals/screens/create/create_item.dart';
 // Import your CreateItem page
 // import 'package:your_app/screens/create_item.dart';
@@ -20,6 +21,10 @@ class _CreateItemTempState extends State<CreateItemTemp> {
     super.initState();
     // Use addPostFrameCallback to ensure navigation happens after build
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Clear pricing provider for new item creation
+      final spp = Provider.of<SetPriceProvider>(context, listen: false);
+      spp.clearAllFields();
+      
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const CreateItem(item: null,)),
       );

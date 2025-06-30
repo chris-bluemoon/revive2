@@ -31,6 +31,7 @@ class CreateItem extends StatefulWidget {
 
 class _CreateItemState extends State<CreateItem> {
   bool _initialized = false;
+  bool _hasBeenCleared = false; // Flag to track if we've already cleared for new items
 
   late final bool isEditItemActive;
 
@@ -43,6 +44,18 @@ class _CreateItemState extends State<CreateItem> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    
+    // Always clear the provider for new items (not editing), but do it after build and only once
+    if (!isEditItemActive && !_hasBeenCleared) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final cip = Provider.of<CreateItemProvider>(context, listen: false);
+        cip.reset();
+        _imageFiles.clear(); // Also clear local image files
+        hashtags.clear(); // Clear hashtags
+        _hasBeenCleared = true; // Mark as cleared to prevent future clearing
+      });
+    }
+    
     if (!_initialized && widget.item != null) {
       final cip = Provider.of<CreateItemProvider>(context, listen: false);
       cip.sizeValue = (widget.item!.size.isNotEmpty) ? widget.item!.size[0].toString() : '';
@@ -134,7 +147,7 @@ class _CreateItemState extends State<CreateItem> {
 
   String number = '';
 
-  final TextEditingController _hashtagsController = TextEditingController();
+
   List<String> hashtags = [];
 
   @override
@@ -173,6 +186,10 @@ class _CreateItemState extends State<CreateItem> {
                 if (isEditItemActive) {
                   Navigator.of(context).pop();
                 } else {
+                  // Clear the provider before navigating away from new item creation
+                  final cip = Provider.of<CreateItemProvider>(context, listen: false);
+                  cip.reset();
+                  _hasBeenCleared = false; // Reset the flag for next time
                   Navigator.of(context).pushReplacementNamed("/");
                 }
               },

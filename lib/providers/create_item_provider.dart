@@ -35,17 +35,18 @@ class CreateItemProvider with ChangeNotifier {
   }
 
   void reset() {
+    isCompleteForm = false;
     sizeValue = '';
     productTypeValue = '';
     colourValue = '';
     brandValue = '';
     retailPriceValue = '';
-    retailPriceController.clear(); // <-- Add this line
+    retailPriceController.clear();
     shortDescController.clear();
     longDescController.clear();
     titleController.clear();
     images.clear();
-    // Reset any other fields as needed
+    notifyListeners(); // Notify UI of the reset
   }
 }
 
