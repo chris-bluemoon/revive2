@@ -2,8 +2,6 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/messages/message_conversation_page.dart';
 import 'package:revivals/shared/styled_text.dart';
 
@@ -205,12 +203,60 @@ class InboxPage extends StatelessWidget {
                       return false;
                     },
                     onDismissed: (direction) {
-                      // Remove the conversation from your data source
-                      // Optionally show a snackbar
-                      
-                      messagePreviews.removeAt(index);
-                      final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
-                      itemStore.deleteMessagesByParticipant(currentUserId);
+                      // Use post-frame callback to ensure the dismiss animation completes
+                      // before updating the data, preventing the tree inconsistency error
+                      WidgetsBinding.instance.addPostFrameCallback((_) async {
+                        // Delete the specific conversation between current user and the other user
+                        try {
+                          log('Starting deletion process - Current User: $currentUserId, Other User: ${preview.userId}');
+                          final firestore = FirebaseFirestore.instance;
+                          final query = await firestore
+                              .collection('messages')
+                              .where('participants', arrayContains: currentUserId)
+                              .get();
+
+                          log('Found ${query.docs.length} messages involving current user');
+
+                          for (var doc in query.docs) {
+                            final participants = List<String>.from(doc['participants'] ?? []);
+                            // Only delete messages in this specific conversation
+                            if (participants.contains(preview.userId) && participants.contains(currentUserId)) {
+                              final List<dynamic> deletedFor = doc['deletedFor'] ?? [];
+                              log('Processing message ${doc.id} - Participants: $participants, Before update - deletedFor: $deletedFor');
+                              if (!deletedFor.contains(currentUserId)) {
+                                await firestore.collection('messages').doc(doc.id).update({
+                                  'deletedFor': FieldValue.arrayUnion([currentUserId]),
+                                });
+                                log('✓ Updated message ${doc.id} - added ONLY $currentUserId to deletedFor');
+                              } else {
+                                log('⚠ Message ${doc.id} already marked as deleted for $currentUserId');
+                              }
+                            } else {
+                              log('⏩ Skipping message ${doc.id} - not part of this conversation (participants: $participants)');
+                            }
+                          }
+                          
+                          // Optionally show a snackbar
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Conversation deleted'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          log('Error deleting conversation: $e');
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Failed to delete conversation'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        }
+                      });
                     },
                     background: Container(
                       color: Colors.red,
