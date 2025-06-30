@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
@@ -25,43 +23,16 @@ class _FollowListScreenState extends State<FollowListScreen> {
   Widget build(BuildContext context) {
     final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
 
-    List<Widget> buildUserList(List<String> ids) {
-      final users = renters.where((r) => ids.contains(r.id)).toList();
-      if (users.isEmpty) {
-        return <Widget>[
-          const Center(
-            child: StyledBody('No users found', color: Colors.grey, weight: FontWeight.normal),
-          ),
-        ];
-      }
-      return users.map<Widget>((user) {
-        return ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Increased padding
-          leading: CircleAvatar(
-            backgroundColor: Colors.grey[300],
-            backgroundImage: (user.profilePicUrl.isNotEmpty)
-                ? NetworkImage(user.profilePicUrl)
-                : null,
-            child: (user.profilePicUrl.isEmpty)
-                ? const Icon(Icons.person, color: Colors.white)
-                : null,
-          ),
-          title: StyledHeading(user.name, weight: FontWeight.bold),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => Profile(userN: user.name, canGoBack: true,),
-              ),
-            );
-          },
-        );
-      }).toList();
-    }
-
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.chevron_left, size: MediaQuery.of(context).size.width * 0.08),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
           bottom: const TabBar(
             labelColor: Colors.black, // Selected tab text color
             unselectedLabelColor: Colors.grey, // Unselected tab text color
@@ -74,13 +45,15 @@ class _FollowListScreenState extends State<FollowListScreen> {
         ),
         body: TabBarView(
           children: [
+            // First tab: Followers
             Builder(
               builder: (context) {
-                final followingList = renters.where((r) => widget.followingIds.contains(r.id)).toList();
-                if (followingList.isEmpty) {
+                final followersList = renters.where((r) => widget.followersIds.contains(r.id)).toList();
+                
+                if (followersList.isEmpty) {
                   return Center(
                     child: Text(
-                      'Not Following Anyone',
+                      'No Current Followers',
                       style: TextStyle(
                         fontSize: 22,
                         color: Colors.grey[600],
@@ -91,11 +64,10 @@ class _FollowListScreenState extends State<FollowListScreen> {
                   );
                 }
                 return ListView.builder(
-                  itemCount: followingList.length,
+                  itemCount: followersList.length,
                   itemBuilder: (context, index) {
-                    final user = followingList[index];
+                    final user = followersList[index];
                     final isFollowing = Provider.of<ItemStoreProvider>(context, listen: false).renter.following.contains(user.id);
-                    log('Following user: ${user.name}, isFollowing: $isFollowing');
 
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Increased padding
@@ -136,13 +108,14 @@ class _FollowListScreenState extends State<FollowListScreen> {
                 );
               },
             ),
+            // Second tab: Following
             Builder(
               builder: (context) {
-                final followersList = renters.where((r) => widget.followersIds.contains(r.id)).toList();
-                if (followersList.isEmpty) {
+                final followingList = renters.where((r) => widget.followingIds.contains(r.id)).toList();
+                if (followingList.isEmpty) {
                   return Center(
                     child: Text(
-                      'No Current Followers',
+                      'Not Following Anyone',
                       style: TextStyle(
                         fontSize: 22,
                         color: Colors.grey[600],
@@ -153,11 +126,10 @@ class _FollowListScreenState extends State<FollowListScreen> {
                   );
                 }
                 return ListView.builder(
-                  itemCount: followersList.length,
+                  itemCount: followingList.length,
                   itemBuilder: (context, index) {
-                    final user = followersList[index];
+                    final user = followingList[index];
                     final isFollowing = Provider.of<ItemStoreProvider>(context, listen: false).renter.following.contains(user.id);
-                    log('Following user: ${user.name}, isFollowing: $isFollowing');
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Increased padding
                       leading: CircleAvatar(
@@ -177,7 +149,7 @@ class _FollowListScreenState extends State<FollowListScreen> {
                                 final currentUser = itemStore.renter;
                                 if (!currentUser.following.contains(user.id)) {
                                   currentUser.following.add(user.id);
-                                  itemStore.renter.following.add(currentUser); // Update the renter in the store
+                                  itemStore.renter.following.add(currentUser.id); // Fixed: should add user ID, not user object
                                 }
                               },
                               style: ElevatedButton.styleFrom(

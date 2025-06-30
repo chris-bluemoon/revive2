@@ -730,6 +730,13 @@ class ItemStoreProvider extends ChangeNotifier {
   Future<void> updateRenterStatus(String status) async {
     log('Updating renter status to: $status for user: ${_user.email}');
     await FirestoreService.updateRenterStatus(_user.id, status);
+    
+    // If the status is "deleted", clean up the user from all follow lists
+    if (status == 'deleted') {
+      log('User being deleted, cleaning up from follow lists');
+      await FirestoreService.cleanupDeletedUserFromFollowLists(_user.id);
+    }
+    
     // Update local user status
     _user = _user.copyWith(status: status);
     notifyListeners();

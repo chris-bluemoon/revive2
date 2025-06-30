@@ -233,12 +233,12 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
       log('Starting account deletion process for user: ${widget.renter.email}');
       
       setState(() {
-        _statusMessage = 'Updating account status in Firebase...';
+        _statusMessage = 'Deleting account and cleaning up data...';
       });
       
       // Use the fast status update method instead of full renter update
       await provider.updateRenterStatus('deleted');
-      log('Renter status updated to deleted in Firebase');
+      log('Renter status updated to deleted in Firebase and cleaned up from follow lists');
       
       setState(() {
         _statusMessage = 'Logging out...';

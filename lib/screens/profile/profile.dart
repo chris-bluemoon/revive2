@@ -378,8 +378,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => FollowListScreen(
-                                followersIds: profileOwner.following,
-                                followingIds: profileOwner.followers,
+                                followersIds: profileOwner.followers,
+                                followingIds: profileOwner.following,
                               ),
                             ),
                           );
@@ -398,11 +398,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       ),
                       // Followers count
                       GestureDetector(
-                        onTap: () {Navigator.of(context).push(
+                        onTap: () {
+                          Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => FollowListScreen(
-                                followersIds: profileOwner.following,
-                                followingIds: profileOwner.followers,
+                                followersIds: profileOwner.followers,
+                                followingIds: profileOwner.following,
                               ),
                             ),
                           );

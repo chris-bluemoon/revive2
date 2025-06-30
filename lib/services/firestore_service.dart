@@ -299,4 +299,56 @@ class FirestoreService {
   static Future<void> deleteItemById(String itemId) async {
     await FirebaseFirestore.instance.collection('item').doc(itemId).delete();
   }
+
+  // Clean up deleted user from all followers and following lists
+  static Future<void> cleanupDeletedUserFromFollowLists(String deletedUserId) async {
+    log('Cleaning up deleted user $deletedUserId from all follow lists');
+    
+    try {
+      // Get all renters
+      final QuerySnapshot<Renter> rentersSnapshot = await refRenter.get();
+      
+      // Track which renters need to be updated
+      List<Future<void>> updateTasks = [];
+      
+      for (var doc in rentersSnapshot.docs) {
+        final renter = doc.data();
+        bool needsUpdate = false;
+        
+        // Check if this renter has the deleted user in their followers list
+        List<String> updatedFollowers = List<String>.from(renter.followers);
+        if (updatedFollowers.contains(deletedUserId)) {
+          updatedFollowers.remove(deletedUserId);
+          needsUpdate = true;
+          log('Removing $deletedUserId from ${renter.name}\'s followers list');
+        }
+        
+        // Check if this renter has the deleted user in their following list
+        List<String> updatedFollowing = List<String>.from(renter.following);
+        if (updatedFollowing.contains(deletedUserId)) {
+          updatedFollowing.remove(deletedUserId);
+          needsUpdate = true;
+          log('Removing $deletedUserId from ${renter.name}\'s following list');
+        }
+        
+        // Update the renter if changes were made
+        if (needsUpdate) {
+          updateTasks.add(
+            refRenter.doc(renter.id).update({
+              'followers': updatedFollowers,
+              'following': updatedFollowing,
+            })
+          );
+        }
+      }
+      
+      // Execute all updates in parallel
+      await Future.wait(updateTasks);
+      log('Completed cleanup of deleted user $deletedUserId from ${updateTasks.length} renters');
+      
+    } catch (error) {
+      log('Error cleaning up deleted user from follow lists: $error');
+      rethrow;
+    }
+  }
 }
