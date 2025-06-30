@@ -651,10 +651,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 Builder(
                   builder: (context) {
                     final myItems = items.where((item) {
-                      final isOwner = isOwnProfile;
+                      // Only show items that belong to the profile owner and have "accepted" status
                       if (item.owner != profileOwner.id) return false;
                       if (item.status == 'accepted') return true;
-                      if (item.status == 'submitted' && isOwner) return true;
                       return false;
                     }).toList();
                     if (myItems.isEmpty) {
@@ -776,7 +775,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             if (item.owner == profileOwnerId) {
                               log("Item owner is the current profile, navigating to edit page");
                               log(item.owner.toString());
-                              log((profileOwner.id ?? '').toString());
+                              log(profileOwner.id.toString());
                               final result = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) => ToRent(item),
