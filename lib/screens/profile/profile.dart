@@ -39,6 +39,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   final Map<String, Future<String?>> _imageUrlFutures = {}; // <-- Add this
 
   String userName = '';
+  
+  // Cache computed values to avoid recalculating on every build
+  Renter? _cachedProfileOwner;
+  bool? _cachedIsOwnProfile;
+  String? _lastComputedForUserId; // Track when we last computed the cache
 
   // 1. Add a state variable at the top of _ProfileState:
   bool notificationsEnabled = true;
@@ -72,32 +77,53 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     return null;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    final itemStore = Provider.of<ItemStoreProvider>(context);
-    final List<Renter> myRenters = itemStore.renters;
+  // Method to efficiently compute profile owner and ownership status
+  void _computeProfileOwner(ItemStoreProvider itemStore) {
+    final currentUserId = itemStore.renter.id;
     
-    // Determine profile owner - if no userN specified, it's the current user's profile
-    Renter? profileOwner;
-    bool isOwnProfile = false;
+    // Only recompute if the current user has changed
+    if (_lastComputedForUserId == currentUserId && 
+        _cachedProfileOwner != null && 
+        _cachedIsOwnProfile != null) {
+      return; // Use cached values
+    }
     
     if (widget.userN == null || widget.userN!.isEmpty) {
       // This is the current logged-in user's profile
       final currentUser = itemStore.renter;
-      profileOwner = currentUser;
-      isOwnProfile = itemStore.loggedIn;
-      userName = currentUser.name; // Always update userName to current user's name
-      log('Showing own profile: ${currentUser.name}, ID: ${currentUser.id}, email: ${currentUser.email}');
+      _cachedProfileOwner = currentUser;
+      _cachedIsOwnProfile = itemStore.loggedIn;
+      userName = currentUser.name;
     } else {
-      // This is another user's profile, find by name
-      final List<Renter> ownerList = myRenters.where((r) => r.name == userName).toList();
-      profileOwner = ownerList.isNotEmpty ? ownerList.first : null;
-      final currentRenter = itemStore.renter;
-      final isLoggedIn = itemStore.loggedIn;
-      isOwnProfile = isLoggedIn && currentRenter.name == userName;
-      log('Showing other user profile: $userName');
+      // This is another user's profile, find by name efficiently
+      _cachedProfileOwner = null;
+      for (final renter in itemStore.renters) {
+        if (renter.name == userName) {
+          _cachedProfileOwner = renter;
+          break;
+        }
+      }
+      _cachedIsOwnProfile = itemStore.loggedIn && itemStore.renter.name == userName;
     }
+    
+    _lastComputedForUserId = currentUserId;
+    log('Profile computed - Owner: ${_cachedProfileOwner?.name}, IsOwn: $_cachedIsOwnProfile');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    final itemStore = Provider.of<ItemStoreProvider>(context);
+    
+    // Efficiently compute profile owner using cached values
+    _computeProfileOwner(itemStore);
+    
+    final profileOwner = _cachedProfileOwner;
+    final isOwnProfile = _cachedIsOwnProfile ?? false;
+    
+    // Get current user info for other parts of the widget
+    final currentRenter = itemStore.renter;
+    final isLoggedIn = itemStore.loggedIn;
 
     // Redirect to authenticate if userName is still 'no_user' after determining profile owner
     log('Current userName: $userName');
@@ -111,9 +137,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     final String profileOwnerId = profileOwner?.id ?? itemStore.renter.id;
     log('Profile Owner ID: ${profileOwner?.bio}');
 
-    // currentRenter is already available from the logic above
-    final currentRenter = itemStore.renter;
-    final isLoggedIn = itemStore.loggedIn;
     if (profileOwner == null) {
       return const Center(
         child: StyledBody(
@@ -125,7 +148,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     }
 
     final items = itemStore.items;
-    final myItemsCount = items.where((item) => item.owner == profileOwner?.id && item.status != 'deleted').length;
+    final myItemsCount = items.where((item) => item.owner == profileOwner.id && item.status != 'deleted').length;
 
     return Scaffold(
       appBar: AppBar(
@@ -355,8 +378,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => FollowListScreen(
-                                followersIds: profileOwner?.following ?? [],
-                                followingIds: profileOwner?.followers ?? [],
+                                followersIds: profileOwner.following,
+                                followingIds: profileOwner.followers,
                               ),
                             ),
                           );
@@ -378,8 +401,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                         onTap: () {Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => FollowListScreen(
-                                followersIds: profileOwner?.following ?? [],
-                                followingIds: profileOwner?.followers ?? [],
+                                followersIds: profileOwner.following,
+                                followingIds: profileOwner.followers,
                               ),
                             ),
                           );
@@ -446,7 +469,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 builder: (context) {
                   final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
                   final reviews = itemStore.reviews.where(
-                    (review) => review.reviewedUserId == profileOwner?.id,
+                    (review) => review.reviewedUserId == profileOwner.id,
                   ).toList();
                   if (reviews.isEmpty) {
                     return const StyledBody(
@@ -460,7 +483,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       Icon(Icons.star, color: Colors.amber, size: width * 0.05),
                       const SizedBox(width: 6),
                       StyledBody(
-                        (profileOwner?.avgReview ?? 0.0).toStringAsFixed(1),
+                        (profileOwner.avgReview ?? 0.0).toStringAsFixed(1),
                         color: Colors.black,
                         weight: FontWeight.bold,
                       ),
@@ -491,10 +514,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       width: double.infinity,
                       child: OutlinedButton(
                         onPressed: () async {
-                          if (profileOwner != null) {
                             final updatedRenter = await Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => EditProfilePage(renter: profileOwner!),
+                                builder: (context) => EditProfilePage(renter: profileOwner),
                               ),
                             );
                             if (updatedRenter != null) {
@@ -505,7 +527,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               if (index != -1) {
                                 itemStore.renters[index] = updatedRenter;
                               }
-                            }
 
                             // Update current renter if it's the same user
                             if (itemStore.renter.id == updatedRenter.id) {
@@ -543,10 +564,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                 MaterialPageRoute(
                                   builder: (context) => MessageConversationPage(
                                     currentUserId: currentRenter.id,
-                                    otherUserId: profileOwner?.id ?? '',
+                                    otherUserId: profileOwner.id ?? '',
                                     otherUser: {
-                                      'name': profileOwner?.name ?? '',
-                                      'profilePicUrl': profileOwner?.profilePicUrl ?? '',
+                                      'name': profileOwner.name ?? '',
+                                      'profilePicUrl': profileOwner.profilePicUrl ?? '',
                                     },
                                   ),
                                 ),
@@ -566,26 +587,24 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           child: OutlinedButton(
                             onPressed: () async {
                               // Implement follow/unfollow logic
-                              final isFollowing = profileOwner?.followers.contains(currentRenter.id) ?? false;
+                              final isFollowing = profileOwner.followers.contains(currentRenter.id) ?? false;
                               final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
 
-                              if (profileOwner != null) {
-                                if (isFollowing) {
-                                  // UNFOLLOW: Remove profileOwner.id from current user's following
-                                  itemStore.renter.following?.remove(profileOwner.id);
-                                  profileOwner.followers.remove(currentRenter.id);
-                                } else {
-                                  // FOLLOW: Add profileOwner.id to current user's following
-                                  itemStore.renter.following ??= [];
-                                  itemStore.renter.following!.add(profileOwner.id);
-                                  profileOwner.followers.add(currentRenter.id);
-                                }
-
-                                // Optionally, persist changes to backend here
-                                itemStore.saveRenter(itemStore.renter);
-                                itemStore.saveRenter(profileOwner);
+                              if (isFollowing) {
+                                // UNFOLLOW: Remove profileOwner.id from current user's following
+                                itemStore.renter.following?.remove(profileOwner.id);
+                                profileOwner.followers.remove(currentRenter.id);
+                              } else {
+                                // FOLLOW: Add profileOwner.id to current user's following
+                                itemStore.renter.following ??= [];
+                                itemStore.renter.following!.add(profileOwner.id);
+                                profileOwner.followers.add(currentRenter.id);
                               }
 
+                              // Optionally, persist changes to backend here
+                              itemStore.saveRenter(itemStore.renter);
+                              itemStore.saveRenter(profileOwner);
+                            
                               setState(() {});
                             },
                             style: OutlinedButton.styleFrom(
@@ -632,7 +651,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   builder: (context) {
                     final myItems = items.where((item) {
                       final isOwner = isOwnProfile;
-                      if (item.owner != profileOwner?.id) return false;
+                      if (item.owner != profileOwner.id) return false;
                       if (item.status == 'accepted') return true;
                       if (item.status == 'submitted' && isOwner) return true;
                       return false;
@@ -756,7 +775,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             if (item.owner == profileOwnerId) {
                               log("Item owner is the current profile, navigating to edit page");
                               log(item.owner.toString());
-                              log((profileOwner?.id ?? '').toString());
+                              log((profileOwner.id ?? '').toString());
                               final result = await Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) => ToRent(item),
@@ -810,7 +829,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
                     // Filter reviews where reviewedUserId matches the profile owner's id
                     final reviews = itemStore.reviews.where(
-                      (review) => review.reviewedUserId == profileOwner?.id,
+                      (review) => review.reviewedUserId == profileOwner.id,
                     ).toList();
 
                     if (reviews.isEmpty) {

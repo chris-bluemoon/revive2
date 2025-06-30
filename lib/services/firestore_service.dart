@@ -77,8 +77,19 @@ class FirestoreService {
   }
 
   // Update renter
-  static Future<void> updateRenter(Renter renter) async {
-    final String fcmToken = await NotificationService.getFCMToken();  // for firebase messaging
+  static Future<void> updateRenter(Renter renter, {bool refreshFcmToken = false}) async {
+    log('Updating renter in Firestore: ${renter.id} - ${renter.name}');
+    
+    String? fcmToken;
+    if (refreshFcmToken) {
+      log('Getting FCM token for ${renter.name}');
+      fcmToken = await NotificationService.getFCMToken();
+      log('Completed FCM token fetch for ${renter.name}');
+    } else {
+      // Use existing FCM token from renter object
+      fcmToken = renter.fcmToken;
+    }
+    
     await refRenter.doc(renter.id).update({
       'email': renter.email,
       'name': renter.name,
@@ -105,6 +116,11 @@ class FirestoreService {
       'fcmToken' : fcmToken,
       'status': renter.status,
     });
+  }
+
+  // Convenience method for updating renter with FCM token refresh
+  static Future<void> updateRenterWithFcmRefresh(Renter renter) async {
+    return updateRenter(renter, refreshFcmToken: true);
   }
 
   // Optimized version for profile updates - doesn't refresh FCM token

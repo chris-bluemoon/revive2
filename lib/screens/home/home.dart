@@ -66,6 +66,7 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false, // Never show back chevron on home page
           toolbarHeight: width * 0.2,
           actions: Provider.of<ItemStoreProvider>(context, listen: false).loggedIn
               ? [

@@ -236,7 +236,7 @@ class ItemStoreProvider extends ChangeNotifier {
   }
   Future<void> saveRenter(Renter renter) async {
     log('Updating renter: ${renter.name} with email: ${renter.type}');
-    await FirestoreService.updateRenter(renter);
+    await FirestoreService.updateRenter(renter, refreshFcmToken: false); // Default to no FCM refresh for performance
     // _renters[0].aditem = renter.aditem;
     // _user.aditem = renter.aditem;
     // fetchRentersOnce(); // Refddresh the renters list
@@ -337,7 +337,7 @@ class ItemStoreProvider extends ChangeNotifier {
         // Update lastLogin
         r.lastLogin = DateTime.now();
         assignUser(r);
-        await FirestoreService.updateRenter(r); // Save to Firestore, just for lastLogin
+        await FirestoreService.updateRenter(r, refreshFcmToken: false); // Save to Firestore, just for lastLogin - no need for FCM token refresh
         setLoggedIn(true);
         listenToMessages(r.id); // Start listening to messages for this user
         userFound = true;
@@ -599,7 +599,7 @@ class ItemStoreProvider extends ChangeNotifier {
       if (renterIndex != -1) {
         log('Updating reviewed user ${_renters[renterIndex].name} with new average: $avg');
         _renters[renterIndex].avgReview = avg;
-        await FirestoreService.updateRenter(_renters[renterIndex]);
+        await FirestoreService.updateRenter(_renters[renterIndex], refreshFcmToken: false); // Just updating average - no need for FCM token refresh
       }
     }
 
