@@ -158,9 +158,13 @@ class ItemStoreProvider extends ChangeNotifier {
 
   // assign the user
   void assignUser(Renter user) async {
-    // await FirestoreService.addItem(item);
+    log('=== ASSIGNING USER ===');
+    log('Assigning user: ${user.name} with email: ${user.email} and ID: ${user.id}');
+    log('Previous user was: ${_user.name} (${_user.id})');
     _user = user;
+    log('User assigned successfully. Current user is now: ${_user.name} (${_user.id})');
     notifyListeners();
+    log('=== END ASSIGNING USER ===');
   }
 
   // Fetch and set all ledgers for the current user
@@ -203,14 +207,26 @@ class ItemStoreProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addRenter(Renter renter) async {
+  Future<void> addRenter(Renter renter) async {
+    log('=== ADDING NEW RENTER ===');
+    log('Adding new renter: ${renter.name} with email: ${renter.email} and ID: ${renter.id}');
+    log('Current user before adding: ${_user.name} (${_user.id})');
     if (renter.status != 'deleted') {
       _renters.add(renter);
+      log('Added to renters list, new count: ${_renters.length}');
       await FirestoreService.addRenter(renter);
-      setCurrentUser(); // Set the current user to the newly added renter
+      log('Saved to Firestore');
+      // Directly assign the new user instead of searching through the list
+      assignUser(renter);
+      log('Assigned user');
       setLoggedIn(true);
+      log('Set logged in to true');
       notifyListeners();
+      log('Notified listeners');
+      log('Successfully added and assigned new renter: ${renter.name}');
+      log('Current user after adding: ${_user.name} (${_user.id})');
     }
+    log('=== END ADDING NEW RENTER ===');
   }
 
   void saveRenterLocal(Renter updated) {
@@ -296,21 +312,34 @@ class ItemStoreProvider extends ChangeNotifier {
     User? user = FirebaseAuth.instance.currentUser;
     log('Setting current user, then assigning: ${user?.email}');
     log('Renters (assigning) count: ${renters.length}');
+    
+    if (user?.email == null) {
+      log('No Firebase user found, cannot set current user');
+      return null;
+    }
+    
+    bool userFound = false;
     for (Renter r in renters) {
       log('Checking renter: ${r.email} with user email: ${user?.email}');
       if (r.email == user?.email) {
         // Update lastLogin
-        log('Checking assgining user: ${r.name} with email: ${r.type}');
+        log('Found matching user: ${r.name} with email: ${r.email}');
         r.lastLogin = DateTime.now();
         assignUser(r);
         await FirestoreService.updateRenter(r); // Save to Firestore, just for lastLogin
         setLoggedIn(true);
         listenToMessages(r.id); // Start listening to messages for this user
+        userFound = true;
+        break;
       }
     }
+    
+    if (!userFound) {
+      log('User not found in renters list. Email: ${user?.email}');
+    }
+    
     log('Renters (assigning) count: ${renters.length}');
     return user;
-    // return asda;
   }
 
   void setLoggedIn(bool loggedIn) {
@@ -464,7 +493,13 @@ class ItemStoreProvider extends ChangeNotifier {
         _renters.add(doc.data());
         log('Fetched renter: ${doc.data().type}');
       }
-      setCurrentUser();
+      // Only call setCurrentUser if no user is currently assigned or if the current user is the default placeholder
+      if (_user.id == '0000' || _user.name == 'no_user') {
+        log('No current user set, calling setCurrentUser()');
+        setCurrentUser();
+      } else {
+        log('Current user already set: ${_user.name}, skipping setCurrentUser()');
+      }
     }
     notifyListeners();
     return true;

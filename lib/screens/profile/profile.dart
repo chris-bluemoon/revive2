@@ -46,15 +46,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    if (widget.userN == null || widget.userN!.isEmpty) {
-      final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
-      // widget.userN is final, so you cannot assign to it. Consider using a local variable or refactor.
-      // For now, you can use a local variable to hold the user name.
-      userName = itemStore.renter.name;
-      log('Showing profile for (first If) ${itemStore.renter.name}');
-    } else {
+    // Don't set userName here - it will be determined dynamically in build()
+    if (widget.userN != null && widget.userN!.isNotEmpty) {
       userName = widget.userN!;
-      log('Showing profile for (2nd if) $userName');
+      log('Showing profile for specific user: $userName');
     }
     _tabController = TabController(length: 3, vsync: this);
   }
@@ -79,9 +74,32 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // final String? userName = widget.userN;
+    double width = MediaQuery.of(context).size.width;
+    final itemStore = Provider.of<ItemStoreProvider>(context);
+    final List<Renter> myRenters = itemStore.renters;
+    
+    // Determine profile owner - if no userN specified, it's the current user's profile
+    Renter? profileOwner;
+    bool isOwnProfile = false;
+    
+    if (widget.userN == null || widget.userN!.isEmpty) {
+      // This is the current logged-in user's profile
+      final currentUser = itemStore.renter;
+      profileOwner = currentUser;
+      isOwnProfile = itemStore.loggedIn;
+      userName = currentUser.name; // Always update userName to current user's name
+      log('Showing own profile: ${currentUser.name}, ID: ${currentUser.id}, email: ${currentUser.email}');
+    } else {
+      // This is another user's profile, find by name
+      final List<Renter> ownerList = myRenters.where((r) => r.name == userName).toList();
+      profileOwner = ownerList.isNotEmpty ? ownerList.first : null;
+      final currentRenter = itemStore.renter;
+      final isLoggedIn = itemStore.loggedIn;
+      isOwnProfile = isLoggedIn && currentRenter.name == userName;
+      log('Showing other user profile: $userName');
+    }
 
-    // Redirect to authenticate if userName is null or 'no_user'
+    // Redirect to authenticate if userName is still 'no_user' after determining profile owner
     log('Current userName: $userName');
     if (userName == 'no_user') {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -89,33 +107,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       });
       return const SizedBox.shrink();
     }
-
-    double width = MediaQuery.of(context).size.width;
-    final itemStore = Provider.of<ItemStoreProvider>(context);
-    final List<Renter> myRenters = itemStore.renters;
-    
-    // Determine profile owner - if no userN specified, it's the current user's profile
-    Renter? profileOwner;
-    if (widget.userN == null || widget.userN!.isEmpty) {
-      // This is the current logged-in user's profile
-      final currentUser = itemStore.renter;
-      profileOwner = currentUser;
-      if (currentUser.name != 'no_user') {
-        userName = currentUser.name; // Update userName to reflect current name
-      }
-    } else {
-      // This is another user's profile, find by name
-      final List<Renter> ownerList = myRenters.where((r) => r.name == userName).toList();
-      profileOwner = ownerList.isNotEmpty ? ownerList.first : null;
-    }
     
     final String profileOwnerId = profileOwner?.id ?? itemStore.renter.id;
     log('Profile Owner ID: ${profileOwner?.bio}');
 
-    // Determine if user is logged in and if this is their own profile
+    // currentRenter is already available from the logic above
     final currentRenter = itemStore.renter;
     final isLoggedIn = itemStore.loggedIn;
-    final isOwnProfile = isLoggedIn && currentRenter.name == userName;
     if (profileOwner == null) {
       return const Center(
         child: StyledBody(
@@ -367,7 +365,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                         child: Column(
                           children: [
                             StyledHeading(
-                              (profileOwner.following.length ?? 0).toString(),
+                              profileOwner.following.length.toString(),
                               weight: FontWeight.bold,
                             ),
                             const SizedBox(height: 2),
@@ -390,7 +388,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                         child: Column(
                           children: [
                             StyledHeading(
-                              (profileOwner.followers.length ?? 0).toString(),
+                              profileOwner.followers.length.toString(),
                               weight: FontWeight.bold,
                             ),
                             const SizedBox(height: 2),
@@ -480,7 +478,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 const SizedBox(height: 4),
                 Center(
                   child: StyledBody(
-                    profileOwner.bio ?? '',
+                    profileOwner.bio,
                     color: Colors.black,
                     weight: FontWeight.normal,
                   ),
@@ -597,7 +595,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               side: const BorderSide(width: 1.0, color: Colors.black),
                             ),
                             child: StyledHeading(
-                              (profileOwner.followers.contains(currentRenter.id) ?? false) ? 'UNFOLLOW' : 'FOLLOW',
+                              profileOwner.followers.contains(currentRenter.id) ? 'UNFOLLOW' : 'FOLLOW',
                               weight: FontWeight.bold,
                             ),
                           ),

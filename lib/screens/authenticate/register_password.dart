@@ -1,11 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/services/auth.dart';
-import 'package:revivals/shared/loading.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
 
@@ -27,6 +29,7 @@ class _RegisterPassword extends State<RegisterPassword> {
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
+  String loadingMessage = 'Creating your account...';
 
   // String password = '';
   bool ready = false;
@@ -72,23 +75,33 @@ class _RegisterPassword extends State<RegisterPassword> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
 
-    void handleNewLogIn(String email, String name) {
+    Future<void> handleNewLogIn(String email, String name) async {
+      log('=== HANDLE NEW LOGIN START ===');
+      log('Email: $email, Name: $name');
+      
       List<Renter> renters =
           Provider.of<ItemStoreProvider>(context, listen: false).renters;
+      log('Current renters count: ${renters.length}');
 
+      // Check if user already exists
       for (Renter r in renters) {
+        log('Checking existing renter: ${r.email}');
         if (r.email == email) {
           found = true;
-
-          Provider.of<ItemStoreProvider>(context, listen: false)
+          log('User already exists, calling setCurrentUser');
+          await Provider.of<ItemStoreProvider>(context, listen: false)
               .setCurrentUser();
-          break; // fixed this
+          break;
         } else {
           found = false;
         }
       }
+      
       if (found == false) {
+        log('User not found, creating new user');
         String jointUuid = uuid.v4();
+        log('Generated UUID: $jointUuid');
+        
         Renter newRenter = Renter(
           id: jointUuid,
           email: email,
@@ -108,24 +121,48 @@ class _RegisterPassword extends State<RegisterPassword> {
           following: [],
           avgReview: 0.0,
           lastLogin: DateTime.now(),
-          status: 'active', // <-- Added status field
+          status: 'active',
           vacations: [],
         );
         
-        Provider.of<ItemStoreProvider>(context, listen: false).addRenter(newRenter);
-
+        log('Created new renter object: ${newRenter.name} (${newRenter.id})');
+        
+        log('About to call addRenter - this will save to Firebase and assign user');
+        await Provider.of<ItemStoreProvider>(context, listen: false).addRenter(newRenter);
+        log('addRenter completed - user should now be assigned');
       }
 
+      log('Populating favourites...');
       Provider.of<ItemStoreProvider>(context, listen: false)
           .populateFavourites();
-
-      // Provider.of<ItemStoreProvider>(context, listen: false).populateFittings();
+      log('=== HANDLE NEW LOGIN END ===');
     }
 
     // NEW PASSWORD CODE
 
     return loading
-        ? const Loading()
+        ? Scaffold(
+            body: Container(
+              color: Colors.white,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SpinKitChasingDots(
+                      color: Colors.black,
+                      size: 50,
+                    ),
+                    const SizedBox(height: 20),
+                    StyledBody(
+                      loadingMessage,
+                      color: Colors.black,
+                      weight: FontWeight.w500,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
         : Scaffold(
             key: _formKey,
             appBar: AppBar(
@@ -319,7 +356,10 @@ class _RegisterPassword extends State<RegisterPassword> {
                         onPressed: () async {
                           // if (_formKey.currentState!.validate()) {
                           if (strength == 1) {
-                            setState(() => loading = true);
+                            setState(() {
+                              loading = true;
+                              loadingMessage = 'Creating your account...';
+                            });
                             dynamic result =
                                 await _auth.registerWithEmailAndPassword(
                                     widget.email, password);
@@ -380,11 +420,31 @@ class _RegisterPassword extends State<RegisterPassword> {
                                 _formKey.currentState!.reset();
                               });
                             } else {
-                              handleNewLogIn(widget.email, widget.name);
-if(context.mounted) {
-                              Navigator.of(context)
-                                  // .popUntil((route) => route.isFirst);}
-                                  .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);}
+                              // Keep loading state while setting up user
+                              setState(() {
+                                loadingMessage = 'Setting up your profile...';
+                              });
+                              try {
+                                await handleNewLogIn(widget.email, widget.name);
+                                // Only navigate if the context is still mounted
+                                if(context.mounted) {
+                                  setState(() {
+                                    loadingMessage = 'Welcome! Taking you to the app...';
+                                  });
+                                  // Small delay to show the welcome message
+                                  await Future.delayed(const Duration(milliseconds: 500));
+                                  // Reset loading state before navigation
+                                  setState(() => loading = false);
+                                  Navigator.of(context)
+                                      .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+                                }
+                              } catch (error) {
+                                log('Error during user setup: $error');
+                                if(context.mounted) {
+                                  setState(() => loading = false);
+                                  // Show error dialog if needed
+                                }
+                              }
                             }
                           }
                         },
