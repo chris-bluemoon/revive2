@@ -75,23 +75,27 @@ class _RegisterPassword extends State<RegisterPassword> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
 
-    Future<void> handleNewLogIn(String email, String name) async {
+    Future<void> handleNewLogIn(String email, String name, ItemStoreProvider provider) async {
       log('=== HANDLE NEW LOGIN START ===');
       log('Email: $email, Name: $name');
       
-      List<Renter> renters =
-          Provider.of<ItemStoreProvider>(context, listen: false).renters;
+      List<Renter> renters = provider.renters;
       log('Current renters count: ${renters.length}');
 
       // Check if user already exists
       for (Renter r in renters) {
-        log('Checking existing renter: ${r.email}');
+        log('Checking existing renter: ${r.email}, status: ${r.status}');
         if (r.email == email) {
-          found = true;
-          log('User already exists, calling setCurrentUser');
-          await Provider.of<ItemStoreProvider>(context, listen: false)
-              .setCurrentUser();
-          break;
+          if (r.status == 'deleted') {
+            log('User exists but account is deleted, cannot register/login');
+            found = false; // Treat as if user doesn't exist, allow new registration
+            break;
+          } else {
+            found = true;
+            log('User already exists and is active, calling setCurrentUser');
+            await provider.setCurrentUser();
+            break;
+          }
         } else {
           found = false;
         }
@@ -128,13 +132,12 @@ class _RegisterPassword extends State<RegisterPassword> {
         log('Created new renter object: ${newRenter.name} (${newRenter.id})');
         
         log('About to call addRenter - this will save to Firebase and assign user');
-        await Provider.of<ItemStoreProvider>(context, listen: false).addRenter(newRenter);
+        await provider.addRenter(newRenter);
         log('addRenter completed - user should now be assigned');
       }
 
       log('Populating favourites...');
-      Provider.of<ItemStoreProvider>(context, listen: false)
-          .populateFavourites();
+      provider.populateFavourites();
       log('=== HANDLE NEW LOGIN END ===');
     }
 
@@ -420,12 +423,15 @@ class _RegisterPassword extends State<RegisterPassword> {
                                 _formKey.currentState!.reset();
                               });
                             } else {
+                              // Store provider reference to avoid deactivated widget error
+                              final provider = Provider.of<ItemStoreProvider>(context, listen: false);
+                              
                               // Keep loading state while setting up user
                               setState(() {
                                 loadingMessage = 'Setting up your profile...';
                               });
                               try {
-                                await handleNewLogIn(widget.email, widget.name);
+                                await handleNewLogIn(widget.email, widget.name, provider);
                                 // Only navigate if the context is still mounted
                                 if(context.mounted) {
                                   setState(() {

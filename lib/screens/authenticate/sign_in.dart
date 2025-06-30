@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/renter.dart';
@@ -34,25 +35,72 @@ class _SignIn extends State<SignIn> {
 
   bool ready = false;
 
-  void handleFoundLogIn(String email) {
-    Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(true);
+  void handleFoundLogIn(String email) async {
+    // First refresh the renters list to get the latest data from Firebase
+    await Provider.of<ItemStoreProvider>(context, listen: false).fetchRentersOnce();
+    
     List<Renter> renters =
         Provider.of<ItemStoreProvider>(context, listen: false).renters;
     found = false;
+    bool isDeleted = false;
 
     for (Renter r in renters) {
-      log('Checking renter: ${r.email} against ${r.status}');
-      if (r.email == email && r.status != 'deleted') {
-        found = true;
-
-        Provider.of<ItemStoreProvider>(context, listen: false)
-            .setCurrentUser();
+      log('Checking renter: ${r.email} against status: ${r.status}');
+      if (r.email == email) {
+        if (r.status == 'deleted') {
+          log('User account is deleted: $email');
+          isDeleted = true;
+          break;
+        } else {
+          found = true;
+          Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(true);
+          Provider.of<ItemStoreProvider>(context, listen: false)
+              .setCurrentUser();
+          break;
+        }
       }
     }
-    if (found == false) {
-      log('Checking - Found is false for email: $email');
+
+    if (isDeleted) {
+      log('Showing deleted account error for email: $email');
       Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
-      log('Checking - showDialog');
+      
+      // Reset loading state since login is rejected
+      setState(() => loading = false);
+      
+      // Sign out from Firebase Auth since this account is deleted
+      try {
+        await FirebaseAuth.instance.signOut();
+        log('Signed out deleted user from Firebase Auth');
+      } catch (e) {
+        log('Error signing out deleted user: $e');
+      }
+      
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Account Deleted'),
+            content: const Text('This account has been deleted. If you believe this is an error, please contact us for assistance.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else if (found == false) {
+      log('User not found for email: $email');
+      Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
+      
+      // Reset loading state since login failed
+      setState(() => loading = false);
+      
+      log('Showing login error dialog');
       showDialog(
         context: context,
         builder: (BuildContext context) {

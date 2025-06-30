@@ -318,12 +318,23 @@ class ItemStoreProvider extends ChangeNotifier {
       return null;
     }
     
+    // First, refresh the renters list to get the latest data from Firebase
+    await fetchRentersOnce();
+    
     bool userFound = false;
     for (Renter r in renters) {
       log('Checking renter: ${r.email} with user email: ${user?.email}');
       if (r.email == user?.email) {
+        log('Found matching user: ${r.name} with email: ${r.email}, status: ${r.status}');
+        
+        // Check if the account is deleted - if so, reject login
+        if (r.status == 'deleted') {
+          log('Account is deleted, rejecting login and signing out');
+          await FirebaseAuth.instance.signOut();
+          throw Exception('Account has been deleted');
+        }
+        
         // Update lastLogin
-        log('Found matching user: ${r.name} with email: ${r.email}');
         r.lastLogin = DateTime.now();
         assignUser(r);
         await FirestoreService.updateRenter(r); // Save to Firestore, just for lastLogin
@@ -714,4 +725,13 @@ class ItemStoreProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+  // Fast update for renter status only
+  Future<void> updateRenterStatus(String status) async {
+    log('Updating renter status to: $status for user: ${_user.email}');
+    await FirestoreService.updateRenterStatus(_user.id, status);
+    // Update local user status
+    _user = _user.copyWith(status: status);
+    notifyListeners();
+  }
 }

@@ -118,6 +118,14 @@ class FirestoreService {
     });
   }
 
+  // Fast update for status only - doesn't refresh FCM token
+  static Future<void> updateRenterStatus(String renterId, String status) async {
+    await refRenter.doc(renterId).update({
+      'status': status,
+      'lastLogin': DateTime.now(),
+    });
+  }
+
   // get renters once
   static Future<QuerySnapshot<Renter>> getRentersOnce() {
     return refRenter.get();
