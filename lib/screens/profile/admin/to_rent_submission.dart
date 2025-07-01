@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:revivals/globals.dart' as globals;
 import 'package:revivals/models/item.dart';
 import 'package:revivals/providers/class_store.dart';
-import 'package:revivals/screens/sign_up/google_sign_in.dart';
+import 'package:revivals/screens/authenticate/sign_in_up.dart';
 import 'package:revivals/screens/to_rent/item_widget.dart';
 import 'package:revivals/shared/get_country_price.dart';
 import 'package:revivals/shared/styled_text.dart';

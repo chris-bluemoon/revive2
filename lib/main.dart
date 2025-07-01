@@ -11,12 +11,12 @@ import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/providers/create_item_provider.dart';
 import 'package:revivals/providers/set_price_provider.dart';
 import 'package:revivals/screens/authenticate/authenticate.dart';
+import 'package:revivals/screens/authenticate/sign_in_up.dart';
 import 'package:revivals/screens/help_centre/faqs.dart';
 import 'package:revivals/screens/help_centre/how_it_works.dart';
 import 'package:revivals/screens/help_centre/sizing_guide.dart';
 import 'package:revivals/screens/help_centre/who_are_we.dart';
 import 'package:revivals/screens/home_page.dart';
-import 'package:revivals/screens/sign_up/google_sign_in.dart';
 import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/theme.dart';
 

@@ -30,13 +30,25 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
 
   late bool found = false;
 
-  void handleNewLogIn(String email, String name) {
+  void handleNewLogIn(String email, String name) async {
+    print('=== DEBUG: handleNewLogIn called ===');
+    print('Email: $email');
+    print('Name: $name');
+    
     Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(true);
     List<Renter> renters =
         Provider.of<ItemStoreProvider>(context, listen: false).renters;
 
+    print('Total renters in database: ${renters.length}');
+    
+    // Debug: Print all renter emails to see what's available
+    for (int i = 0; i < renters.length; i++) {
+      print('Renter $i: ${renters[i].email} (status: ${renters[i].status})');
+    }
+
     for (Renter r in renters) {
       if (r.email == email && r.status != 'deleted') {
+        print('✓ User found: ${r.email}');
         found = true;
 
         Provider.of<ItemStoreProvider>(context, listen: false).setCurrentUser();
@@ -45,36 +57,21 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         found = false;
       }
     }
+    
+    print('User found: $found');
+    
     if (found == false) {
-      Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero, // Square corners
-            ),
-            title: const Text('Login Error'),
-            content: const Text('Error logging in, please contact support'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/', // Navigate to home page
-                    (route) => false,
-                  );
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
+      // Auto-register the new user
+      final newRenter = Renter(
+        id: uuid.v4(),
+        email: email,
+        name: name ?? email.split('@')[0], type: '', size: 0, address: '', countryCode: '', phoneNum: '', favourites: [], verified: '', imagePath: '', creationDate: '', location: '', bio: '', followers: [], following: [], avgReview: 0, lastLogin: DateTime.now(), vacations: [], status: 'active',
+        // ... other required fields
       );
-    } else {
-      // User found and logged in successfully
-      // Navigation will be handled by the success dialog
+      
+      // Add to database and local list
+      await Provider.of<ItemStoreProvider>(context, listen: false).addRenter(newRenter);
+      found = true;
     }
 
     Provider.of<ItemStoreProvider>(context, listen: false).populateFavourites();
@@ -129,9 +126,16 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                           userCredential.value = await signInWithGoogle();
                           hideProgressDialogue(context);
                           
+                          print('=== DEBUG: Google Sign-In Result ===');
+                          print('userCredential.value: ${userCredential.value}');
+                          
                           if (userCredential.value != null && context.mounted) {
-                            handleNewLogIn(userCredential.value.user!.email,
-                                userCredential.value.user!.displayName);
+                            final email = userCredential.value.user!.email;
+                            final displayName = userCredential.value.user!.displayName;
+                            print('Email from Google: $email');
+                            print('Display Name from Google: $displayName');
+                            
+                            handleNewLogIn(email, displayName);
                             
                             // Only show success dialog if user was found (found == true)
                             if (found == true) {
