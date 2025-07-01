@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -52,7 +53,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ? widget.renter.location
         : 'Bangkok';
     selectedCity = thailandCities.contains(initialCity) ? initialCity : 'Bangkok';
-    imagePath = widget.renter.profilePicUrl;
+    imagePath = widget.renter.imagePath; // Use imagePath directly instead of profilePicUrl
+    print('EditProfile initialized with imagePath: $imagePath'); // Debug log
   }
 
   @override
@@ -64,15 +66,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<String?> uploadProfileImage(File file) async {
     try {
+      print('Starting image upload for file: ${file.path}'); // Debug log
       final renterId = widget.renter.id; // Make sure your Renter model has an 'id' field
       final ext = path.extension(file.path);
       final filename = '${const Uuid().v4()}$ext';
       final ref = FirebaseStorage.instance.ref().child('profile_pics/$renterId/$filename');
+      print('Uploading to Firebase Storage path: profile_pics/$renterId/$filename'); // Debug log
       final uploadTask = await ref.putFile(file);
       final url = await uploadTask.ref.getDownloadURL();
+      print('Upload successful, URL: $url'); // Debug log
       return url;
     } catch (e) {
       // Handle error, e.g. show a snackbar
+      print('Upload failed with error: $e'); // Debug log
       return null;
     }
   }
@@ -91,8 +97,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (url != null) {
         setState(() {
           imagePath = url;
-          widget.renter.imagePath = url;
         });
+        print('Image uploaded successfully: $url'); // Debug log
+      } else {
+        print('Failed to upload image'); // Debug log
       }
     }
   }
@@ -106,12 +114,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
       // Save bio, location, name, and imagePath to your backend or state management
       final provider = Provider.of<ItemStoreProvider>(context, listen: false);
       
+      print('Saving profile - imagePath: $imagePath'); // Debug log
+      
       // Update the local renter object immediately for responsive UI
       provider.renter.bio = bioController.text;
       provider.renter.location = selectedCity ?? 'Bangkok';
       provider.renter.name = nameController.text;
       if (imagePath != null) {
         provider.renter.imagePath = imagePath!;
+        print('Updated renter imagePath to: ${provider.renter.imagePath}'); // Debug log
       }
       
       // Call the optimized update method
@@ -122,8 +133,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         name: nameController.text,
       );
       
+      print('Profile update complete'); // Debug log
+      
       if (mounted) {
-        Navigator.pop(context);
+        // Return the updated renter object so the profile page can refresh
+        Navigator.pop(context, provider.renter);
       }
     } catch (e) {
       // Handle error if needed
@@ -175,7 +189,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       backgroundColor: Colors.grey[300],
                       backgroundImage: imagePath != null && imagePath!.isNotEmpty
                           ? (imagePath!.startsWith('http')
-                              ? NetworkImage(imagePath!)
+                              ? CachedNetworkImageProvider(imagePath!)
                               : FileImage(File(imagePath!)) as ImageProvider
                             )
                           : null,
