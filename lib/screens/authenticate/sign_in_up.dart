@@ -25,6 +25,7 @@ class GoogleSignInScreen extends StatefulWidget {
 
 class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
   ValueNotifier userCredential = ValueNotifier('');
+  bool _isProcessingLogin = false; // Add this loading state
 
   bool showSignIn = true;
 
@@ -121,6 +122,24 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         body: ValueListenableBuilder(
           valueListenable: userCredential,
           builder: (context, value, child) {
+            // Show loading state when processing login after Google sign-in
+            if (_isProcessingLogin) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Loading(isDialog: false),
+                    SizedBox(height: 20),
+                    StyledBody(
+                      'Setting up your account...',
+                      color: Colors.grey,
+                      weight: FontWeight.normal,
+                    ),
+                  ],
+                ),
+              );
+            }
+            
             if (userCredential.value == '' || userCredential.value == null) {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -145,6 +164,10 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                       child: SignInButton(
                         Buttons.Google,
                         onPressed: () async {
+                          setState(() {
+                            _isProcessingLogin = true;
+                          });
+                          
                           showDialogue(context);
                           userCredential.value = await signInWithGoogle();
                           hideProgressDialogue(context);
@@ -170,6 +193,9 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                           } else {
                             // Sign-in was cancelled or failed
                             print('Google Sign-In was cancelled or failed');
+                            setState(() {
+                              _isProcessingLogin = false;
+                            });
                             if (context.mounted) {
                               showDialog(
                                 context: context,
@@ -281,15 +307,20 @@ void hideProgressDialogue(BuildContext context) {
 }
 
 class Loading extends StatelessWidget {
-  const Loading({super.key});
+  final bool isDialog;
+  const Loading({super.key, this.isDialog = true});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: const Center(
-        child: SpinKitChasingDots(color: Colors.black, size: 50),
-      ),
-    );
+    const spinner = SpinKitChasingDots(color: Colors.black, size: 50);
+    
+    if (isDialog) {
+      return Container(
+        color: Colors.white,
+        child: const Center(child: spinner),
+      );
+    } else {
+      return spinner;
+    }
   }
 }
