@@ -7,6 +7,7 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.width * 0.2,
         title: const Text('Settings'),
       ),
       body: const Center(

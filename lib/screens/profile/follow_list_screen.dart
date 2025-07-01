@@ -27,6 +27,7 @@ class _FollowListScreenState extends State<FollowListScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          toolbarHeight: MediaQuery.of(context).size.width * 0.2,
           leading: IconButton(
             icon: Icon(Icons.chevron_left, size: MediaQuery.of(context).size.width * 0.08),
             onPressed: () {

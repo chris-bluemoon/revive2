@@ -180,6 +180,7 @@ class _CreateItemState extends State<CreateItem> {
 
       return Scaffold(
           appBar: AppBar(
+            toolbarHeight: width * 0.2,
             leading: IconButton(
               icon: Icon(Icons.chevron_left, size: width * 0.08),
               onPressed: () {
@@ -194,7 +195,6 @@ class _CreateItemState extends State<CreateItem> {
                 }
               },
             ),
-            toolbarHeight: width * 0.2,
             centerTitle: true,
             title: StyledTitle(widget.item != null ? 'EDIT ITEM' : 'LIST ITEM'),
             // leading: IconButton(
