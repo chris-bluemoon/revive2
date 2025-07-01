@@ -48,7 +48,7 @@ class _InboxPageState extends State<InboxPage> {
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
               child: StyledBody(
-                'No Messages Yet',
+                'No New Messages',
                 color: Colors.grey,
                 weight: FontWeight.normal,
               ),
@@ -101,7 +101,7 @@ class _InboxPageState extends State<InboxPage> {
           if (visiblePreviews.isEmpty) {
             return const Center(
               child: StyledBody(
-                'No Messages Yet',
+                'No New Messages',
                 color: Colors.grey,
                 weight: FontWeight.normal,
               ),
