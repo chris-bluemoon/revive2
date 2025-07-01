@@ -154,12 +154,9 @@ class Renter {
   }
 
   String get profilePicUrl {
-    print('profilePicUrl getter called - imagePath: "$imagePath"'); // Debug
     if (imagePath.isNotEmpty && (imagePath.startsWith('http://') || imagePath.startsWith('https://'))) {
-      print('profilePicUrl returning: "$imagePath"'); // Debug
       return imagePath;
     }
-    print('profilePicUrl returning empty string'); // Debug
     return '';
   }
 }

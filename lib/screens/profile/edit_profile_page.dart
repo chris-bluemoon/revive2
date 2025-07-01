@@ -106,15 +106,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
       // Save bio, location, name, and imagePath to your backend or state management
       final provider = Provider.of<ItemStoreProvider>(context, listen: false);
       
-      print('Saving profile - imagePath: $imagePath'); // Debug log
-      
       // Update the local renter object immediately for responsive UI
       provider.renter.bio = bioController.text;
       provider.renter.location = selectedCity ?? 'Bangkok';
       provider.renter.name = nameController.text;
       if (imagePath != null) {
         provider.renter.imagePath = imagePath!;
-        print('Updated renter imagePath to: ${provider.renter.imagePath}'); // Debug log
       }
       
       // Call the optimized update method
@@ -124,8 +121,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         imagePath: imagePath,
         name: nameController.text,
       );
-      
-      print('Profile update complete'); // Debug log
       
       if (mounted) {
         // Return the updated renter object so the profile page can refresh

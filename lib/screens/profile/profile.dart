@@ -337,27 +337,20 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       ? Icon(Icons.person, size: width * 0.09, color: Colors.white)
                       : ClipRRect(
                           borderRadius: BorderRadius.circular(width * 0.09),
-                          child: Builder(
-                            builder: (context) {
-                              print('Displaying profile image with URL: ${profileOwner.profilePicUrl}'); // Debug
-                              return CachedNetworkImage(
-                                imageUrl: profileOwner.profilePicUrl,
-                                fit: BoxFit.cover,
-                                width: width * 0.18,
-                                height: width * 0.18,
-                                placeholder: (context, url) => Center(
-                                  child: SizedBox(
-                                    width: width * 0.06,
-                                    height: width * 0.06,
-                                    child: const CircularProgressIndicator(strokeWidth: 2),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) {
-                                  print('Error loading profile image: $error'); // Debug
-                                  return Icon(Icons.person, size: width * 0.09, color: Colors.white);
-                                },
-                              );
-                            },
+                          child: CachedNetworkImage(
+                            imageUrl: profileOwner.profilePicUrl,
+                            fit: BoxFit.cover,
+                            width: width * 0.18,
+                            height: width * 0.18,
+                            placeholder: (context, url) => Center(
+                              child: SizedBox(
+                                width: width * 0.06,
+                                height: width * 0.06,
+                                child: const CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.person, size: width * 0.09, color: Colors.white),
                           ),
                         ),
                 ),
@@ -520,22 +513,18 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       width: double.infinity,
                       child: OutlinedButton(
                         onPressed: () async {
-                            print('Navigating to EditProfilePage with profileOwner imagePath: ${profileOwner.imagePath}'); // Debug
                             final updatedRenter = await Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => EditProfilePage(renter: profileOwner),
                               ),
                             );
-                            print('Returned from EditProfilePage with updatedRenter: ${updatedRenter?.imagePath}'); // Debug
                             if (updatedRenter != null) {
                               final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
-                              print('Before update - itemStore.renter.imagePath: ${itemStore.renter.imagePath}'); // Debug
 
                               // Update in renters list
                               final index = itemStore.renters.indexWhere((r) => r.id == updatedRenter.id);
                               if (index != -1) {
                                 itemStore.renters[index] = updatedRenter;
-                                print('Updated renter in renters list at index $index'); // Debug
                               }
 
                             // Update current renter if it's the same user
@@ -546,7 +535,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               itemStore.renter.location = updatedRenter.location;
                               itemStore.renter.followers = updatedRenter.followers;
                               itemStore.renter.following = updatedRenter.following;
-                              print('After update - itemStore.renter.imagePath: ${itemStore.renter.imagePath}'); // Debug
                               // Add any other fields that need to be updated
                             }
                             
@@ -554,7 +542,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             _cachedProfileOwner = null;
                             _cachedIsOwnProfile = null;
                             _lastComputedForUserId = null;
-                            print('Cleared profile cache and calling setState'); // Debug
 
                             setState(() {}); // Refresh UI
                           }
