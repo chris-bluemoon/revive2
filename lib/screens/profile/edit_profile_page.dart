@@ -65,19 +65,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<String?> uploadProfileImage(File file) async {
     try {
-      print('Starting image upload for file: ${file.path}'); // Debug log
       final renterId = widget.renter.id; // Make sure your Renter model has an 'id' field
       final ext = path.extension(file.path);
       final filename = '${const Uuid().v4()}$ext';
       final ref = FirebaseStorage.instance.ref().child('profile_pics/$renterId/$filename');
-      print('Uploading to Firebase Storage path: profile_pics/$renterId/$filename'); // Debug log
       final uploadTask = await ref.putFile(file);
       final url = await uploadTask.ref.getDownloadURL();
-      print('Upload successful, URL: $url'); // Debug log
       return url;
     } catch (e) {
       // Handle error, e.g. show a snackbar
-      print('Upload failed with error: $e'); // Debug log
       return null;
     }
   }
@@ -97,9 +93,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         setState(() {
           imagePath = url;
         });
-        print('Image uploaded successfully: $url'); // Debug log
-      } else {
-        print('Failed to upload image'); // Debug log
       }
     }
   }
