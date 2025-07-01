@@ -54,7 +54,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         : 'Bangkok';
     selectedCity = thailandCities.contains(initialCity) ? initialCity : 'Bangkok';
     imagePath = widget.renter.imagePath; // Use imagePath directly instead of profilePicUrl
-    print('EditProfile initialized with imagePath: $imagePath'); // Debug log
   }
 
   @override
