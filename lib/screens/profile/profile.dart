@@ -153,6 +153,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: width * 0.2,
         leading: widget.canGoBack
             ? IconButton(
                 icon: Icon(Icons.chevron_left, size: width * 0.08),
