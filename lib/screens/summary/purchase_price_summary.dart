@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:revivals/globals.dart' as globals;
 import 'package:revivals/shared/styled_text.dart';
 
@@ -23,7 +24,7 @@ class PurchasePriceSummary extends StatelessWidget {
               children: [
                 const StyledBody('Purchase price', color: Colors.black, weight: FontWeight.normal),
                 const Expanded(child: SizedBox()),
-                StyledBody('$price${globals.thb}', color: Colors.black, weight: FontWeight.normal),
+                StyledBody('${NumberFormat('#,###').format(price)}${globals.thb}', color: Colors.black, weight: FontWeight.normal),
               ],
             ),
           ),
@@ -34,7 +35,7 @@ class PurchasePriceSummary extends StatelessWidget {
               children: [
                 const StyledHeading('Total', color: Colors.black),
                 const Expanded(child: SizedBox()),
-                StyledHeading('$price${globals.thb}', color: Colors.black),
+                StyledHeading('${NumberFormat('#,###').format(price)}${globals.thb}', color: Colors.black),
               ],
             ),
           ),

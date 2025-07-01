@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/globals.dart' as globals;
 import 'package:revivals/models/item.dart';
 import 'package:revivals/models/item_renter.dart';
+import 'package:revivals/models/ledger.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/summary/purchase_price_summary.dart';
 import 'package:revivals/screens/summary/summary_image_widget.dart';
+import 'package:revivals/services/notification_service.dart';
+import 'package:revivals/services/stripe_sevice.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
 
@@ -35,22 +39,6 @@ class _SummaryPurchaseState extends State<SummaryPurchase> {
     double width = MediaQuery.of(context).size.width;
 
     // int pricePerDay = widget.price~/widget.noOfDays;
-
-    void handleSubmit(String renterId, String ownerId, String itemId,
-        String startDate, String endDate, int price, String status) {
-      Provider.of<ItemStoreProvider>(context, listen: false)
-          .addItemRenter(ItemRenter(
-        id: uuid.v4(),
-        renterId: renterId,
-        ownerId: ownerId,
-        itemId: itemId,
-        transactionType: 'purchase',
-        startDate: startDate,
-        endDate: endDate,
-        price: price,
-        status: status,
-      ));
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -106,19 +94,13 @@ class _SummaryPurchaseState extends State<SummaryPurchase> {
           Center(
             child: Container(
               color: Colors.grey[200],
-              height: 70,
-              width: 350,
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                      child: StyledHeading(
-                          'Buying for ${widget.price}${globals.thb}',
-                          weight: FontWeight.normal)),
-                  // SizedBox(height: 5),
-                  // Text('(${pricePerDay}${globals.thb} per day)', style: TextStyle(fontSize: 14)),
-                ],
+              height: 50,
+              width: 300,
+              padding: const EdgeInsets.all(8),
+              child: Center(
+                child: StyledHeading(
+                    'Buying ${widget.item.name} for ${NumberFormat('#,###').format(widget.price)}${globals.thb}',
+                    weight: FontWeight.normal),
               ),
             ),
           ),
@@ -152,24 +134,91 @@ class _SummaryPurchaseState extends State<SummaryPurchase> {
                     ),
                     side: const BorderSide(width: 1.0, color: Colors.black),
                   ),
-                  onPressed: () {
-                    String email =
+                  onPressed: () async {
+                    // Use Stripe payment logic similar to renters_rentals_page
+                    try {
+                      print('Starting payment process for amount: ${widget.item.buyPrice}');
+                      bool success = await StripeService.instance
+                          .makePayment(widget.item.buyPrice);
+                      
+                      print('Payment result: $success');
+                      
+                      if (success) {
+                        print('Payment successful, proceeding with notifications and records');
+                        // Send notification to the owner
+                        NotificationService.sendNotification(
+                          notiType: NotiType.payment,
+                          item: widget.item.name,
+                          notiReceiverId: widget.item.owner,
+                        );
+                        
+                        if (!context.mounted) return;
+                        
+                        // Create the item renter record
+                        String email =
+                            Provider.of<ItemStoreProvider>(context, listen: false)
+                                .renter
+                                .email;
+                        String startDateText = widget.startDate.toString();
+                        String endDateText = widget.endDate.toString();
+                        
+                        final newItemRenter = ItemRenter(
+                          id: uuid.v4(),
+                          renterId: email,
+                          ownerId: widget.item.owner,
+                          itemId: widget.item.id,
+                          transactionType: 'purchase',
+                          startDate: startDateText,
+                          endDate: endDateText,
+                          price: widget.item.buyPrice,
+                          status: 'paid', // Set to paid since payment was successful
+                        );
+                        
                         Provider.of<ItemStoreProvider>(context, listen: false)
-                            .renter
-                            .email;
-                    String startDateText = widget.startDate.toString();
-                    String endDateText = widget.endDate.toString();
-                    handleSubmit(
-                        email,
-                        widget.item.owner,
-                        widget.item.id,
-                        startDateText,
-                        endDateText,
-                        widget.item.buyPrice,
-                        widget.status);
-                    showAlertDialog(context, widget.item.type, width);
-                    // Navigator.of(context).push(MaterialPageRoute(
-                    // builder: (context) => (const Congrats())));
+                            .addItemRenter(newItemRenter);
+                        
+                        // Create ledger entry
+                        ItemStoreProvider itemStore =
+                            Provider.of<ItemStoreProvider>(context, listen: false);
+                        Ledger newLedgerEntry = Ledger(
+                          id: uuid.v4(),
+                          itemRenterId: newItemRenter.id,
+                          owner: widget.item.owner,
+                          date: DateTime.now().toIso8601String(),
+                          type: "purchase",
+                          desc: "Payment for purchase of ${widget.item.name}",
+                          amount: widget.item.buyPrice,
+                          balance: itemStore.getBalance() + widget.item.buyPrice,
+                        );
+                        itemStore.addLedger(newLedgerEntry);
+                        
+                        // Show success dialog
+                        showAlertDialog(context, widget.item.type, width);
+                      } else {
+                        print('Payment failed - StripeService returned false');
+                        if (!context.mounted) return;
+                        
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Payment failed. Please try again.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    } catch (e, stackTrace) {
+                      print('Error in payment process: $e');
+                      print('Stack trace: $stackTrace');
+                      
+                      if (!context.mounted) return;
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Payment error: ${e.toString()}'),
+                          backgroundColor: Colors.red,
+                          duration: const Duration(seconds: 5),
+                        ),
+                      );
+                    }
                   },
                   child: Padding(
                     padding: EdgeInsets.all(width * 0.01),
