@@ -39,7 +39,13 @@ class InboxPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No messages'));
+            return const Center(
+              child: StyledBody(
+                'No Messages Yet',
+                color: Colors.grey,
+                weight: FontWeight.normal,
+              ),
+            );
           }
           // Filter out messages deleted for the current user
           final filteredDocs = snapshot.data!.docs.where((doc) {
@@ -80,6 +86,16 @@ class InboxPage extends StatelessWidget {
           for (var i in messagePreviews) {
             log('Message Preview: ${i.userId}, ${i.latestMessage}, ${i.time}');
           } 
+
+          if (messagePreviews.isEmpty) {
+            return const Center(
+              child: StyledBody(
+                'No Messages Yet',
+                color: Colors.grey,
+                weight: FontWeight.normal,
+              ),
+            );
+          }
 
           return ListView.separated(
             itemCount: messagePreviews.length,

@@ -149,7 +149,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     }
 
     final items = itemStore.items;
-    final myItemsCount = items.where((item) => item.owner == profileOwner.id && item.status != 'deleted').length;
+    final myItemsCount = items.where((item) => item.owner == profileOwner.id && item.status == 'accepted').length;
 
     return Scaffold(
       appBar: AppBar(
