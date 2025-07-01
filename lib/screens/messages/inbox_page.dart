@@ -5,10 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:revivals/screens/messages/message_conversation_page.dart';
 import 'package:revivals/shared/styled_text.dart';
 
-class InboxPage extends StatelessWidget {
+class InboxPage extends StatefulWidget {
   final String currentUserId; // Pass the current user's ID
 
   const InboxPage({super.key, required this.currentUserId});
+
+  @override
+  State<InboxPage> createState() => _InboxPageState();
+}
+
+class _InboxPageState extends State<InboxPage> {
+  final Set<String> _dismissedConversations = <String>{};
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +38,7 @@ class InboxPage extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('messages')
-            .where('participants', arrayContains: currentUserId)
+            .where('participants', arrayContains: widget.currentUserId)
             .orderBy('time', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
@@ -51,7 +58,7 @@ class InboxPage extends StatelessWidget {
           final filteredDocs = snapshot.data!.docs.where((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final deletedFor = List<String>.from(data['deletedFor'] ?? []);
-            return !deletedFor.contains(currentUserId);
+            return !deletedFor.contains(widget.currentUserId);
           }).toList();
 
           // Group messages by other participant to get the latest message per conversation
@@ -61,7 +68,7 @@ class InboxPage extends StatelessWidget {
             // No need to check deletedFor again here
             final participants = List<String>.from(data['participants'] ?? []);
             log('Participants: $participants');
-            final otherUserIds = participants.where((id) => id != currentUserId).toList();
+            final otherUserIds = participants.where((id) => id != widget.currentUserId).toList();
             if (otherUserIds.isEmpty) continue;
             final otherUserId = otherUserIds.first;
             if (!latestMessages.containsKey(otherUserId)) {
@@ -83,11 +90,15 @@ class InboxPage extends StatelessWidget {
             );
           }).toList();
 
-          for (var i in messagePreviews) {
+          // Filter out dismissed conversations
+          final visiblePreviews = messagePreviews.where((preview) => 
+              !_dismissedConversations.contains(preview.userId)).toList();
+
+          for (var i in visiblePreviews) {
             log('Message Preview: ${i.userId}, ${i.latestMessage}, ${i.time}');
           } 
 
-          if (messagePreviews.isEmpty) {
+          if (visiblePreviews.isEmpty) {
             return const Center(
               child: StyledBody(
                 'No Messages Yet',
@@ -98,7 +109,7 @@ class InboxPage extends StatelessWidget {
           }
 
           return ListView.separated(
-            itemCount: messagePreviews.length,
+            itemCount: visiblePreviews.length,
             separatorBuilder: (_, __) => const Row(
               children: [
                 SizedBox(width: 16), // Add space at the start
@@ -113,7 +124,7 @@ class InboxPage extends StatelessWidget {
               ],
             ),
             itemBuilder: (context, index) {
-              final preview = messagePreviews[index];
+              final preview = visiblePreviews[index];
               return FutureBuilder<DocumentSnapshot>(
                 future: FirebaseFirestore.instance
                     .collection('renter')
@@ -219,16 +230,21 @@ class InboxPage extends StatelessWidget {
                       return false;
                     },
                     onDismissed: (direction) {
+                      // Add the conversation to dismissed set immediately to prevent rebuild issues
+                      setState(() {
+                        _dismissedConversations.add(preview.userId);
+                      });
+                      
                       // Use post-frame callback to ensure the dismiss animation completes
                       // before updating the data, preventing the tree inconsistency error
                       WidgetsBinding.instance.addPostFrameCallback((_) async {
                         // Delete the specific conversation between current user and the other user
                         try {
-                          log('Starting deletion process - Current User: $currentUserId, Other User: ${preview.userId}');
+                          log('Starting deletion process - Current User: ${widget.currentUserId}, Other User: ${preview.userId}');
                           final firestore = FirebaseFirestore.instance;
                           final query = await firestore
                               .collection('messages')
-                              .where('participants', arrayContains: currentUserId)
+                              .where('participants', arrayContains: widget.currentUserId)
                               .get();
 
                           log('Found ${query.docs.length} messages involving current user');
@@ -236,16 +252,16 @@ class InboxPage extends StatelessWidget {
                           for (var doc in query.docs) {
                             final participants = List<String>.from(doc['participants'] ?? []);
                             // Only delete messages in this specific conversation
-                            if (participants.contains(preview.userId) && participants.contains(currentUserId)) {
+                            if (participants.contains(preview.userId) && participants.contains(widget.currentUserId)) {
                               final List<dynamic> deletedFor = doc['deletedFor'] ?? [];
                               log('Processing message ${doc.id} - Participants: $participants, Before update - deletedFor: $deletedFor');
-                              if (!deletedFor.contains(currentUserId)) {
+                              if (!deletedFor.contains(widget.currentUserId)) {
                                 await firestore.collection('messages').doc(doc.id).update({
-                                  'deletedFor': FieldValue.arrayUnion([currentUserId]),
+                                  'deletedFor': FieldValue.arrayUnion([widget.currentUserId]),
                                 });
-                                log('✓ Updated message ${doc.id} - added ONLY $currentUserId to deletedFor');
+                                log('✓ Updated message ${doc.id} - added ONLY ${widget.currentUserId} to deletedFor');
                               } else {
-                                log('⚠ Message ${doc.id} already marked as deleted for $currentUserId');
+                                log('⚠ Message ${doc.id} already marked as deleted for ${widget.currentUserId}');
                               }
                             } else {
                               log('⏩ Skipping message ${doc.id} - not part of this conversation (participants: $participants)');
@@ -270,6 +286,10 @@ class InboxPage extends StatelessWidget {
                                 duration: Duration(seconds: 2),
                               ),
                             );
+                            // Re-add to visible list if deletion failed
+                            setState(() {
+                              _dismissedConversations.remove(preview.userId);
+                            });
                           }
                         }
                       });
@@ -308,7 +328,7 @@ class InboxPage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (_) => MessageConversationPage(
-                              currentUserId: currentUserId,
+                              currentUserId: widget.currentUserId,
                               otherUserId: preview.userId,
                               otherUser: {
                                 'name': displayName,

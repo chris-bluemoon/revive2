@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:revivals/models/fitting_renter.dart';
 import 'package:revivals/models/item.dart';
 import 'package:revivals/models/item_image.dart';
@@ -12,6 +13,8 @@ import 'package:revivals/models/ledger.dart';
 import 'package:revivals/models/message.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/models/review.dart';
+import 'package:revivals/providers/create_item_provider.dart';
+import 'package:revivals/providers/set_price_provider.dart';
 import 'package:revivals/services/firestore_service.dart';
 import 'package:revivals/shared/secure_repo.dart';
 
@@ -309,31 +312,43 @@ class ItemStoreProvider extends ChangeNotifier {
   // }
 
   Future<dynamic> setCurrentUser() async {
+    log('=== SET CURRENT USER START ===');
     User? user = FirebaseAuth.instance.currentUser;
-    log('Setting current user, then assigning: ${user?.email}');
-    log('Renters (assigning) count: ${renters.length}');
+    log('Firebase Auth user: ${user?.email}');
+    log('Current renters count: ${renters.length}');
     
     if (user?.email == null) {
-      log('No Firebase user found, cannot set current user');
+      log('❌ No Firebase user found, cannot set current user');
+      log('=== SET CURRENT USER END (NO FIREBASE USER) ===');
       return null;
     }
     
-    // First, refresh the renters list to get the latest data from Firebase
-    await fetchRentersOnce();
+    // Don't fetch renters here to avoid recursion - they should already be loaded
+    if (renters.isEmpty) {
+      log('⚠️  WARNING: Renters list is empty when trying to set current user');
+      log('=== SET CURRENT USER END (NO RENTERS LOADED) ===');
+      return null;
+    }
     
     bool userFound = false;
     for (Renter r in renters) {
-      log('Checking renter: ${r.email} with user email: ${user?.email}');
+      log('🔍 Checking renter: "${r.email}" vs Firebase user: "${user?.email}"');
+      log('🔍 Renter status: "${r.status}" (trimmed: "${r.status.trim()}", length: ${r.status.length})');
+      
       if (r.email == user?.email) {
-        log('Found matching user: ${r.name} with email: ${r.email}, status: ${r.status}');
+        log('📧 EMAIL MATCH FOUND: ${r.name} with email: ${r.email}, status: "${r.status}"');
         
         // Check if the account is deleted - if so, reject login
-        if (r.status == 'deleted') {
-          log('Account is deleted, rejecting login and signing out');
+        if (r.status == 'deleted' || r.status.toLowerCase().trim() == 'deleted') {
+          log('🚫 DELETED ACCOUNT DETECTED: ${r.email} with status: "${r.status}"');
+          log('Signing out Firebase user...');
           await FirebaseAuth.instance.signOut();
+          log('✅ Firebase user signed out');
+          log('=== SET CURRENT USER END (DELETED USER REJECTED) ===');
           throw Exception('Account has been deleted');
         }
         
+        log('✅ ACCEPTING USER: ${r.name} with status: "${r.status}"');
         // Update lastLogin
         r.lastLogin = DateTime.now();
         assignUser(r);
@@ -341,43 +356,30 @@ class ItemStoreProvider extends ChangeNotifier {
         setLoggedIn(true);
         listenToMessages(r.id); // Start listening to messages for this user
         userFound = true;
+        log('✅ User successfully set and logged in');
         break;
       }
     }
     
     if (!userFound) {
-      log('User not found in renters list. Email: ${user?.email}');
+      log('❌ User not found in renters list. Firebase email: ${user?.email}');
+      log('Available renters:');
+      for (int i = 0; i < renters.length; i++) {
+        log('  Renter $i: ${renters[i].email} (status: ${renters[i].status})');
+      }
     }
     
-    log('Renters (assigning) count: ${renters.length}');
+    log('Final renters count: ${renters.length}');
+    log('=== SET CURRENT USER END ===');
     return user;
   }
 
   void setLoggedIn(bool loggedIn) {
-    _loggedIn = loggedIn;
     if (loggedIn == false) {
-      _user = Renter(
-        id: '0000',
-        email: 'dummy',
-        name: 'no_user',
-        type: 'USER',
-        size: 0,
-        countryCode: '',
-        address: '',
-        phoneNum: '',
-        favourites: [],
-        verified: 'not started',
-        imagePath: '',
-        creationDate: '',
-        location: '', // <-- Add this line
-        bio: '',
-        following: [],
-        followers: [],
-        vacations: [],
-        avgReview: 0.0,
-        lastLogin: DateTime.now(),
-        status: 'not active'
-      );
+      // When logging out, reset all provider state to ensure clean slate
+      resetAllProviderState();
+    } else {
+      _loggedIn = loggedIn;
       notifyListeners();
     } 
   }
@@ -498,20 +500,50 @@ class ItemStoreProvider extends ChangeNotifier {
   }
 
   Future<bool> fetchRentersOnce() async {
+    log('=== FETCH RENTERS ONCE START ===');
+    log('Current renters count: ${renters.length}');
+    log('Current user: ${_user.name} (${_user.id})');
+    
     if (renters.length == 0) {
+      log('Fetching renters from Firestore...');
       final snapshot = await FirestoreService.getRentersOnce();
+      log('Fetched ${snapshot.docs.length} renters from Firestore');
+      
       for (var doc in snapshot.docs) {
         _renters.add(doc.data());
-        log('Fetched renter: ${doc.data().type}');
+        log('Added renter: ${doc.data().email} (status: ${doc.data().status})');
       }
+      
       // Only call setCurrentUser if no user is currently assigned or if the current user is the default placeholder
       if (_user.id == '0000' || _user.name == 'no_user') {
-        log('No current user set, calling setCurrentUser()');
-        setCurrentUser();
+        log('No current user set, attempting auto-login via setCurrentUser()');
+        try {
+          await setCurrentUser();
+          log('✅ Auto-login via setCurrentUser() completed successfully');
+        } catch (e) {
+          log('💥 Exception caught during auto-login: $e');
+          if (e.toString().contains('Account has been deleted')) {
+            log('❌ DELETED USER CAUGHT BY AUTO-LOGIN: resetting all provider state');
+            // Reset all provider state to ensure clean slate for deleted user
+            resetAllProviderState();
+          } else {
+            log('❌ Other error in automatic setCurrentUser: $e');
+            // For other errors, we can choose to ignore or handle differently
+          }
+        }
       } else {
-        log('Current user already set: ${_user.name}, skipping setCurrentUser()');
+        log('Current user already set: ${_user.name} (${_user.id}), skipping setCurrentUser()');
       }
+    } else {
+      log('Renters already loaded (${renters.length} renters), skipping fetch');
     }
+    
+    log('Final state - renters count: ${renters.length}, user: ${_user.name} (${_user.id})');
+    
+    // Debug dump all renters data
+    debugDumpAllRenters();
+    
+    log('=== FETCH RENTERS ONCE END ===');
     notifyListeners();
     return true;
   }
@@ -740,5 +772,172 @@ class ItemStoreProvider extends ChangeNotifier {
     // Update local user status
     _user = _user.copyWith(status: status);
     notifyListeners();
+  }
+
+  /// Reset all provider state - call this when account is deleted or user logs out
+  void resetAllProviderState() {
+    log('🔄 RESETTING ALL PROVIDER STATE');
+    
+    // Clear all lists
+    _ledgers.clear();
+    _messages.clear();
+    _images.clear();
+    _items.clear();
+    _favourites.clear();
+    _fittings.clear();
+    _renters.clear();
+    _itemRenters.clear();
+    _fittingRenters.clear();
+    _reviews.clear();
+    
+    // Reset user to default state
+    _user = Renter(
+      id: '0000',
+      email: 'dummy',
+      name: 'no_user',
+      type: 'USER',
+      size: 0,
+      countryCode: '',
+      address: '',
+      phoneNum: '',
+      favourites: [],
+      verified: 'not started',
+      imagePath: '',
+      creationDate: '',
+      location: '',
+      bio: '',
+      following: [],
+      followers: [],
+      vacations: [],
+      avgReview: 0.0,
+      lastLogin: DateTime.now(),
+      status: 'not active'
+    );
+    
+    // Reset logged in status
+    _loggedIn = false;
+    
+    // Reset all filters to default state
+    _sizesFilter = {
+      '4': false,
+      '6': false,
+      '8': false,
+      '10': false,
+    };
+    _coloursFilter = {
+      Colors.black: false,
+      Colors.white: false,
+      Colors.blue: false,
+      Colors.red: false,
+      Colors.green: false,
+      Colors.yellow: false,
+      Colors.grey: false,
+      Colors.brown: false,
+      Colors.purple: false,
+      Colors.pink: false,
+      Colors.cyan: false,
+    };
+    _lengthsFilter = {
+      'mini': false,
+      'midi': false,
+      'long': false
+    };
+    _printsFilter = {
+      'enthic': false,
+      'boho': false,
+      'preppy': false,
+      'floral': false,
+      'abstract': false,
+      'stripes': false,
+      'dots': false,
+      'textured': false,
+      'none': false
+    };
+    _sleevesFilter = {
+      'sleeveless': false,
+      'short sleeve': false,
+      '3/4 sleeve': false,
+      'long sleeve': false
+    };
+    _rangeValuesFilter = const RangeValues(0, 10000);
+    
+    log('✅ Provider state reset complete');
+    notifyListeners();
+  }
+
+  /// Reset all providers state - call this when account is deleted
+  /// This should be called with context to access other providers
+  static void resetAllProviders(BuildContext context) {
+    log('🔄 RESETTING ALL PROVIDERS');
+    
+    // Reset the main item store provider
+    final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+    itemStore.resetAllProviderState();
+    
+    // Reset create item provider
+    final createItemProvider = Provider.of<CreateItemProvider>(context, listen: false);
+    createItemProvider.reset();
+    
+    // Reset price provider
+    final priceProvider = Provider.of<SetPriceProvider>(context, listen: false);
+    priceProvider.clearAllFields();
+    
+    log('✅ All providers reset complete');
+  }
+
+  // Debug method to dump all renters data
+  void debugDumpAllRenters() {
+    log('=== DEBUG: DUMPING ALL RENTERS DATA ===');
+    log('Total renters in memory: ${renters.length}');
+    
+    for (int i = 0; i < renters.length; i++) {
+      Renter r = renters[i];
+      log('Renter $i:');
+      log('  ID: ${r.id}');
+      log('  Email: "${r.email}"');
+      log('  Name: "${r.name}"');
+      log('  Status: "${r.status}" (length: ${r.status.length})');
+      log('  Status bytes: ${r.status.codeUnits}');
+      log('  Type: "${r.type}"');
+      log('  Verified: "${r.verified}"');
+      log('  LastLogin: ${r.lastLogin}');
+      log('  ---');
+    }
+    log('=== END DEBUG DUMP ===');
+  }
+
+  // Debug method to check specific user status
+  Future<void> debugCheckUserStatus(String email) async {
+    log('=== DEBUG: CHECKING STATUS FOR EMAIL: $email ===');
+    
+    // Ensure renters are loaded
+    await fetchRentersOnce();
+    
+    log('Searching among ${renters.length} renters...');
+    bool found = false;
+    
+    for (Renter r in renters) {
+      if (r.email == email) {
+        log('✅ FOUND USER: ${r.email}');
+        log('  ID: ${r.id}');
+        log('  Name: "${r.name}"');
+        log('  Status: "${r.status}" (length: ${r.status.length})');
+        log('  Status bytes: ${r.status.codeUnits}');
+        log('  Status == "deleted": ${r.status == "deleted"}');
+        log('  Status.toLowerCase().trim() == "deleted": ${r.status.toLowerCase().trim() == "deleted"}');
+        found = true;
+        break;
+      }
+    }
+    
+    if (!found) {
+      log('❌ USER NOT FOUND: $email');
+      log('Available emails:');
+      for (Renter r in renters) {
+        log('  - "${r.email}"');
+      }
+    }
+    
+    log('=== END DEBUG CHECK ===');
   }
 }

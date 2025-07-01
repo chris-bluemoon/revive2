@@ -4,7 +4,6 @@ import 'package:revivals/globals.dart' as globals;
 import 'package:revivals/models/item.dart';
 import 'package:revivals/models/item_renter.dart';
 import 'package:revivals/providers/class_store.dart';
-import 'package:revivals/screens/summary/delivery_radio_widget.dart';
 import 'package:revivals/screens/summary/purchase_price_summary.dart';
 import 'package:revivals/screens/summary/summary_image_widget.dart';
 import 'package:revivals/shared/styled_text.dart';
@@ -13,7 +12,7 @@ import 'package:uuid/uuid.dart';
 var uuid = const Uuid();
 
 class SummaryPurchase extends StatefulWidget {
-  SummaryPurchase(this.item, this.startDate, this.endDate, this.noOfDays,
+  const SummaryPurchase(this.item, this.startDate, this.endDate, this.noOfDays,
       this.price, this.status, this.symbol,
       {super.key});
 
@@ -24,8 +23,6 @@ class SummaryPurchase extends StatefulWidget {
   final int price;
   final String status;
   final String symbol;
-
-  final ValueNotifier<int> deliveryPrice = ValueNotifier<int>(0);
 
   @override
   State<SummaryPurchase> createState() => _SummaryPurchaseState();
@@ -53,12 +50,6 @@ class _SummaryPurchaseState extends State<SummaryPurchase> {
         price: price,
         status: status,
       ));
-    }
-
-    void updateDeliveryPrice(int newDeliveryPrice) {
-      setState(() {
-        widget.deliveryPrice.value = newDeliveryPrice;
-      });
     }
 
     return Scaffold(
@@ -139,19 +130,14 @@ class _SummaryPurchaseState extends State<SummaryPurchase> {
             endIndent: 50,
             color: Colors.grey[200],
           ),
-          // SizedBox(height: 20),
-          DeliveryRadioWidget(updateDeliveryPrice, widget.symbol),
+          // Remove delivery section
           Divider(
             height: 1,
             indent: 50,
             endIndent: 50,
             color: Colors.grey[300],
           ),
-          ValueListenableBuilder(
-              valueListenable: widget.deliveryPrice,
-              builder: (BuildContext context, int val, Widget? child) {
-                return PurchasePriceSummary(widget.price, val);
-              }),
+          PurchasePriceSummary(widget.price),
           const Expanded(child: SizedBox()),
           Row(
             children: [
@@ -187,7 +173,7 @@ class _SummaryPurchaseState extends State<SummaryPurchase> {
                   },
                   child: Padding(
                     padding: EdgeInsets.all(width * 0.01),
-                    child: const StyledHeading('CONFIRM', color: Colors.white),
+                    child: const StyledHeading('MAKE PAYMENT', color: Colors.white),
                   ),
                 ),
               ),

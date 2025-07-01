@@ -30,11 +30,12 @@ class StyledBody extends StatelessWidget {
 
 class StyledBodyStrikeout extends StatelessWidget {
   const StyledBodyStrikeout(this.text,
-      {this.color = Colors.grey, this.weight = FontWeight.normal, super.key}); // Default to grey and normal weight
+      {this.color = Colors.grey, this.weight = FontWeight.normal, this.fontSize, super.key}); // Add fontSize parameter
 
   final String text;
   final Color color;
   final FontWeight weight;
+  final double? fontSize; // Add this line
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +46,7 @@ class StyledBodyStrikeout extends StatelessWidget {
             decoration: TextDecoration.lineThrough,
             decorationColor: Colors.grey, // Make the strikeout grey
             decorationThickness: 1.5,     // Make the strikeout thinner
-            fontSize: width * 0.03,
+            fontSize: fontSize ?? width * 0.03, // Use custom fontSize or default
             color: color,
             fontWeight: weight,
           ),

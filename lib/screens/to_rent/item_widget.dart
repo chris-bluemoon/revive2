@@ -25,7 +25,7 @@ class _ItemWidgetState extends State<ItemWidget> {
   late String brandName;
   late String imageName;
   // late Image thisImage;
-  late String thisImage;
+  String thisImage = ''; // Initialize with empty string to prevent LateInitializationError
 
   // late List<Image> images = [];
   late List<String> images = [];
@@ -51,12 +51,24 @@ class _ItemWidgetState extends State<ItemWidget> {
         }
       }
     }
+    
+    // Find the specific image for this item number
+    thisImage = ''; // Reset to empty string
     for (ItemImage i
         in Provider.of<ItemStoreProvider>(context, listen: false).images) {
-      if (i.id == widget.item.imageId[widget.itemNumber - 1]) {
+      if (widget.item.imageId.isNotEmpty && 
+          widget.itemNumber <= widget.item.imageId.length &&
+          i.id == widget.item.imageId[widget.itemNumber - 1]) {
         log(widget.item.imageId[widget.itemNumber - 1].toString());
         thisImage = i.imageId;
+        break; // Exit loop once found
       }
+    }
+    
+    // If no image was found, try to use a fallback or placeholder
+    if (thisImage.isEmpty) {
+      log('No image found for item ${widget.item.name}, number ${widget.itemNumber}');
+      // Could set a default image URL here if needed
     }
     // images.add(thisImage);
     //   return thisImage;
@@ -64,18 +76,23 @@ class _ItemWidgetState extends State<ItemWidget> {
 
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => (ViewImage(
-                  images,
-                  0,
-                ))));
+        // Only navigate if we have images to show
+        if (images.isNotEmpty) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => (ViewImage(
+                    images,
+                    0,
+                  ))));
+        }
       },
-      child: CachedNetworkImage(
-        imageUrl: thisImage,
-        placeholder: (context, url) => const Loading(),
-        errorWidget: (context, url, error) =>
-            Image.asset('assets/img/items/No_Image_Available.jpg'),
-      ),
+      child: thisImage.isNotEmpty 
+          ? CachedNetworkImage(
+              imageUrl: thisImage,
+              placeholder: (context, url) => const Loading(),
+              errorWidget: (context, url, error) =>
+                  Image.asset('assets/img/items/No_Image_Available.jpg'),
+            )
+          : Image.asset('assets/img/items/No_Image_Available.jpg'), // Fallback when no image URL
     );
     // return Image.asset(setItemImage(), fit: BoxFit.contain);
     // child: Image.asset(setItemImage(),),

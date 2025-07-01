@@ -280,6 +280,10 @@ class _ToRentState extends State<ToRent> {
                         if (!isOwner)
                           IconButton(
                             onPressed: () {
+                              final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
+                              final ownerList = renters.where((r) => r.id == widget.item.owner).toList();
+                              final owner = ownerList.isNotEmpty ? ownerList.first : null;
+                              
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) => MessageConversationPage(
@@ -287,7 +291,7 @@ class _ToRentState extends State<ToRent> {
                                     otherUserId: widget.item.owner,
                                     otherUser: {
                                       'name': ownerName,
-                                      'profilePicUrl': '', // Add profilePic if available
+                                      'profilePicUrl': owner?.imagePath ?? '', // Use owner's imagePath or empty string as fallback
                                     },
                                   ),
                                 ),
@@ -389,37 +393,40 @@ class _ToRentState extends State<ToRent> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   StyledBody(
-                                    "7 Day Price",
+                                    "Daily Price",
                                     weight: FontWeight.bold,
                                     color: Colors.grey,
                                     fontSize: width * 0.042,
                                   ),
                                   StyledBody(
-                                    "${NumberFormat('#,###').format(widget.item.rentPrice7)}$symbol",
+                                    "${NumberFormat('#,###').format(widget.item.rentPriceDaily)}$symbol",
                                     weight: FontWeight.bold, // <-- Make value bold
                                     color: Colors.black,
                                     fontSize: width * 0.042,
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  StyledBody(
-                                    "Retail Price",
-                                    weight: FontWeight.bold,
-                                    color: Colors.grey,
-                                    fontSize: width * 0.042,
-                                  ),
-                                  StyledBody(
-                                    "${NumberFormat('#,###').format(widget.item.rrp)}$symbol",
-                                    weight: FontWeight.bold, // <-- Make value bold
-                                    color: Colors.black,
-                                    fontSize: width * 0.042,
-                                  ),
-                                ],
-                              ),
+                              // Show Buy Price if booking type is "buy" or "both"
+                              if (widget.item.bookingType == "buy" || widget.item.bookingType == "both") ...[
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    StyledBody(
+                                      "Buy Price",
+                                      weight: FontWeight.bold,
+                                      color: Colors.grey,
+                                      fontSize: width * 0.042,
+                                    ),
+                                    StyledBody(
+                                      "${NumberFormat('#,###').format(widget.item.buyPrice)}$symbol",
+                                      weight: FontWeight.bold, // <-- Make value bold
+                                      color: Colors.black,
+                                      fontSize: width * 0.042,
+                                    ),
+                                  ],
+                                ),
+                              ],
                               const SizedBox(height: 12),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -684,8 +691,8 @@ class _ToRentState extends State<ToRent> {
           padding: const EdgeInsets.all(10),
           child: Row(
             children: [
-              // Only show the rentPriceDaily row if not in edit mode
-              if (!isOwner)
+              // Only show the rentPriceDaily row if not in edit mode AND not both buy and rent
+              if (!isOwner && widget.item.bookingType != 'both')
                 Row(
                   children: [
                     StyledHeading(
@@ -700,8 +707,9 @@ class _ToRentState extends State<ToRent> {
                   ],
                 ),
               (widget.item.bookingType == 'buy' ||
-                      widget.item.bookingType == 'both')
+                      widget.item.bookingType == 'both') && !isOwner
                   ? Expanded(
+                      flex: widget.item.bookingType == 'both' ? 1 : 1, // Equal flex when both buttons are shown
                       child: OutlinedButton(
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
@@ -715,20 +723,33 @@ class _ToRentState extends State<ToRent> {
                                   symbol))));
                         },
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18), // Match RENT button padding
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(1.0),
                           ),
                           side: const BorderSide(width: 1.0, color: Colors.black),
+                          minimumSize: const Size(100, 44), // Match RENT button minimumSize
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-                        child: const StyledHeading('BUY PRELOVED'),
+                        child: Text(
+                          'BUY',
+                          style: TextStyle(
+                            fontSize: width * 0.05,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            letterSpacing: 1.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
                       ))
                   : const Expanded(child: SizedBox()),
               const SizedBox(width: 5),
               (widget.item.bookingType == 'rental' ||
                       widget.item.bookingType == 'both')
                   ? Expanded(
-                      flex: 5,
+                      flex: (widget.item.bookingType == 'both' && !isOwner) ? 1 : 5, // Equal flex when both buttons are shown to non-owners, full width otherwise
                       child: isOwner
                           ? Row(
                               children: [

@@ -36,7 +36,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
     print('Email: $email');
     print('Name: $name');
     
-    Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(true);
+    // Don't set logged in status until we verify the user is not deleted
     List<Renter> renters =
         Provider.of<ItemStoreProvider>(context, listen: false).renters;
 
@@ -58,7 +58,20 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         } else {
           print('✓ User found: ${r.email}');
           found = true;
-          Provider.of<ItemStoreProvider>(context, listen: false).setCurrentUser();
+          Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(true);
+          try {
+            await Provider.of<ItemStoreProvider>(context, listen: false).setCurrentUser();
+          } catch (e) {
+            if (e.toString().contains('Account has been deleted')) {
+              print('❌ DELETED USER CAUGHT BY PROVIDER: $email');
+              isDeleted = true;
+              found = false; // Reset found flag
+              Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
+            } else {
+              print('❌ Other error in setCurrentUser: $e');
+              rethrow;
+            }
+          }
           break;
         }
       } else {
@@ -142,6 +155,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
       
       // Set the newly created user as current user
       final provider = Provider.of<ItemStoreProvider>(context, listen: false);
+      provider.setLoggedIn(true);
       provider.setCurrentUser();
       
       found = true;
@@ -234,12 +248,12 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                             await handleNewLogIn(email, displayName);
                             
                             // Only navigate to home page if login was successful and user wasn't deleted
-                            if (context.mounted && found == true) {
+                            if (context.mounted && found == true && !_isProcessingLogin) {
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/', // Navigate to home page
                                 (route) => false,
                               );
-                            } else if (context.mounted) {
+                            } else if (context.mounted && _isProcessingLogin) {
                               // Reset processing state if login failed or account was deleted
                               setState(() {
                                 _isProcessingLogin = false;

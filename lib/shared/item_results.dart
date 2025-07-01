@@ -324,7 +324,7 @@ class _ItemResultsState extends State<ItemResults> {
                       itemBuilder: (_, index) => GestureDetector(
                           child: SizedBox(
                                   width: width * 0.5, // Constrain width
-                                  height: width * 1,
+                                  // Removed fixed height to let IntrinsicHeight work
                                   child: ItemCard(finalItems[index])),
                           onTap: () {
                             final item = finalItems[index];

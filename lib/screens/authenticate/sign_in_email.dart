@@ -36,34 +36,71 @@ class _SignIn extends State<SignIn> {
   bool ready = false;
 
   void handleFoundLogIn(String email) async {
+    log('=== DEBUG: handleFoundLogIn called for email: $email ===');
+    
     // First refresh the renters list to get the latest data from Firebase
     await Provider.of<ItemStoreProvider>(context, listen: false).fetchRentersOnce();
     
+    // Debug check specific user status
+    await Provider.of<ItemStoreProvider>(context, listen: false).debugCheckUserStatus(email);
+    
     List<Renter> renters =
         Provider.of<ItemStoreProvider>(context, listen: false).renters;
+    log('Total renters loaded: ${renters.length}');
+    
+    // Debug: Print all renters and their status
+    for (int i = 0; i < renters.length; i++) {
+      log('Renter $i: ${renters[i].email} (status: ${renters[i].status})');
+    }
+    
     found = false;
     bool isDeleted = false;
 
     for (Renter r in renters) {
-      log('Checking renter: ${r.email} against status: ${r.status}');
+      log('🔍 Checking renter: "${r.email}" against login email: "$email"');
+      log('🔍 Renter status: "${r.status}" (length: ${r.status.length})');
+      log('🔍 Email match: ${r.email == email}');
+      log('🔍 Status check: ${r.status == 'deleted'} (comparing "${r.status}" with "deleted")');
+      
       if (r.email == email) {
-        if (r.status == 'deleted') {
-          log('User account is deleted: $email');
+        log('📧 EMAIL MATCH FOUND for: $email');
+        
+        // Check status with multiple conditions to catch any variations
+        if (r.status == 'deleted' || r.status.toLowerCase().trim() == 'deleted') {
+          log('🚫 DELETED USER DETECTED: $email with status: "${r.status}"');
           isDeleted = true;
           break;
         } else {
+          log('✅ ACTIVE USER FOUND: $email with status: "${r.status}"');
           found = true;
           Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(true);
-          Provider.of<ItemStoreProvider>(context, listen: false)
-              .setCurrentUser();
+          try {
+            await Provider.of<ItemStoreProvider>(context, listen: false).setCurrentUser();
+            log('✅ setCurrentUser completed successfully');
+          } catch (e) {
+            log('💥 Exception caught from setCurrentUser: $e');
+            if (e.toString().contains('Account has been deleted')) {
+              log('❌ DELETED USER CAUGHT BY PROVIDER: $email');
+              isDeleted = true;
+              found = false; // Reset found flag
+              Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
+            } else {
+              log('❌ Other error in setCurrentUser: $e');
+              rethrow;
+            }
+          }
           break;
         }
       }
     }
 
+    log('Final state - found: $found, isDeleted: $isDeleted');
+
     if (isDeleted) {
-      log('Showing deleted account error for email: $email');
-      Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
+      log('🚨 DELETED USER DETECTED - RESETTING ALL PROVIDERS FOR: $email');
+      
+      // Reset all provider state to ensure no cached data remains
+      ItemStoreProvider.resetAllProviders(context);
       
       // Reset loading state since login is rejected
       setState(() => loading = false);
@@ -71,32 +108,37 @@ class _SignIn extends State<SignIn> {
       // Sign out from Firebase Auth since this account is deleted
       try {
         await FirebaseAuth.instance.signOut();
-        log('Signed out deleted user from Firebase Auth');
+        log('✓ Signed out deleted user from Firebase Auth');
       } catch (e) {
-        log('Error signing out deleted user: $e');
+        log('❌ Error signing out deleted user: $e');
       }
       
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero, // Square corners
-            ),
-            title: const Text('Account Deleted'),
-            content: const Text('This account has been deleted. If you believe this is an error, please contact us for assistance.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                child: const Text('OK'),
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero, // Square corners
               ),
-            ],
-          );
-        },
-      );
+              title: const Text('Account Deleted'),
+              content: const Text('This account has been deleted. If you believe this is an error, please contact us for assistance.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    log('User dismissed deleted account dialog');
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+      log('🛑 RETURNING EARLY FOR DELETED USER');
+      return; // Exit early, don't proceed with login
     } else if (found == false) {
       log('User not found for email: $email');
       Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
@@ -132,6 +174,7 @@ class _SignIn extends State<SignIn> {
       );
     } else {
       // User found and logged in successfully, navigate to home
+      log('🏠 NAVIGATING TO HOME PAGE FOR USER: $email');
       if (context.mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil(
           '/', // Replace with your HomePage route name
@@ -316,6 +359,11 @@ class _SignIn extends State<SignIn> {
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             setState(() => loading = true);
+                            
+                            // Debug check before sign in
+                            final itemProvider = Provider.of<ItemStoreProvider>(context, listen: false);
+                            await itemProvider.debugCheckUserStatus(email);
+                            
                             dynamic result = await _auth
                                 .signInWithEmailAndPassword(email, password);
 

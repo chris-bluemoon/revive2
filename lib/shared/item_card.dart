@@ -169,13 +169,14 @@ class _ItemCardState extends State<ItemCard> {
         borderRadius: BorderRadius.circular(10.0),
       ),
       color: Colors.white,
-      child: Padding(
-        padding: EdgeInsets.all(width * 0.03), // Slightly more padding
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: IntrinsicHeight(
+        child: Padding(
+          padding: EdgeInsets.all(width * 0.025), // Reduced padding
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Center(child: StyledHeading(widget.item.brand)),
-            SizedBox(height: width * 0.015),
+            SizedBox(height: width * 0.01), // Reduced spacing
             AspectRatio(
               aspectRatio: 3 / 4,
               child: Stack(
@@ -256,7 +257,7 @@ class _ItemCardState extends State<ItemCard> {
                 ],
               ),
             ),
-            SizedBox(height: width * 0.02), // Add this gap below the image
+            SizedBox(height: width * 0.015), // Kept this spacing after image
             Row(
               children: [
                 Container(
@@ -271,32 +272,37 @@ class _ItemCardState extends State<ItemCard> {
                 SizedBox(width: width * 0.01),
               ],
             ),
-            SizedBox(height: width * 0.015),
+            SizedBox(height: width * (widget.item.bookingType == 'both' ? 0.005 : 0.01)), // Even less spacing for 'both' type
             StyledBody(
               '${widget.item.type}, UK ${widget.item.size}',
               weight: FontWeight.normal,
             ),
-            SizedBox(height: width * 0.015),
-            if (widget.item.bookingType == 'both' ||
-                widget.item.bookingType == 'rental')
+            SizedBox(height: width * (widget.item.bookingType == 'both' ? 0.005 : 0.01)), // Even less spacing for 'both' type
+            // Show rental price for "rental" or "both" booking types
+            if (widget.item.bookingType == 'rental' || widget.item.bookingType == 'both')
               StyledBody(
-                'Rent from $convertedRentPrice$symbol', // <-- Removed " per day"
+                'Rent from $convertedRentPrice$symbol',
                 weight: FontWeight.bold,
-                color: Colors.black, // <-- Make this row black
+                color: Colors.black,
+                fontSize: widget.item.bookingType == 'both' ? width * 0.03 : null, // Smaller text for 'both'
               ),
-            if (widget.item.bookingType == 'both' ||
-                widget.item.bookingType == 'buy')
-              ...[
-                SizedBox(height: width * 0.015),
-                StyledBody('Buy for $convertedBuyPrice$symbol',
-                    weight: FontWeight.normal),
-              ],
-            SizedBox(height: width * 0.015),
+            // Show buy price for "buy" or "both" booking types
+            if (widget.item.bookingType == 'buy' || widget.item.bookingType == 'both') ...[
+              if (widget.item.bookingType == 'both') SizedBox(height: width * 0.005), // Even smaller spacing
+              StyledBody(
+                'Buy for $convertedBuyPrice$symbol',
+                weight: FontWeight.normal,
+                fontSize: widget.item.bookingType == 'both' ? width * 0.03 : null, // Smaller text for 'both'
+              ),
+            ],
+            SizedBox(height: width * (widget.item.bookingType == 'both' ? 0.005 : 0.01)), // Conditional spacing
             StyledBodyStrikeout('RRP ${widget.item.rrp}$symbol',
-                weight: FontWeight.normal),
+                weight: FontWeight.normal,
+                fontSize: widget.item.bookingType == 'both' ? width * 0.025 : null), // Smaller RRP text for 'both'
           ],
         ),
       ),
+    ),
     );
   }
 }
