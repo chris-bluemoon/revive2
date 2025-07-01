@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -336,22 +337,19 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       ? Icon(Icons.person, size: width * 0.09, color: Colors.white)
                       : ClipRRect(
                           borderRadius: BorderRadius.circular(width * 0.09),
-                          child: Image.network(
-                            profileOwner.profilePicUrl,
+                          child: CachedNetworkImage(
+                            imageUrl: profileOwner.profilePicUrl,
                             fit: BoxFit.cover,
                             width: width * 0.18,
                             height: width * 0.18,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Center(
-                                child: SizedBox(
-                                  width: width * 0.06,
-                                  height: width * 0.06,
-                                  child: const CircularProgressIndicator(strokeWidth: 2),
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) =>
+                            placeholder: (context, url) => Center(
+                              child: SizedBox(
+                                width: width * 0.06,
+                                height: width * 0.06,
+                                child: const CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
                                 Icon(Icons.person, size: width * 0.09, color: Colors.white),
                           ),
                         ),
@@ -682,42 +680,48 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                         if (isDirectUrl(imageId)) {
                           imageWidget = ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              imageId,
+                            child: CachedNetworkImage(
+                              imageUrl: imageId,
                               width: 56,
                               height: 56,
                               fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  ),
-                                );
-                              },
+                              placeholder: (context, url) => const Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                width: 56,
+                                height: 56,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.error, color: Colors.grey),
+                              ),
                             ),
                           );
                         } else if (isMapWithUrl(imageId)) {
                           final url = imageId['url'];
                           imageWidget = ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              url,
+                            child: CachedNetworkImage(
+                              imageUrl: url,
                               width: 56,
                               height: 56,
                               fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  ),
-                                );
-                              },
+                              placeholder: (context, url) => const Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                width: 56,
+                                height: 56,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.error, color: Colors.grey),
+                              ),
                             ),
                           );
                         } else if (imageId is String && imageId.isNotEmpty) {
@@ -738,21 +742,24 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               if (url != null) {
                                 return ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
-                                  child: Image.network(
-                                    url,
+                                  child: CachedNetworkImage(
+                                    imageUrl: url,
                                     width: 56,
                                     height: 56,
                                     fit: BoxFit.cover,
-                                    loadingBuilder: (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return const Center(
-                                        child: SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
-                                        ),
-                                      );
-                                    },
+                                    placeholder: (context, url) => const Center(
+                                      child: SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Container(
+                                      width: 56,
+                                      height: 56,
+                                      color: Colors.grey[300],
+                                      child: const Icon(Icons.error, color: Colors.grey),
+                                    ),
                                   ),
                                 );
                               }
@@ -894,7 +901,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                   radius: 22,
                                   backgroundColor: Colors.grey[300],
                                   backgroundImage: (reviewerPic.isNotEmpty)
-                                      ? NetworkImage(reviewerPic)
+                                      ? CachedNetworkImageProvider(reviewerPic)
                                       : null,
                                   child: (reviewerPic.isEmpty)
                                       ? const Icon(Icons.person, color: Colors.white)
