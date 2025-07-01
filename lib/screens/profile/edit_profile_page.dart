@@ -238,7 +238,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: EdgeInsets.only(left: 4, bottom: 6),
-                child: StyledBody('Location', color: Colors.black, weight: FontWeight.bold),
+                child: StyledBody('Location', color: Colors.black, weight: FontWeight.normal),
               ),
             ),
             DropdownButtonFormField<String>(
