@@ -80,6 +80,10 @@ class _SignIn extends State<SignIn> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Colors.white,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero, // Square corners
+            ),
             title: const Text('Account Deleted'),
             content: const Text('This account has been deleted. If you believe this is an error, please contact us for assistance.'),
             actions: [
@@ -105,6 +109,10 @@ class _SignIn extends State<SignIn> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Colors.white,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero, // Square corners
+            ),
             title: const Text('Login Error'),
             content: const Text('Error logging in, please contact support'),
             actions: [
@@ -318,8 +326,7 @@ class _SignIn extends State<SignIn> {
                                 context: context,
                                 builder: (_) => AlertDialog(
                                   shape: const RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(0))),
+                                      borderRadius: BorderRadius.zero), // Square corners
                                   actions: [
                                     // ElevatedButton(
                                     // onPressed: () {cancelLogOut(context);},
@@ -423,6 +430,7 @@ class _SignIn extends State<SignIn> {
     );
     // Create AlertDialog
     AlertDialog alert = AlertDialog(
+      backgroundColor: Colors.white,
       title: const Center(child: StyledHeading('EMAIL NOT FOUND')),
       content: SizedBox(
         height: width * 0.1,
@@ -451,7 +459,7 @@ class _SignIn extends State<SignIn> {
         okButton,
       ],
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(-1.0)),
+        borderRadius: BorderRadius.zero, // Square corners
       ),
     );
     showDialog(
@@ -484,6 +492,7 @@ class _SignIn extends State<SignIn> {
     );
     // Create AlertDialog
     AlertDialog alert = AlertDialog(
+      backgroundColor: Colors.white,
       title: const Center(child: StyledHeading('PASSWORD RESET SENT')),
       content: SizedBox(
         height: width * 0.1,
@@ -513,7 +522,7 @@ class _SignIn extends State<SignIn> {
         okButton,
       ],
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(-1.0)),
+        borderRadius: BorderRadius.zero, // Square corners
       ),
     );
     showDialog(

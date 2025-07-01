@@ -245,6 +245,7 @@ class _SummaryPurchaseState extends State<SummaryPurchase> {
     );
     // Create AlertDialog
     AlertDialog alert = AlertDialog(
+      backgroundColor: Colors.white,
       title: const Center(child: StyledHeading("Thank you!")),
       content: SizedBox(
         height: width * 0.15,

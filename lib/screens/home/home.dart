@@ -319,6 +319,7 @@ class _HomeState extends State<Home> {
     );
     // Create AlertDialog
     AlertDialog alert = AlertDialog(
+      backgroundColor: Colors.white,
       title: const Center(child: StyledHeading("NOT LOGGED IN")),
       content: SizedBox(
         height: width * 0.2,

@@ -341,6 +341,7 @@ showAlertDialog(BuildContext context) {
   );
   // Create AlertDialog
   AlertDialog alert = AlertDialog(
+    backgroundColor: Colors.white,
     title: const Center(child: Text("NOT LOGGED IN")),
     content: SizedBox(
       height: width * 0.2,

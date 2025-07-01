@@ -51,6 +51,10 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Colors.white,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero, // Square corners
+            ),
             title: const Text('Login Error'),
             content: const Text('Error logging in, please contact support'),
             actions: [
@@ -136,8 +140,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                                 context: context,
                                 builder: (_) => AlertDialog(
                                   shape: const RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(0))),
+                                      borderRadius: BorderRadius.zero), // Square corners
                                   actions: [
                                     ElevatedButton(
                                       style: ButtonStyle(
@@ -185,6 +188,10 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
+                                    backgroundColor: Colors.white,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.zero, // Square corners
+                                    ),
                                     title: const Text('Sign-In Failed'),
                                     content: const Text('Google Sign-In failed. Please check your internet connection and try again.'),
                                     actions: [

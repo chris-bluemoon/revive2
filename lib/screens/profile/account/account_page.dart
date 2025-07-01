@@ -163,6 +163,10 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Square corners
+      ),
       content: _isDeleting
           ? Column(
               mainAxisSize: MainAxisSize.min,
@@ -285,6 +289,10 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
+            backgroundColor: Colors.white,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero, // Square corners
+            ),
             title: const Text('Error'),
             content: const Text('Failed to delete account. Please try again.'),
             actions: [

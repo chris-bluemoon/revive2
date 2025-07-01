@@ -63,6 +63,10 @@ Future<void> showReviewDialog(BuildContext context, TextEditingController review
       int selectedStars = 5;
       return StatefulBuilder(
         builder: (context, setState) => AlertDialog(
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero, // Square corners
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

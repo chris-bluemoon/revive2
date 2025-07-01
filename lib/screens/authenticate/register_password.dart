@@ -373,8 +373,7 @@ class _RegisterPassword extends State<RegisterPassword> {
                                 context: context,
                                 builder: (_) => AlertDialog(
                                   shape: const RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(0))),
+                                      borderRadius: BorderRadius.zero), // Square corners
                                   actions: [
                                     // ElevatedButton(
                                     // onPressed: () {cancelLogOut(context);},
