@@ -30,7 +30,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
 
   late bool found = false;
 
-  void handleNewLogIn(String email, String name) async {
+  Future<void> handleNewLogIn(String email, String name) async {
     print('=== DEBUG: handleNewLogIn called ===');
     print('Email: $email');
     print('Name: $name');
@@ -61,17 +61,40 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
     print('User found: $found');
     
     if (found == false) {
+      print('❌ User not found in database - Auto-registering new user');
       // Auto-register the new user
       final newRenter = Renter(
         id: uuid.v4(),
         email: email,
-        name: name ?? email.split('@')[0], type: '', size: 0, address: '', countryCode: '', phoneNum: '', favourites: [], verified: '', imagePath: '', creationDate: '', location: '', bio: '', followers: [], following: [], avgReview: 0, lastLogin: DateTime.now(), vacations: [], status: 'active',
-        // ... other required fields
+        name: name.isNotEmpty ? name : email.split('@')[0], 
+        type: '', 
+        size: 0, 
+        address: '', 
+        countryCode: '', 
+        phoneNum: '', 
+        favourites: [], 
+        verified: '', 
+        imagePath: '', 
+        creationDate: DateTime.now().toString(), 
+        location: '', 
+        bio: '', 
+        followers: [], 
+        following: [], 
+        avgReview: 0, 
+        lastLogin: DateTime.now(), 
+        vacations: [], 
+        status: 'active',
       );
       
       // Add to database and local list
       await Provider.of<ItemStoreProvider>(context, listen: false).addRenter(newRenter);
+      
+      // Set the newly created user as current user
+      final provider = Provider.of<ItemStoreProvider>(context, listen: false);
+      provider.setCurrentUser();
+      
       found = true;
+      print('✓ New user auto-registered and set as current user');
     }
 
     Provider.of<ItemStoreProvider>(context, listen: false).populateFavourites();
@@ -135,11 +158,10 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                             print('Email from Google: $email');
                             print('Display Name from Google: $displayName');
                             
-                            handleNewLogIn(email, displayName);
+                            await handleNewLogIn(email, displayName);
                             
-                            // Only show success dialog if user was found (found == true)
-                            if (found == true) {
-                              // Navigate directly to home page after successful login
+                            // Navigate to home page after login/registration is complete
+                            if (context.mounted) {
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/', // Navigate to home page
                                 (route) => false,
