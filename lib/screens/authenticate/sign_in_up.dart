@@ -139,49 +139,10 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                             
                             // Only show success dialog if user was found (found == true)
                             if (found == true) {
-                              showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (_) => AlertDialog(
-                                  shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.zero), // Square corners
-                                  actions: [
-                                    ElevatedButton(
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              const WidgetStatePropertyAll<Color>(
-                                                  Colors.black),
-                                          shape: WidgetStateProperty.all<
-                                                  RoundedRectangleBorder>(
-                                              const RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(0)),
-                                                  side: BorderSide(
-                                                      color: Colors.black)))),
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Close dialog
-                                        Navigator.of(context).pushNamedAndRemoveUntil(
-                                          '/', // Navigate to home page
-                                          (route) => false,
-                                        );
-                                      },
-                                      child: const StyledHeading('OK',
-                                          weight: FontWeight.normal,
-                                          color: Colors.white),
-                                    ),
-                                  ],
-                                  backgroundColor: Colors.white,
-                                  title: const Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Flexible(
-                                          child: StyledHeading(
-                                              "Successfully logged in",
-                                              weight: FontWeight.normal)),
-                                    ],
-                                  ),
-                                ),
+                              // Navigate directly to home page after successful login
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/', // Navigate to home page
+                                (route) => false,
                               );
                             }
                           } else {
