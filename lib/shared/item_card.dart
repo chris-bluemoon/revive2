@@ -7,7 +7,6 @@ import 'package:revivals/models/item_image.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/shared/get_country_price.dart';
-import 'package:revivals/shared/loading.dart';
 import 'package:revivals/shared/styled_text.dart';
 
 // ignore: must_be_immutable
@@ -51,23 +50,42 @@ class _ItemCardState extends State<ItemCard> {
 
   @override
   void initState() {
-    // List currListOfFavs =
-    //     Provider.of<ItemStoreProvider>(context, listen: false).favourites;
-    // isFav = isAFav(widget.item, currListOfFavs);
-    // Future.delayed(const Duration(seconds: 5));
+    super.initState();
+    _loadImage();
+  }
 
+  void _loadImage() async {
     //ynt added first [if condition] to handle empty imageId
     //but still don't understand following [loop] and [second if condition]
 
     if (widget.item.imageId.isNotEmpty) {
-      for (ItemImage i
-          in Provider.of<ItemStoreProvider>(context, listen: false).images) {
-        if (i.id == widget.item.imageId[0]) {
-          thisImage = i.imageId;
+      // Wait for images to be loaded if they aren't available yet
+      final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+      
+      // Try to find the image, with retry logic
+      for (int attempt = 0; attempt < 3; attempt++) {
+        bool imageFound = false;
+        
+        for (ItemImage i in itemStore.images) {
+          if (i.id == widget.item.imageId[0]) {
+            if (mounted) {
+              setState(() {
+                thisImage = i.imageId;
+              });
+            }
+            imageFound = true;
+            break;
+          }
+        }
+        
+        if (imageFound) break;
+        
+        // If not found and this isn't the last attempt, wait and try again
+        if (attempt < 2) {
+          await Future.delayed(Duration(milliseconds: 500 * (attempt + 1)));
         }
       }
     }
-    super.initState();
   }
 
   int getPricePerDay(noOfDays) {
@@ -165,18 +183,38 @@ class _ItemCardState extends State<ItemCard> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: thisImage.isEmpty
-                        ? Image.asset(
-                            'assets/img/items/No_Image_Available.jpg',
-                            fit: BoxFit.cover,
+                        ? Container(
                             width: double.infinity,
                             height: double.infinity,
+                            color: Colors.grey[200],
+                            child: widget.item.imageId.isNotEmpty
+                                ? const Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                                    ),
+                                  )
+                                : Image.asset(
+                                    'assets/img/items/No_Image_Available.jpg',
+                                    fit: BoxFit.cover,
+                                  ),
                           )
                         : CachedNetworkImage(
                             imageUrl: thisImage,
                             fit: BoxFit.cover,
                             width: double.infinity,
                             height: double.infinity,
-                            placeholder: (context, url) => const Loading(),
+                            placeholder: (context, url) => Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                                ),
+                              ),
+                            ),
                             errorWidget: (context, url, error) =>
                                 Image.asset('assets/img/items/No_Image_Available.jpg', fit: BoxFit.cover),
                           ),
