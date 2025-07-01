@@ -191,6 +191,8 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
         return Colors.blue;
       case 'requested':
         return Colors.orange;
+      case 'expired':
+        return Colors.grey;
       default:
         return Colors.grey;
     }
@@ -201,6 +203,26 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
     final formattedPrice = NumberFormat("#,##0", "en_US").format(widget.price);
     final DateTime rentalStartDate = DateTime.parse(widget.itemRenter.startDate);
     final bool canCancel = rentalStartDate.isAfter(DateTime.now());
+    
+    // Check if the start date is today or in the future for expired status
+    final DateTime today = DateTime.now();
+    final DateTime startDateOnly = DateTime(rentalStartDate.year, rentalStartDate.month, rentalStartDate.day);
+    final DateTime todayOnly = DateTime(today.year, today.month, today.day);
+    final bool isExpired = startDateOnly.isBefore(todayOnly) || startDateOnly.isAtSameMomentAs(todayOnly);
+    
+    // Determine the effective status
+    String effectiveStatus = widget.itemRenter.status;
+    if (isExpired && effectiveStatus == "accepted") {
+      effectiveStatus = "expired";
+      // Update the database status if needed
+      if (widget.itemRenter.status != "expired") {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          widget.itemRenter.status = "expired";
+          Provider.of<ItemStoreProvider>(context, listen: false)
+              .saveItemRenter(widget.itemRenter);
+        });
+      }
+    }
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
@@ -229,16 +251,16 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: _statusColor(widget.itemRenter.status).withOpacity(0.13),
+                    color: _statusColor(effectiveStatus).withOpacity(0.13),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    widget.itemRenter.status.toLowerCase() == "cancelledrenter" ||
-                    widget.itemRenter.status.toLowerCase() == "cancelledlender"
+                    effectiveStatus.toLowerCase() == "cancelledrenter" ||
+                    effectiveStatus.toLowerCase() == "cancelledlender"
                         ? "CANCELLED"
-                        : widget.itemRenter.status.toUpperCase(),
+                        : effectiveStatus.toUpperCase(),
                     style: TextStyle(
-                      color: _statusColor(widget.itemRenter.status),
+                      color: _statusColor(effectiveStatus),
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       letterSpacing: 1,
@@ -292,7 +314,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                 ),
               ],
             ),
-            if (widget.itemRenter.status == "accepted")
+            if (widget.itemRenter.status == "accepted" && !isExpired)
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
