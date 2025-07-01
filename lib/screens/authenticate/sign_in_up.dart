@@ -47,19 +47,69 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
       print('Renter $i: ${renters[i].email} (status: ${renters[i].status})');
     }
 
+    bool isDeleted = false;
+    
     for (Renter r in renters) {
-      if (r.email == email && r.status != 'deleted') {
-        print('✓ User found: ${r.email}');
-        found = true;
-
-        Provider.of<ItemStoreProvider>(context, listen: false).setCurrentUser();
-        break; // fixed this
+      if (r.email == email) {
+        if (r.status == 'deleted') {
+          print('❌ User account is deleted: $email');
+          isDeleted = true;
+          break;
+        } else {
+          print('✓ User found: ${r.email}');
+          found = true;
+          Provider.of<ItemStoreProvider>(context, listen: false).setCurrentUser();
+          break;
+        }
       } else {
         found = false;
       }
     }
     
-    print('User found: $found');
+    print('User found: $found, Is deleted: $isDeleted');
+    
+    if (isDeleted) {
+      print('Showing deleted account error for email: $email');
+      Provider.of<ItemStoreProvider>(context, listen: false).setLoggedIn(false);
+      
+      // Sign out from Firebase Auth since this account is deleted
+      try {
+        await FirebaseAuth.instance.signOut();
+        print('Signed out deleted user from Firebase Auth');
+      } catch (e) {
+        print('Error signing out deleted user: $e');
+      }
+      
+      // Reset processing state
+      setState(() {
+        _isProcessingLogin = false;
+      });
+      
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero, // Square corners
+              ),
+              title: const Text('Account Deleted'),
+              content: const Text('This account has been deleted. If you believe this is an error, please contact us for assistance.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+      return; // Exit early, don't proceed with auto-registration
+    }
     
     if (found == false) {
       print('❌ User not found in database - Auto-registering new user');
@@ -183,12 +233,17 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                             
                             await handleNewLogIn(email, displayName);
                             
-                            // Navigate to home page after login/registration is complete
-                            if (context.mounted) {
+                            // Only navigate to home page if login was successful and user wasn't deleted
+                            if (context.mounted && found == true) {
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/', // Navigate to home page
                                 (route) => false,
                               );
+                            } else if (context.mounted) {
+                              // Reset processing state if login failed or account was deleted
+                              setState(() {
+                                _isProcessingLogin = false;
+                              });
                             }
                           } else {
                             // Sign-in was cancelled or failed
