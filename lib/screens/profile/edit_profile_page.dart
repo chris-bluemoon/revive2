@@ -238,11 +238,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: EdgeInsets.only(left: 4, bottom: 6),
-                child: StyledBody('Location', color: Colors.black, weight: FontWeight.normal),
+                child: StyledBody('Location', color: Colors.black, weight: FontWeight.bold),
               ),
             ),
             DropdownButtonFormField<String>(
               value: selectedCity,
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+                fontSize: MediaQuery.of(context).size.width * 0.04,
+              ),
               decoration: const InputDecoration(
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black), // <-- Black border
@@ -260,8 +265,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         value: city,
                         child: Text(
                           city,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.normal, // Make location text normal weight
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.normal,
+                            fontSize: MediaQuery.of(context).size.width * 0.04,
                           ),
                         ),
                       ))
