@@ -68,12 +68,12 @@ class _RegisterLocationState extends State<RegisterLocation> {
               // Logo
               Center(
                 child: Container(
-                  width: 80.0,
-                  height: 80.0,
+                  width: width * 0.2,
+                  height: width * 0.3,
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('assets/logos/velaa_logo_image_only.png'),
-                      fit: BoxFit.cover,
+                      image: AssetImage('assets/logos/new_velaa_logo_transparent.png'),
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
@@ -103,6 +103,7 @@ class _RegisterLocationState extends State<RegisterLocation> {
               
               // Form Card
               Card(
+                color: Colors.white,
                 elevation: 8,
                 shadowColor: Colors.black.withOpacity(0.1),
                 shape: RoundedRectangleBorder(
