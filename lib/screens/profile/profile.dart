@@ -20,6 +20,7 @@ import 'package:revivals/screens/to_rent/to_rent.dart';
 import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/settings.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
+import 'package:revivals/shared/profile_avatar.dart';
 import 'package:revivals/shared/item_results.dart';
 import 'package:revivals/shared/line.dart';
 import 'package:revivals/shared/styled_text.dart';
@@ -332,29 +333,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(width: width * 0.06),
-                CircleAvatar(
+                ProfileAvatar(
+                  imageUrl: profileOwner.profilePicUrl,
+                  userName: profileOwner.name,
                   radius: width * 0.09,
-                  backgroundColor: Colors.grey[300],
-                  child: profileOwner.profilePicUrl.isEmpty
-                      ? Icon(Icons.person, size: width * 0.09, color: Colors.white)
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(width * 0.09),
-                          child: CachedNetworkImage(
-                            imageUrl: profileOwner.profilePicUrl,
-                            fit: BoxFit.cover,
-                            width: width * 0.18,
-                            height: width * 0.18,
-                            placeholder: (context, url) => Center(
-                              child: SizedBox(
-                                width: width * 0.06,
-                                height: width * 0.06,
-                                child: AnimatedLogoSpinner(size: width * 0.12),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.person, size: width * 0.09, color: Colors.white),
-                          ),
-                        ),
                 ),
                 SizedBox(width: width * 0.04),
                 Expanded(
@@ -904,15 +886,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                CircleAvatar(
+                                ProfileAvatar(
+                                  imageUrl: reviewerPic,
+                                  userName: reviewerName,
                                   radius: 22,
-                                  backgroundColor: Colors.grey[300],
-                                  backgroundImage: (reviewerPic.isNotEmpty)
-                                      ? CachedNetworkImageProvider(reviewerPic)
-                                      : null,
-                                  child: (reviewerPic.isEmpty)
-                                      ? const Icon(Icons.person, color: Colors.white)
-                                      : null,
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(

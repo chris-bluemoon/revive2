@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:revivals/screens/messages/message_conversation_page.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/styled_text.dart';
+import 'package:revivals/shared/profile_avatar.dart';
 
 class InboxPage extends StatefulWidget {
   final String currentUserId; // Pass the current user's ID
@@ -302,14 +303,10 @@ class _InboxPageState extends State<InboxPage> {
                       child: const Icon(Icons.delete, color: Colors.white),
                     ),
                     child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: profilePic.isNotEmpty
-                            ? NetworkImage(profilePic)
-                            : null,
-                        backgroundColor: Colors.grey[300],
-                        child: (profilePic.isEmpty)
-                            ? const Icon(Icons.person, color: Colors.white)
-                            : null,
+                      leading: ProfileAvatar(
+                        imageUrl: profilePic,
+                        userName: displayName,
+                        radius: 20,
                       ),
                       title: Text(
                         displayName,

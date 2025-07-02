@@ -8,6 +8,7 @@ import 'package:revivals/models/message.dart';
 // Add the correct import for ItemStoreProvider below.
 // For example, if it's defined in item_store_provider.dart:
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/shared/profile_avatar.dart';
 
 class MessageConversationPage extends StatefulWidget {
   final String currentUserId;
@@ -146,15 +147,12 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
           if (otherUser != null)
             Padding(
               padding: const EdgeInsets.only(right: 12.0),
-              child: CircleAvatar(
+              child: AppBarProfileAvatar(
+                imageUrl: (otherUser['profilePicUrl'] != null && otherUser['profilePicUrl'].isNotEmpty) 
+                  ? otherUser['profilePicUrl'] 
+                  : '',
+                userName: otherUser['name'] ?? '',
                 radius: width * 0.06,
-                backgroundColor: Colors.grey[300],
-                backgroundImage: (otherUser['profilePicUrl'] != null && otherUser['profilePicUrl'].isNotEmpty)
-                    ? NetworkImage(otherUser['profilePicUrl'])
-                    : null,
-                child: (otherUser['profilePicUrl'] == null || otherUser['profilePicUrl'].isEmpty)
-                    ? Icon(Icons.person, size: width * 0.06, color: Colors.white)
-                    : null,
               ),
             ),
         ],

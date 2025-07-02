@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/shared/styled_text.dart';
+import 'package:revivals/shared/profile_avatar.dart';
 
 class UserCard extends StatelessWidget {
   const UserCard(this.ownerName, this.location, {super.key});
@@ -22,45 +23,10 @@ class UserCard extends StatelessWidget {
 
     return Row(
       children: [
-        CircleAvatar(
-          backgroundColor: Colors.greenAccent[400],
+        ProfileAvatar(
+          imageUrl: profilePicUrl,
+          userName: ownerName,
           radius: width * 0.06,
-          child: (profilePicUrl.isEmpty)
-              ? ClipOval(
-                  child: Image.asset(
-                    'assets/img/items/No_Image_Available.jpg',
-                    width: width * 0.12,
-                    height: width * 0.12,
-                    fit: BoxFit.cover,
-                  ),
-                )
-              : ClipOval(
-                  child: Image.network(
-                    profilePicUrl,
-                    width: width * 0.12,
-                    height: width * 0.12,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: SizedBox(
-                          width: width * 0.06,
-                          height: width * 0.06,
-                          child: const CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      // Return Image.asset directly, not inside Image.network
-                      return Image.asset(
-                        'assets/img/items/No_Image_Available.jpg',
-                        width: width * 0.12,
-                        height: width * 0.12,
-                        fit: BoxFit.cover,
-                      );
-                    },
-                  ),
-                ),
         ),
         SizedBox(width: width * 0.02),
         Column(

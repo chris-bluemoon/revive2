@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/profile/profile.dart';
 import 'package:revivals/shared/styled_text.dart';
+import 'package:revivals/shared/profile_avatar.dart';
 
 class FollowListScreen extends StatefulWidget {
   final List<String> followersIds;
@@ -71,15 +72,11 @@ class _FollowListScreenState extends State<FollowListScreen> {
                     final isFollowing = Provider.of<ItemStoreProvider>(context, listen: false).renter.following.contains(user.id);
 
                     return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Increased padding
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.grey[300],
-                        backgroundImage: (user.profilePicUrl.isNotEmpty)
-                            ? NetworkImage(user.profilePicUrl)
-                            : null,
-                        child: (user.profilePicUrl.isEmpty)
-                            ? const Icon(Icons.person, color: Colors.white)
-                            : null,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      leading: ProfileAvatar(
+                        imageUrl: user.profilePicUrl,
+                        userName: user.name,
+                        radius: 20,
                       ),
                       title: StyledHeading(user.name, weight: FontWeight.bold),
                       trailing: !(isFollowing || user.id == Provider.of<ItemStoreProvider>(context, listen: false).renter.id)
@@ -132,15 +129,11 @@ class _FollowListScreenState extends State<FollowListScreen> {
                     final user = followingList[index];
                     final isFollowing = Provider.of<ItemStoreProvider>(context, listen: false).renter.following.contains(user.id);
                     return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Increased padding
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.grey[300],
-                        backgroundImage: (user.profilePicUrl.isNotEmpty)
-                            ? NetworkImage(user.profilePicUrl)
-                            : null,
-                        child: (user.profilePicUrl.isEmpty)
-                            ? const Icon(Icons.person, color: Colors.white)
-                            : null,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      leading: ProfileAvatar(
+                        imageUrl: user.profilePicUrl,
+                        userName: user.name,
+                        radius: 20,
                       ),
                       title: StyledHeading(user.name, weight: FontWeight.bold),
                       trailing: !(isFollowing || user.id == Provider.of<ItemStoreProvider>(context, listen: false).renter.id)

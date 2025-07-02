@@ -174,7 +174,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   children: [
                     CircleAvatar(
                       radius: width * 0.14,
-                      backgroundColor: Colors.grey[300],
+                      backgroundColor: Colors.black,
                       backgroundImage: imagePath != null && imagePath!.isNotEmpty
                           ? (imagePath!.startsWith('http')
                               ? CachedNetworkImageProvider(imagePath!)
@@ -182,7 +182,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             )
                           : null,
                       child: imagePath == null || imagePath!.isEmpty
-                          ? Icon(Icons.person, size: width * 0.14, color: Colors.white)
+                          ? Text(
+                              widget.renter.name.isNotEmpty 
+                                ? widget.renter.name.substring(0, 1).toUpperCase() 
+                                : '?',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: width * 0.08,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
                           : null,
                     ),
                     if (_isUploading)

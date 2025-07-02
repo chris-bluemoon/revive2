@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/shared/profile_avatar.dart';
 
 class MessagePage extends StatefulWidget {
   final dynamic user;
@@ -117,15 +118,12 @@ class _MessagePageState extends State<MessagePage> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
-            child: CircleAvatar(
+            child: AppBarProfileAvatar(
+              imageUrl: (widget.user.profilePicUrl != null && widget.user.profilePicUrl.isNotEmpty)
+                  ? widget.user.profilePicUrl
+                  : '',
+              userName: widget.user.name ?? '',
               radius: width * 0.06,
-              backgroundColor: Colors.grey[300],
-              backgroundImage: (widget.user.profilePicUrl != null && widget.user.profilePicUrl.isNotEmpty)
-                  ? NetworkImage(widget.user.profilePicUrl)
-                  : null,
-              child: (widget.user.profilePicUrl == null || widget.user.profilePicUrl.isEmpty)
-                  ? Icon(Icons.person, size: width * 0.06, color: Colors.white)
-                  : null,
             ),
           ),
         ],
