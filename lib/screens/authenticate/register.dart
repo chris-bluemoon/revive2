@@ -47,7 +47,7 @@ class _Register extends State<Register> {
         : Scaffold(
             backgroundColor: Colors.grey.shade50,
             appBar: AppBar(
-              toolbarHeight: 70,
+              toolbarHeight: width * 0.2,
               backgroundColor: Colors.white,
               elevation: 0,
               leading: IconButton(

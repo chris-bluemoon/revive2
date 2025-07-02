@@ -17,6 +17,7 @@ class BalancePage extends StatelessWidget {
     const payouts = [ ]; // Example payouts data
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: width * 0.2,
         leading: IconButton(
           icon: Icon(Icons.chevron_left, size: width * 0.08),
           onPressed: () => Navigator.of(context).pop(),

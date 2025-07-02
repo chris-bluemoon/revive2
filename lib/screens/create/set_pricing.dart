@@ -169,15 +169,10 @@ class _SetPricingState extends State<SetPricing> {
               appBar: AppBar(
                 backgroundColor: Colors.white,
                 elevation: 0,
-                toolbarHeight: 70,
+                toolbarHeight: width * 0.2,
                 centerTitle: true,
-                title: const Text(
+                title: const StyledTitle(
                   'SET PRICING',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
                 ),
                 leading: IconButton(
                   icon: Icon(Icons.chevron_left, color: Colors.black, size: width * 0.08),

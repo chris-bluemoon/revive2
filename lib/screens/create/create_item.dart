@@ -184,7 +184,7 @@ class _CreateItemState extends State<CreateItem> {
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
-            toolbarHeight: 70,
+            toolbarHeight: width * 0.2,
             leading: IconButton(
               icon: Icon(Icons.chevron_left, color: Colors.black, size: width * 0.08),
               onPressed: () {
@@ -200,13 +200,8 @@ class _CreateItemState extends State<CreateItem> {
               },
             ),
             centerTitle: true,
-            title: Text(
+            title: StyledTitle(
               widget.item != null ? 'EDIT ITEM' : 'LIST ITEM',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
             ),
             // leading: IconButton(
             //   icon: Icon(Icons.chevron_left, size: width * 0.08),

@@ -34,7 +34,7 @@ class _RegisterName extends State<RegisterName> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        toolbarHeight: 70,
+        toolbarHeight: width * 0.2,
         leading: IconButton(
           icon: Icon(Icons.chevron_left, color: Colors.black, size: width * 0.08),
           onPressed: () {
