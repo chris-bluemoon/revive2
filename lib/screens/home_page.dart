@@ -48,6 +48,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   int _pageIndex = 0;
+  bool _isAnimating = false;
 
   bool loggedIn = false;
 
@@ -60,13 +61,64 @@ class _HomePageState extends State<HomePage> {
     const Profile(canGoBack: false,),
   ];
 
+  void _onNavBarTap(int index) {
+    bool loggedIn = Provider.of<ItemStoreProvider>(context, listen: false).loggedIn;
+    log('Page Index: $index, Logged In: $loggedIn');
+    
+    if (!loggedIn && index == 2) {
+      Navigator.of(context).pushNamedAndRemoveUntil('/sign_in', (Route<dynamic> route) => false);
+      return;
+    }
+
+    if (index != _pageIndex && !_isAnimating) {
+      _animateToPage(index);
+    }
+  }
+
+  void _animateToPage(int index) async {
+    if (_isAnimating) return;
+    
+    _isAnimating = true;
+    
+    // Update the page index - AnimatedSwitcher will handle the transition
+    setState(() {
+      _pageIndex = index;
+    });
+    
+    // Small delay to prevent rapid tapping
+    await Future.delayed(const Duration(milliseconds: 350));
+    
+    _isAnimating = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Container(
         margin: EdgeInsets.only(bottom: screenHeight * 0.04), // 4% of screen height
-        child: pages[_pageIndex],
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.1, 0.0),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeInOutQuart,
+                )),
+                child: child,
+              ),
+            );
+          },
+          child: Container(
+            key: ValueKey<int>(_pageIndex),
+            child: pages[_pageIndex],
+          ),
+        ),
       ),
       bottomNavigationBar: CurvedNavigationBar(
         index: _pageIndex,
@@ -82,18 +134,8 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         animationCurve: Curves.easeInOutCubic,
         animationDuration: const Duration(milliseconds: 400),
-        letIndexChange: (index) => true,
-        onTap: (int index) {
-          setState(() {
-            _pageIndex = index;
-            bool loggedIn = Provider.of<ItemStoreProvider>(context, listen: false).loggedIn;
-            log('Page Index: $_pageIndex, Logged In: $loggedIn');
-            if (!loggedIn && index == 2) {
-              Navigator.of(context).pushNamedAndRemoveUntil('/sign_in', (Route<dynamic> route) => false);
-              _pageIndex = 0; // Reset to Home page
-            }
-          });
-        },
+        letIndexChange: (index) => !_isAnimating, // Prevent navigation during animation
+        onTap: _onNavBarTap,
       ),
     );
   }
