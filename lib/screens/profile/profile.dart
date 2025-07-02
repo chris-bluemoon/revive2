@@ -23,6 +23,7 @@ import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/item_results.dart';
 import 'package:revivals/shared/line.dart';
 import 'package:revivals/shared/profile_avatar.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:share_plus/share_plus.dart'; // Add this import at the top
 
@@ -227,7 +228,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       Navigator.pop(context);
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => const AccountPage()),
+                                        SmoothTransitions.luxury(const AccountPage()),
                                       );
                                     },
                                   ),
@@ -239,7 +240,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       Navigator.pop(context);
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                                        SmoothTransitions.luxury(const NotificationsPage()),
                                       );
                                     },
                                   ),
@@ -248,7 +249,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                     title: const Text('My Listings'),
                                     onTap: () {
                                       Navigator.push(context,
-                                        MaterialPageRoute(builder: (context) => ItemResults('myItems', profileOwnerId)),
+                                        SmoothTransitions.luxury(ItemResults('myItems', profileOwnerId)),
                                       );
                                     },
                                   ),
@@ -258,7 +259,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                     onTap: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => const RenterDashboard()),
+                                        SmoothTransitions.luxury(const RenterDashboard()),
                                       );
                                     },
                                   ),
@@ -268,7 +269,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                     onTap: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => const LenderDashboard()),
+                                        SmoothTransitions.luxury(const LenderDashboard()),
                                       );
                                     },
                                   ),
@@ -278,7 +279,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                     onTap: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => const SettingsPage()),
+                                        SmoothTransitions.luxury(const SettingsPage()),
                                       );
                                     }
                                   ),
@@ -306,7 +307,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       onTap: () {
                                         Navigator.push(
                                           context,
-                                            MaterialPageRoute(builder: (context) => const AdminPage()),
+                                            SmoothTransitions.luxury(const AdminPage()),
                                         );
                                       },
                                     ),
@@ -358,12 +359,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => FollowListScreen(
+                            SmoothTransitions.luxury(FollowListScreen(
                                 followersIds: profileOwner.followers,
                                 followingIds: profileOwner.following,
-                              ),
-                            ),
+                              )),
                           );
                           setState(() {});
                         },
@@ -382,12 +381,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => FollowListScreen(
+                            SmoothTransitions.luxury(FollowListScreen(
                                 followersIds: profileOwner.followers,
                                 followingIds: profileOwner.following,
-                              ),
-                            ),
+                              )),
                           );
                           setState(() {});
                         },
@@ -498,9 +495,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       child: OutlinedButton(
                         onPressed: () async {
                             final updatedRenter = await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => EditProfilePage(renter: profileOwner),
-                              ),
+                              SmoothTransitions.luxury(EditProfilePage(renter: profileOwner)),
                             );
                             if (updatedRenter != null) {
                               final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
@@ -556,16 +551,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               }
                               
                               Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => MessageConversationPage(
+                                SmoothTransitions.luxury(MessageConversationPage(
                                     currentUserId: currentRenter.id,
                                     otherUserId: profileOwner.id ?? '',
                                     otherUser: {
                                       'name': profileOwner.name ?? '',
                                       'profilePicUrl': profileOwner.profilePicUrl ?? '',
                                     },
-                                  ),
-                                ),
+                                  )),
                               );
                             },
                             style: OutlinedButton.styleFrom(
@@ -780,18 +773,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               log(item.owner.toString());
                               log(profileOwner.id.toString());
                               final result = await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => ToRent(item),
-                                ),
+                                SmoothTransitions.luxury(ToRent(item)),
                               );
                               if (result == true) {
                                 setState(() {});
                               }
                             } else {
                               await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => ToRent(item), // Make sure ToRent accepts the item
-                                ),
+                                SmoothTransitions.luxury(ToRent(item)), // Make sure ToRent accepts the item
                               );
                             }
                           },
@@ -882,9 +871,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           onTap: () {
                             if (reviewer.id.isNotEmpty) {
                               Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => Profile(userN: reviewer.name, canGoBack: true,),
-                                ),
+                                SmoothTransitions.luxury(Profile(userN: reviewer.name, canGoBack: true,)),
                               );
                             }
                           },
@@ -1096,7 +1083,7 @@ showAlertDialog(BuildContext context) {
       okButton,
     ],
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(0.0)),
+      borderRadius: BorderRadius.all(Radius.circular(12)),
     ),
   );
   showDialog(

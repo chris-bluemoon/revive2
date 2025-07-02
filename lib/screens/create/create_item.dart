@@ -13,6 +13,7 @@ import 'package:revivals/providers/create_item_provider.dart';
 import 'package:revivals/screens/create/set_pricing.dart';
 import 'package:revivals/screens/to_rent/view_image.dart';
 import 'package:revivals/shared/item_types.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
 
@@ -831,8 +832,7 @@ class _CreateItemState extends State<CreateItem> {
             child: ElevatedButton(
               onPressed: cip.isCompleteForm
                   ? () async {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => SetPricing(
+                      Navigator.of(context).push(SmoothTransitions.luxury(SetPricing(
                           productType: cip.productTypeValue,
                           brand: cip.brandValue,
                           title: cip.titleController.text,
@@ -1027,12 +1027,11 @@ class _CreateItemState extends State<CreateItem> {
                 onTap: () {
                   Navigator.pop(context);
 
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => (ViewImage(
+                  Navigator.of(context).push(SmoothTransitions.luxury(ViewImage(
                             cip.images,
                             n,
                             isNetworkImage: false,
-                          ))));
+                          )));
                 },
                 child: const Center(child: StyledBody('VIEW IMAGE')),
               ),

@@ -730,7 +730,7 @@ class _SetPricingState extends State<SetPricing> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(0), // Square corners
+          borderRadius: BorderRadius.circular(12),
         ),
         backgroundColor: Colors.white,
         titlePadding: const EdgeInsets.only(top: 32, left: 24, right: 24, bottom: 0),

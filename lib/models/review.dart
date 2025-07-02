@@ -65,7 +65,7 @@ Future<void> showReviewDialog(BuildContext context, TextEditingController review
         builder: (context, setState) => AlertDialog(
           backgroundColor: Colors.white,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero, // Square corners
+            borderRadius: BorderRadius.all(Radius.circular(12)),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,

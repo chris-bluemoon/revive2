@@ -14,7 +14,7 @@ class BlackButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
       backgroundColor: Colors.black,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0.0),
+        borderRadius: BorderRadius.circular(12.0),
       ),
       side: const BorderSide(width: 1.0, color: Colors.black),
       ),

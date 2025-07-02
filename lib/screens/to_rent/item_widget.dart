@@ -8,6 +8,7 @@ import 'package:revivals/models/item_image.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/to_rent/view_image.dart';
 import 'package:revivals/shared/loading.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 
 class ItemWidget extends StatefulWidget {
   const ItemWidget({super.key, required this.item, required this.itemNumber});
@@ -78,11 +79,10 @@ class _ItemWidgetState extends State<ItemWidget> {
       onTap: () {
         // Only navigate if we have images to show
         if (images.isNotEmpty) {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => (ViewImage(
+          Navigator.of(context).push(SmoothTransitions.luxury(ViewImage(
                     images,
                     0,
-                  ))));
+                  )));
         }
       },
       child: thisImage.isNotEmpty 

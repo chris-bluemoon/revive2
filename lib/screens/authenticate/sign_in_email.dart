@@ -119,7 +119,7 @@ class _SignIn extends State<SignIn> {
             return AlertDialog(
               backgroundColor: Colors.white,
               shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.zero, // Square corners
+                borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
               title: const Text('Account Deleted'),
               content: const Text('This account has been deleted. If you believe this is an error, please contact us for assistance.'),
@@ -152,7 +152,7 @@ class _SignIn extends State<SignIn> {
           return AlertDialog(
             backgroundColor: Colors.white,
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero, // Square corners
+              borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
             title: const Text('Login Error'),
             content: const Text('Error logging in, please contact support'),

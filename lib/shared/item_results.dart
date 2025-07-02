@@ -11,6 +11,7 @@ import 'package:revivals/screens/to_rent/to_rent.dart';
 import 'package:revivals/shared/filters_page.dart';
 import 'package:revivals/shared/item_card.dart';
 import 'package:revivals/shared/no_items_found.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
 
@@ -275,9 +276,8 @@ class _ItemResultsState extends State<ItemResults> {
             actions: [
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => (FiltersPage(
-                          setFilter: setFilter, setValues: setValues))));
+                  Navigator.of(context).push(SmoothTransitions.luxury(FiltersPage(
+                          setFilter: setFilter, setValues: setValues)));
                 },
                 child: Padding(
                     padding:
@@ -330,13 +330,9 @@ class _ItemResultsState extends State<ItemResults> {
                             final item = finalItems[index];
                             // final currentUserId = Provider.of<ItemStoreProvider>(context, listen: false).renter.id;
                             if (widget.attribute != 'status') {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => ToRent(item),
-                              ));
+                              Navigator.of(context).push(SmoothTransitions.luxury(ToRent(item)));
                             } else if (widget.attribute == 'status') {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => ToRentSubmission(item),
-                              ));
+                              Navigator.of(context).push(SmoothTransitions.luxury(ToRentSubmission(item)));
                             } 
                           }),
                     );

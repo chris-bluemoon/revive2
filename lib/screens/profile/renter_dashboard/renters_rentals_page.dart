@@ -407,7 +407,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                         builder: (context) => AlertDialog(
                           backgroundColor: Colors.white,
                           shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero, // Square corners
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
                           title: const Text(
                             "Booking Cancelled",
@@ -491,7 +491,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                               Colors.white, // Set dialog background to white
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(
-                                Radius.circular(0)), // Square corners
+                                Radius.circular(12)),
                           ),
                           content: Column(
                             mainAxisSize: MainAxisSize.min,

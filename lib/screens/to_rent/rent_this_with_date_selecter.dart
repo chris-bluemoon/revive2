@@ -13,6 +13,7 @@ import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/authenticate/sign_in_up.dart';
 import 'package:revivals/screens/summary/summary_rental.dart';
 import 'package:revivals/shared/get_country_price.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:uuid/uuid.dart';
@@ -124,6 +125,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
 
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         toolbarHeight: width * 0.2,
         backgroundColor: Colors.white,
@@ -131,7 +133,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const StyledTitle('SELECT RENTAL PERIOD', weight: FontWeight.bold),
+        title: const StyledTitle('RENTAL PERIOD', weight: FontWeight.bold),
         leading: IconButton(
           icon: Icon(Icons.chevron_left, size: width * 0.08, color: Colors.black),
           onPressed: () {
@@ -155,32 +157,52 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(width * 0.05),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // const Text('RENTAL TERM', style: TextStyle(fontSize: 12)),
-            const SizedBox(height: 30),
-            SizedBox(height: width * 0.03),
-
-            // Add day options
-            // if (startDate == null && endDate == null)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+            const SizedBox(height: 10),
+            
+            // Rental Options Card
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.grey.shade200, width: 1),
+              ),
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const StyledHeading('Choose Rental Period', weight: FontWeight.bold),
+                    const SizedBox(height: 8),
+                    const StyledBody(
+                      'Select the duration that works best for you',
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    // Rental options in card
                     LayoutBuilder(
                       builder: (context, constraints) {
-                        double chipWidth = (MediaQuery.of(context).size.width * 0.7).clamp(220, 400);
                         return Column(
                           children: [
                             // Show 3-day option if minDays <= 3
                             if (widget.item.minDays <= 3)
-                              SizedBox(
-                                width: chipWidth,
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                decoration: BoxDecoration(
+                                  color: selectedOption == 3 ? Colors.grey.shade50 : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: selectedOption == 3 ? Colors.black : Colors.grey.shade300,
+                                    width: selectedOption == 3 ? 2 : 1,
+                                  ),
+                                ),
                                 child: RadioListTile<int>(
                                   value: 3,
                                   groupValue: selectedOption,
@@ -222,138 +244,134 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                     ),
                                   ),
                                   activeColor: Colors.black,
-                                  contentPadding: EdgeInsets.zero,
-                                  dense: true,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  dense: false,
                                 ),
                               ),
                             // Show 5-day option if minDays <= 5
                             if (widget.item.minDays <= 5)
-                              Column(
-                                children: [
-                                  if (widget.item.minDays <= 3)
-                                    const Divider(
-                                      height: 1,
-                                      thickness: 2,
-                                      color: Color(0xFF444444),
-                                    ),
-                                  const SizedBox(height: 10),
-                                  SizedBox(
-                                    width: chipWidth,
-                                    child: RadioListTile<int>(
-                                      value: 5,
-                                      groupValue: selectedOption,
-                                      onChanged: (val) {
-                                        setState(() {
-                                          selectedOption = val!;
-                                          noOfDays = 5;
-                                          // Reset date selection when changing rental period or if current range doesn't meet new minimum
-                                          if (startDate != null && endDate != null) {
-                                            int currentDays = endDate!.difference(startDate!).inDays + 1;
-                                            if (currentDays < 5) {
-                                              dateRange = null;
-                                              startDate = null;
-                                              endDate = null;
-                                              showConfirm = false;
-                                              controller.selectedRange = null; // Clear the controller
-                                            }
-                                          }
-                                        });
-                                      },
-                                      title: RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                            fontSize: width * 0.042,
-                                            color: Colors.black,
-                                          ),
-                                          children: [
-                                            const TextSpan(
-                                              text: '5+ days @ ',
-                                            ),
-                                            TextSpan(
-                                              text: '${getPricePerDay(5)}$symbol',
-                                              style: const TextStyle(fontWeight: FontWeight.bold),
-                                            ),
-                                            const TextSpan(
-                                              text: ' per day',
-                                            ),
-                                          ],
-                                        ),
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                decoration: BoxDecoration(
+                                  color: selectedOption == 5 ? Colors.grey.shade50 : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: selectedOption == 5 ? Colors.black : Colors.grey.shade300,
+                                    width: selectedOption == 5 ? 2 : 1,
+                                  ),
+                                ),
+                                child: RadioListTile<int>(
+                                  value: 5,
+                                  groupValue: selectedOption,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedOption = val!;
+                                      noOfDays = 5;
+                                      // Reset date selection when changing rental period or if current range doesn't meet new minimum
+                                      if (startDate != null && endDate != null) {
+                                        int currentDays = endDate!.difference(startDate!).inDays + 1;
+                                        if (currentDays < 5) {
+                                          dateRange = null;
+                                          startDate = null;
+                                          endDate = null;
+                                          showConfirm = false;
+                                          controller.selectedRange = null; // Clear the controller
+                                        }
+                                      }
+                                    });
+                                  },
+                                  title: RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        fontSize: width * 0.042,
+                                        color: Colors.black,
                                       ),
-                                      activeColor: Colors.black,
-                                      contentPadding: EdgeInsets.zero,
-                                      dense: true,
+                                      children: [
+                                        const TextSpan(
+                                          text: '5+ days @ ',
+                                        ),
+                                        TextSpan(
+                                          text: '${getPricePerDay(5)}$symbol',
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        const TextSpan(
+                                          text: ' per day',
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
+                                  activeColor: Colors.black,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  dense: false,
+                                ),
                               ),
                             // Show 7-day option if minDays <= 7
                             if (widget.item.minDays <= 7)
-                              Column(
-                                children: [
-                                  const Divider(
-                                    height: 1,
-                                    thickness: 2,
-                                    color: Color(0xFF444444),
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                decoration: BoxDecoration(
+                                  color: selectedOption == 7 ? Colors.grey.shade50 : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: selectedOption == 7 ? Colors.black : Colors.grey.shade300,
+                                    width: selectedOption == 7 ? 2 : 1,
                                   ),
-                                  const SizedBox(height: 10),
-                                  SizedBox(
-                                    width: chipWidth,
-                                    child: RadioListTile<int>(
-                                      value: 7,
-                                      groupValue: selectedOption,
-                                      onChanged: (val) {
-                                        setState(() {
-                                          selectedOption = val!;
-                                          noOfDays = 7;
-                                          // Reset date selection when changing rental period or if current range doesn't meet new minimum
-                                          if (startDate != null && endDate != null) {
-                                            int currentDays = endDate!.difference(startDate!).inDays + 1;
-                                            if (currentDays < 7) {
-                                              dateRange = null;
-                                              startDate = null;
-                                              endDate = null;
-                                              showConfirm = false;
-                                              controller.selectedRange = null; // Clear the controller
-                                            }
-                                          }
-                                        });
-                                      },
-                                      title: RichText(
-                                        text: TextSpan(
-                                          style: TextStyle(
-                                            fontSize: width * 0.042,
-                                            color: Colors.black,
-                                          ),
-                                          children: [
-                                            const TextSpan(
-                                              text: '7+ days @ ',
-                                            ),
-                                            TextSpan(
-                                              text: '${getPricePerDay(7)}$symbol',
-                                              style: const TextStyle(fontWeight: FontWeight.bold),
-                                            ),
-                                            const TextSpan(
-                                              text: ' per day',
-                                            ),
-                                          ],
-                                        ),
+                                ),
+                                child: RadioListTile<int>(
+                                  value: 7,
+                                  groupValue: selectedOption,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedOption = val!;
+                                      noOfDays = 7;
+                                      // Reset date selection when changing rental period or if current range doesn't meet new minimum
+                                      if (startDate != null && endDate != null) {
+                                        int currentDays = endDate!.difference(startDate!).inDays + 1;
+                                        if (currentDays < 7) {
+                                          dateRange = null;
+                                          startDate = null;
+                                          endDate = null;
+                                          showConfirm = false;
+                                          controller.selectedRange = null; // Clear the controller
+                                        }
+                                      }
+                                    });
+                                  },
+                                  title: RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        fontSize: width * 0.042,
+                                        color: Colors.black,
                                       ),
-                                      activeColor: Colors.black,
-                                      contentPadding: EdgeInsets.zero,
-                                      dense: true,
+                                      children: [
+                                        const TextSpan(
+                                          text: '7+ days @ ',
+                                        ),
+                                        TextSpan(
+                                          text: '${getPricePerDay(7)}$symbol',
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        const TextSpan(
+                                          text: ' per day',
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
+                                  activeColor: Colors.black,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  dense: false,
+                                ),
                               ),
                             // Always show the 14+ days option
-                            const Divider(
-                              height: 1,
-                              thickness: 2,
-                              color: Color(0xFF444444),
-                            ),
-                            const SizedBox(height: 10),
-                            SizedBox(
-                              width: chipWidth,
+                            Container(
+                              decoration: BoxDecoration(
+                                color: selectedOption == 14 ? Colors.grey.shade50 : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: selectedOption == 14 ? Colors.black : Colors.grey.shade300,
+                                  width: selectedOption == 14 ? 2 : 1,
+                                ),
+                              ),
                               child: RadioListTile<int>(
                                 value: 14,
                                 groupValue: selectedOption,
@@ -395,8 +413,8 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                                   ),
                                 ),
                                 activeColor: Colors.black,
-                                contentPadding: EdgeInsets.zero,
-                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                dense: false,
                               ),
                             ),
                           ],
@@ -405,164 +423,200 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
+
             const SizedBox(height: 20),
 
+            // Date Selection Card
             if (selectedOption > 0)
-              const SizedBox(height: 32), // <-- Add this line for more gap between chips and button
-            if (selectedOption > 0)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0), // <-- Square corners
+              Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: Colors.grey.shade200, width: 1),
+                ),
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const StyledHeading('Select Your Dates', weight: FontWeight.bold),
+                      const SizedBox(height: 8),
+                      const StyledBody(
+                        'Choose your preferred rental dates',
+                        fontSize: 14,
+                        color: Colors.grey,
                       ),
-                      side: const BorderSide(
-                        color: Colors.black, // or your preferred border color
-                        width: 1.5,
+                      const SizedBox(height: 20),
+                      
+                      Center(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            side: BorderSide(
+                              color: (startDate != null && endDate != null) ? Colors.green.shade600 : Colors.black,
+                              width: 1.5,
+                            ),
+                            backgroundColor: (startDate != null && endDate != null) ? Colors.green.shade50 : Colors.transparent,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                          ),
+                          onPressed: () async {
+                            final now = DateTime.now();
+                            final onlyDateToday = DateTime(now.year, now.month, now.day);
+                            final onlyDateTomorrow = onlyDateToday.add(const Duration(days: 1));
+                            final firstDate = onlyDateTomorrow;
+                            final lastDate = onlyDateTomorrow.add(const Duration(days: 60));
+
+                            // Get blackout dates from rentals
+                            final blackoutDates = getBlackoutDates(widget.item.id, widget.item.minDays)
+                                .map((d) => DateTime(d.year, d.month, d.day))
+                                .toSet();
+
+                            // Get vacation blackout dates for the item owner and add to blackoutDates
+                            final vacationDates = getVacationBlackoutDates(widget.item.owner);
+                            log('Vacation Dates: $vacationDates');
+                            blackoutDates.addAll(vacationDates);
+                            log('Blackout Dates: $blackoutDates');
+
+                            // Find the next selectable start date
+                            DateTime nextSelectable = onlyDateTomorrow;
+                            while (blackoutDates.contains(nextSelectable)) {
+                              nextSelectable = nextSelectable.add(const Duration(days: 1));
+                            }
+
+                            // Find the next selectable end date after start
+                            DateTime nextSelectableEnd = nextSelectable.add(Duration(days: widget.item.minDays - 1));
+                            while (blackoutDates.contains(nextSelectableEnd)) {
+                              nextSelectableEnd = nextSelectableEnd.add(const Duration(days: 1));
+                            }
+
+                            DateTimeRange initialRange = DateTimeRange(
+                              start: nextSelectable,
+                              end: nextSelectableEnd,
+                            );
+
+                            DateTimeRange? picked = await showSfDateRangePicker(
+                              context,
+                              firstDate,
+                              lastDate,
+                              blackoutDates,
+                              initialRange,
+                            );
+                            if (picked != null) {
+                              int selectedDays = picked.end.difference(picked.start).inDays + 1;
+                              // Check for blackout days in the selected range
+                              bool hasBlackout = false;
+                              for (int i = 0; i < selectedDays; i++) {
+                                final d = picked.start.add(Duration(days: i));
+                                if (blackoutDates.contains(DateTime(d.year, d.month, d.day))) {
+                                  hasBlackout = true;
+                                  break;
+                                }
+                              }
+                              if (hasBlackout) {
+                                setState(() {
+                                  dateRange = null;
+                                  startDate = null;
+                                  endDate = null;
+                                  showConfirm = false;
+                                  controller.selectedRange = null; // Clear the controller
+                                });
+                                return;
+                              }
+                              
+                              // Auto-assign radio button based on selected days
+                              int newSelectedOption = selectedOption;
+                              if (selectedDays >= 14) {
+                                newSelectedOption = 14;
+                              } else if (selectedDays >= 7 && widget.item.minDays <= 7) {
+                                newSelectedOption = 7;
+                              } else if (selectedDays >= 5 && widget.item.minDays <= 5) {
+                                newSelectedOption = 5;
+                              } else if (selectedDays >= 3 && widget.item.minDays <= 3) {
+                                newSelectedOption = 3;
+                              }
+                              
+                              setState(() {
+                                dateRange = picked;
+                                startDate = picked.start;
+                                endDate = picked.end;
+                                noOfDays = selectedDays;
+                                selectedOption = newSelectedOption; // Update radio button selection
+                                showConfirm = true;
+                              });
+                            } else {
+                              // User cancelled - reset the date selection to ensure consistency
+                              setState(() {
+                                dateRange = null;
+                                startDate = null;
+                                endDate = null;
+                                showConfirm = false;
+                                controller.selectedRange = null; // Clear the controller
+                              });
+                            }
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.calendar_today,
+                                size: 20,
+                                color: (startDate != null && endDate != null) ? Colors.green.shade600 : Colors.black,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: StyledBody(
+                                  (startDate != null && endDate != null)
+                                      ? '${DateFormat('dd MMM yyyy').format(startDate!)} - ${DateFormat('dd MMM yyyy').format(endDate!)}'
+                                      : 'SELECT DATES',
+                                  weight: FontWeight.bold,
+                                  color: (startDate != null && endDate != null) ? Colors.green.shade600 : Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    ),
-                    onPressed: () async {
-                      final now = DateTime.now();
-                      final onlyDateToday = DateTime(now.year, now.month, now.day);
-                      final onlyDateTomorrow = onlyDateToday.add(const Duration(days: 1));
-                      final firstDate = onlyDateTomorrow;
-                      final lastDate = onlyDateTomorrow.add(const Duration(days: 60));
-
-                      // Get blackout dates from rentals
-                      final blackoutDates = getBlackoutDates(widget.item.id, widget.item.minDays)
-                          .map((d) => DateTime(d.year, d.month, d.day))
-                          .toSet();
-
-                      // Get vacation blackout dates for the item owner and add to blackoutDates
-                      final vacationDates = getVacationBlackoutDates(widget.item.owner);
-                      log('Vacation Dates: $vacationDates');
-                      blackoutDates.addAll(vacationDates);
-                      log('Blackout Dates: $blackoutDates');
-
-                      // Find the next selectable start date
-                      DateTime nextSelectable = onlyDateTomorrow;
-                      while (blackoutDates.contains(nextSelectable)) {
-                        nextSelectable = nextSelectable.add(const Duration(days: 1));
-                      }
-
-                      // Find the next selectable end date after start
-                      DateTime nextSelectableEnd = nextSelectable.add(Duration(days: widget.item.minDays - 1));
-                      while (blackoutDates.contains(nextSelectableEnd)) {
-                        nextSelectableEnd = nextSelectableEnd.add(const Duration(days: 1));
-                      }
-
-
-
-                      DateTimeRange initialRange = DateTimeRange(
-                        start: nextSelectable,
-                        end: nextSelectableEnd,
-                      );
-
-                      DateTimeRange? picked = await showSfDateRangePicker(
-                        context,
-                        firstDate,
-                        lastDate,
-                        blackoutDates,
-                        initialRange,
-                      );
-                      if (picked != null) {
-                        int selectedDays = picked.end.difference(picked.start).inDays + 1;
-                        // Check for blackout days in the selected range
-                        bool hasBlackout = false;
-                        for (int i = 0; i < selectedDays; i++) {
-                          final d = picked.start.add(Duration(days: i));
-                          if (blackoutDates.contains(DateTime(d.year, d.month, d.day))) {
-                            hasBlackout = true;
-                            break;
-                          }
-                        }
-                        if (hasBlackout) {
-                          setState(() {
-                            dateRange = null;
-                            startDate = null;
-                            endDate = null;
-                            showConfirm = false;
-                            controller.selectedRange = null; // Clear the controller
-                          });
-                          return;
-                        }
-                        
-                        // Auto-assign radio button based on selected days
-                        int newSelectedOption = selectedOption;
-                        if (selectedDays >= 14) {
-                          newSelectedOption = 14;
-                        } else if (selectedDays >= 7 && widget.item.minDays <= 7) {
-                          newSelectedOption = 7;
-                        } else if (selectedDays >= 5 && widget.item.minDays <= 5) {
-                          newSelectedOption = 5;
-                        } else if (selectedDays >= 3 && widget.item.minDays <= 3) {
-                          newSelectedOption = 3;
-                        }
-                        
-                        setState(() {
-                          dateRange = picked;
-                          startDate = picked.start;
-                          endDate = picked.end;
-                          noOfDays = selectedDays;
-                          selectedOption = newSelectedOption; // Update radio button selection
-                          showConfirm = true;
-                        });
-                      } else {
-                        // User cancelled - reset the date selection to ensure consistency
-                        setState(() {
-                          dateRange = null;
-                          startDate = null;
-                          endDate = null;
-                          showConfirm = false;
-                          controller.selectedRange = null; // Clear the controller
-                        });
-                      }
-                    },
-                    child: StyledBody(
-                      (startDate != null && endDate != null)
-                          ? '${DateFormat('dd MMM yyyy').format(startDate!)} - ${DateFormat('dd MMM yyyy').format(endDate!)}'
-                          : 'SELECT DATES', // <-- Changed to all capitals
-                      weight: FontWeight.bold,
-                    ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: (startDate != null && endDate != null)
+          ? Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
                   ),
                 ],
               ),
-        ],
-      ),
-    ),
-    bottomNavigationBar: (startDate != null && endDate != null)
-        ? SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    height: 48,
-                    width: 120, // Shorter width for the button
+              child: SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: 20, horizontal: width * 0.05),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 56,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(0), // Square corners
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         textStyle: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1.1,
-                        ),
-                      ),
-                      child: const Text(
-                        'NEXT',
-                        style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.1,
                         ),
@@ -573,8 +627,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                         int totalPrice = getPricePerDay(noOfDays) * noOfDays;
                         int days = startDate!.difference(endDate!).inDays.abs() + 1;
                         if (loggedIn) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => SummaryRental(
+                          Navigator.of(context).push(SmoothTransitions.luxury(SummaryRental(
                               widget.item,
                               startDate!,
                               endDate!,
@@ -585,18 +638,23 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
                             ),
                           ));
                         } else {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const GoogleSignInScreen(),
-                          ));
+                          Navigator.of(context).push(SmoothTransitions.luxury(const GoogleSignInScreen()));
                         }
                       },
+                      child: const Text(
+                        'CONTINUE TO SUMMARY',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          )
-        : null,
+            )
+          : null,
   );
   }
 
@@ -619,7 +677,7 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
           return AlertDialog(
             backgroundColor: Colors.white,
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero, // <-- Square corners
+              borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
             title: const Text('Select Rental Dates'),
             content: SizedBox(

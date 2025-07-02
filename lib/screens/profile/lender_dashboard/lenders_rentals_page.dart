@@ -328,7 +328,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                         builder: (context) => AlertDialog(
                           backgroundColor: Colors.white,
                           shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero, // Square corners
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
                           title: const Text(
                             "Request Accepted",
@@ -400,7 +400,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                         builder: (context) => AlertDialog(
                           backgroundColor: Colors.white,
                           shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero, // Square corners
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
                           title: const Text(
                             "Request Rejected",

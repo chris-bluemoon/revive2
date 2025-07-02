@@ -10,6 +10,7 @@ import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/profile/account/vacation_page.dart';
 import 'package:revivals/screens/profile/edit_profile_page.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
 
 
@@ -87,7 +88,7 @@ class AccountPage extends StatelessWidget {
                             HapticFeedback.lightImpact();
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => EditProfilePage(renter: renter)),
+                              SmoothTransitions.luxury(EditProfilePage(renter: renter)),
                             );
                           },
                         ),
@@ -109,7 +110,7 @@ class AccountPage extends StatelessWidget {
                             HapticFeedback.lightImpact();
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const VacationPage()),
+                              SmoothTransitions.luxury(const VacationPage()),
                             ); 
                           },
                         ),
@@ -193,7 +194,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
     return AlertDialog(
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero, // Square corners
+        borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
       content: _isDeleting
           ? Column(
@@ -317,7 +318,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
           builder: (context) => AlertDialog(
             backgroundColor: Colors.white,
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero, // Square corners
+              borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
             title: const Text('Error'),
             content: const Text('Failed to delete account. Please try again.'),

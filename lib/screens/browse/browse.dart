@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:revivals/shared/item_results.dart';
 import 'package:revivals/shared/item_types.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
 
 class Browse extends StatefulWidget {
@@ -64,16 +65,14 @@ class _BrowseState extends State<Browse> {
                   onSubmitted: (value) {
                     if (value.trim().isNotEmpty) {
                       Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ItemResults(
+                        SmoothTransitions.luxury(ItemResults(
                             'search',
                             '', // value is not used for search, only values is used
                             values: value
                                 .split(RegExp(r'\s+|,'))
                                 .where((s) => s.isNotEmpty)
                                 .toList(),
-                          ),
-                        ),
+                          )),
                       );
                     }
                   },
@@ -135,12 +134,10 @@ class _BrowseState extends State<Browse> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => ItemResults(
+          SmoothTransitions.luxury(ItemResults(
               'type',
               label,
-            ),
-          ),
+            )),
         );
       },
       child: Container(

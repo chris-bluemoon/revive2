@@ -18,6 +18,7 @@ import 'package:revivals/screens/to_rent/rent_this_with_date_selecter.dart';
 import 'package:revivals/screens/to_rent/user_card.dart';
 import 'package:revivals/shared/get_country_price.dart';
 import 'package:revivals/shared/item_card.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
 
@@ -264,9 +265,7 @@ class _ToRentState extends State<ToRent> {
                             if (owner != null && owner.name.isNotEmpty) {
                               log('Owner name: ${owner.name}');
                               Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => Profile(userN: owner.name, canGoBack: true,),
-                                ),
+                                SmoothTransitions.luxury(Profile(userN: owner.name, canGoBack: true,)),
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -291,16 +290,14 @@ class _ToRentState extends State<ToRent> {
                               final owner = ownerList.isNotEmpty ? ownerList.first : null;
                               
                               Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => MessageConversationPage(
+                                SmoothTransitions.luxury(MessageConversationPage(
                                     currentUserId: Provider.of<ItemStoreProvider>(context, listen: false).renter.id,
                                     otherUserId: widget.item.owner,
                                     otherUser: {
                                       'name': ownerName,
                                       'profilePicUrl': owner?.imagePath ?? '', // Use owner's imagePath or empty string as fallback
                                     },
-                                  ),
-                                ),
+                                  )),
                               );
                             },
                             icon: Icon(Icons.email_outlined, size: width * 0.05),
@@ -657,9 +654,7 @@ class _ToRentState extends State<ToRent> {
                   child: GestureDetector(
                     onTap: () {
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => ToRent(item),
-                        ),
+                        SmoothTransitions.luxury(ToRent(item)),
                       );
                     },
                     child: SizedBox(
@@ -718,15 +713,14 @@ class _ToRentState extends State<ToRent> {
                       flex: widget.item.bookingType == 'both' ? 1 : 1, // Equal flex when both buttons are shown
                       child: OutlinedButton(
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => (SummaryPurchase(
+                          Navigator.of(context).push(SmoothTransitions.luxury(SummaryPurchase(
                                   widget.item,
                                   DateTime.now(),
                                   DateTime.now(),
                                   0,
                                   widget.item.buyPrice,
                                   'booked',
-                                  symbol))));
+                                  symbol)));
                         },
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18), // Match RENT button padding
@@ -778,7 +772,7 @@ class _ToRentState extends State<ToRent> {
                                             child: AlertDialog(
                                               backgroundColor: Colors.white,
                                               shape: const RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(Radius.circular(0.0)),
+                                                borderRadius: BorderRadius.all(Radius.circular(12)),
                                               ),
                                               titlePadding: const EdgeInsets.only(top: 32),
                                               contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -902,9 +896,7 @@ class _ToRentState extends State<ToRent> {
                                   child: OutlinedButton(
                                     onPressed: () {
                                       Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) => CreateItem(item: widget.item),
-                                        ),
+                                        SmoothTransitions.luxury(CreateItem(item: widget.item)),
                                       );
                                     },
                                     style: OutlinedButton.styleFrom(
@@ -937,8 +929,7 @@ class _ToRentState extends State<ToRent> {
                               onPressed: () {
                                 bool loggedIn = Provider.of<ItemStoreProvider>(context, listen: false).loggedIn;
                                 if (loggedIn) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => (RentThisWithDateSelecter(widget.item))));
+                                  Navigator.of(context).push(SmoothTransitions.luxury(RentThisWithDateSelecter(widget.item)));
                                 } else {
                                   showRentAlertDialog(context);
                                 }
@@ -1028,7 +1019,7 @@ showMessagingAlertDialog(BuildContext context) {
       okButton,
     ],
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(0.0)),
+      borderRadius: BorderRadius.all(Radius.circular(12)),
     ),
   );
   showDialog(
@@ -1091,7 +1082,7 @@ showRentAlertDialog(BuildContext context) {
       okButton,
     ],
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(0.0)),
+      borderRadius: BorderRadius.all(Radius.circular(12)),
     ),
   );
   showDialog(

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:revivals/screens/messages/message_conversation_page.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/profile_avatar.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
 
 class InboxPage extends StatefulWidget {
@@ -324,8 +325,7 @@ class _InboxPageState extends State<InboxPage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => MessageConversationPage(
+                          SmoothTransitions.luxury(MessageConversationPage(
                               currentUserId: widget.currentUserId,
                               otherUserId: preview.userId,
                               otherUser: {

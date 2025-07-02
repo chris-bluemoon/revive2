@@ -92,6 +92,11 @@ class _VerifyIdState extends State<VerifyId> {
                               Navigator.pop(context);
                             }
                           },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     child:
                         // (!readyToSubmit) ?
                         const StyledBody('SUBMIT')

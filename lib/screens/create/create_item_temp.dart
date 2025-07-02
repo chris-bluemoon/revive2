@@ -5,8 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/providers/set_price_provider.dart';
 import 'package:revivals/screens/create/create_item.dart';
-// Import your CreateItem page
-// import 'package:your_app/screens/create_item.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 
 class CreateItemTemp extends StatefulWidget {
   const CreateItemTemp({super.key});
@@ -26,7 +25,7 @@ class _CreateItemTempState extends State<CreateItemTemp> {
       spp.clearAllFields();
       
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const CreateItem(item: null,)),
+        SmoothTransitions.luxury(const CreateItem(item: null,)),
       );
     });
   }
@@ -50,4 +49,3 @@ class _CreateItemTempState extends State<CreateItemTemp> {
 
 
 
-  

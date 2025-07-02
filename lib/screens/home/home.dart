@@ -14,6 +14,7 @@ import 'package:revivals/screens/home/rentals_home_widget.dart';
 import 'package:revivals/screens/home/to_buy_home_widget.dart';
 import 'package:revivals/screens/messages/inbox_page.dart';
 import 'package:revivals/shared/item_results.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
 
 class Home extends StatefulWidget {
@@ -82,9 +83,7 @@ class _HomeState extends State<Home> {
                           icon: const Icon(Icons.chat_bubble_outline, color: Colors.black, size: 30),
                           onPressed: () {
                             Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => InboxPage(currentUserId: userId),
-                              ),
+                              SmoothTransitions.luxury(InboxPage(currentUserId: userId)),
                             );
                           },
                         ),
@@ -193,9 +192,8 @@ class _HomeState extends State<Home> {
               ),
               GestureDetector(
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            (const ItemResults('bookingType', 'rental'))));
+                    Navigator.of(context).push(SmoothTransitions.luxury(
+                        const ItemResults('bookingType', 'rental')));
                   },
                   child: const RentalHomeWidget()),
               SizedBox(height: width * 0.02),
@@ -209,9 +207,8 @@ class _HomeState extends State<Home> {
               SizedBox(height: width * 0.02),
               GestureDetector(
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            (const ItemResults('dateAdded', '01-01-2020'))));
+                    Navigator.of(context).push(SmoothTransitions.luxury(
+                        const ItemResults('dateAdded', '01-01-2020')));
                   },
                   child: const NewArrivalsCarousel()),
 
@@ -224,9 +221,8 @@ class _HomeState extends State<Home> {
               ),
               GestureDetector(
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            (const ItemResults('bookingType', 'buy'))));
+                    Navigator.of(context).push(SmoothTransitions.luxury(
+                        const ItemResults('bookingType', 'buy')));
                   },
                   child: const ToBuyHomeWidget()),
 
@@ -316,8 +312,8 @@ class _HomeState extends State<Home> {
       onPressed: () {
         // Navigator.of(context).pop();
         // Navigator.of(context).popUntil((route) => route.isFirst);
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => (const GoogleSignInScreen())));
+        Navigator.of(context).push(SmoothTransitions.luxury(
+            const GoogleSignInScreen()));
       },
       child: const Center(child: StyledHeading("OK", color: Colors.white)),
     );
@@ -354,7 +350,7 @@ class _HomeState extends State<Home> {
         okButton,
       ],
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(0.0)),
+        borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
     );
     showDialog(
