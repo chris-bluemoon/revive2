@@ -158,7 +158,7 @@ class _CustomSplashScreenState extends State<CustomSplashScreen>
                         opacity: _iconOpacity.value,
                         child: Center(
                           child: Image.asset(
-                            'assets/logos/velaa_logo_image_only.png',
+                            'assets/logos/new_velaa_logo_transparent.png',
                             width: width * 0.4,
                             height: width * 0.4,
                             fit: BoxFit.contain,

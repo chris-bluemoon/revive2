@@ -9,6 +9,7 @@ import 'package:revivals/models/review.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/services/stripe_sevice.dart';
+import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:uuid/uuid.dart';
 
@@ -41,7 +42,7 @@ class _RentersRentalsPageState extends State<RentersRentalsPage> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const CenteredLogoSpinner(size: 80);
     }
     final width = MediaQuery.of(context).size.width;
     final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);

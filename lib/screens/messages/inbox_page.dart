@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:revivals/screens/messages/message_conversation_page.dart';
+import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/styled_text.dart';
 
 class InboxPage extends StatefulWidget {
@@ -43,7 +44,7 @@ class _InboxPageState extends State<InboxPage> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const CenteredLogoSpinner(size: 80);
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(

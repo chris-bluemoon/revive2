@@ -6,6 +6,7 @@ import 'package:revivals/models/item.dart';
 import 'package:revivals/models/item_image.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/get_country_price.dart';
 import 'package:revivals/shared/styled_text.dart';
 
@@ -54,18 +55,43 @@ class _ItemCardState extends State<ItemCard> {
     _loadImage();
   }
 
-  void _loadImage() async {
-    //ynt added first [if condition] to handle empty imageId
-    //but still don't understand following [loop] and [second if condition]
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Try to load image again when dependencies change (e.g., when images are loaded)
+    if (thisImage.isEmpty && widget.item.imageId.isNotEmpty) {
+      _loadImage();
+    }
+  }
 
+  void _loadImage() async {
     if (widget.item.imageId.isNotEmpty) {
-      // Wait for images to be loaded if they aren't available yet
       final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
       
-      // Try to find the image, with retry logic
+      // First attempt - immediate check
+      for (ItemImage i in itemStore.images) {
+        if (i.id == widget.item.imageId[0]) {
+          if (mounted) {
+            setState(() {
+              thisImage = i.imageId;
+            });
+          }
+          return; // Found it, exit early
+        }
+      }
+      
+      // If not found immediately, try with delays
       for (int attempt = 0; attempt < 3; attempt++) {
-        bool imageFound = false;
+        await Future.delayed(Duration(milliseconds: 500 + (attempt * 300)));
         
+        if (!mounted) return; // Check if widget is still mounted
+        
+        // Refetch images if needed
+        if (attempt > 0) {
+          await itemStore.fetchImages();
+        }
+        
+        // Try to find the image again
         for (ItemImage i in itemStore.images) {
           if (i.id == widget.item.imageId[0]) {
             if (mounted) {
@@ -73,16 +99,17 @@ class _ItemCardState extends State<ItemCard> {
                 thisImage = i.imageId;
               });
             }
-            imageFound = true;
-            break;
+            return; // Found it, exit
           }
         }
-        
-        if (imageFound) break;
-        
-        // If not found and this isn't the last attempt, wait and try again
-        if (attempt < 2) {
-          await Future.delayed(Duration(milliseconds: 500 * (attempt + 1)));
+      }
+      
+      // If still not found after all attempts, log for debugging
+      if (mounted && thisImage.isEmpty) {
+        print('Failed to load image for item: ${widget.item.name}, imageId: ${widget.item.imageId[0]}');
+        print('Available images count: ${itemStore.images.length}');
+        if (itemStore.images.isNotEmpty) {
+          print('First few image IDs: ${itemStore.images.take(3).map((i) => i.id).toList()}');
         }
       }
     }
@@ -156,70 +183,83 @@ class _ItemCardState extends State<ItemCard> {
 // }
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    List currListOfFavs =
-        Provider.of<ItemStoreProvider>(context, listen: false).favourites;
-    isFav = isAFav(widget.item, currListOfFavs);
-    setPrice();
-    if (thisImage == 'assets/img/items/No_Image_Available.jpg') {
-      thisImage = '';
-    }
-    return Card(
-      shape: BeveledRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      color: Colors.white,
-      child: IntrinsicHeight(
-        child: Padding(
-          padding: EdgeInsets.all(width * 0.025), // Reduced padding
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-            Center(child: StyledHeading(widget.item.brand)),
-            SizedBox(height: width * 0.01), // Reduced spacing
-            AspectRatio(
-              aspectRatio: 3 / 4,
-              child: Stack(
+    return Consumer<ItemStoreProvider>(
+      builder: (context, itemStore, child) {
+        // Try to load image if it's still empty and images are available
+        if (thisImage.isEmpty && widget.item.imageId.isNotEmpty && itemStore.images.isNotEmpty) {
+          for (ItemImage i in itemStore.images) {
+            if (i.id == widget.item.imageId[0]) {
+              thisImage = i.imageId;
+              break;
+            }
+          }
+        }
+        
+        double width = MediaQuery.of(context).size.width;
+        List currListOfFavs = itemStore.favourites;
+        isFav = isAFav(widget.item, currListOfFavs);
+        setPrice();
+        
+        // Reset thisImage if it's the default placeholder
+        String displayImage = thisImage;
+        if (displayImage == 'assets/img/items/No_Image_Available.jpg') {
+          displayImage = '';
+        }
+        
+        return Card(
+          shape: BeveledRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          color: Colors.white,
+          child: IntrinsicHeight(
+            child: Padding(
+              padding: EdgeInsets.all(width * 0.025),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: thisImage.isEmpty
-                        ? Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            color: Colors.grey[200],
-                            child: widget.item.imageId.isNotEmpty
-                                ? const Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                  Center(child: StyledHeading(widget.item.brand)),
+                  SizedBox(height: width * 0.01),
+                  AspectRatio(
+                    aspectRatio: 3 / 4,
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: displayImage.isEmpty
+                              ? Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  color: Colors.grey[200],
+                                  child: widget.item.imageId.isNotEmpty
+                                      ? const Center(
+                                          child: AnimatedLogoSpinner(
+                                            size: 60,
+                                          ),
+                                        )
+                                      : Image.asset(
+                                          'assets/img/items/No_Image_Available.jpg',
+                                          fit: BoxFit.cover,
+                                        ),
+                                )
+                              : CachedNetworkImage(
+                                  imageUrl: displayImage,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  placeholder: (context, url) => Container(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    color: Colors.grey[200],
+                                    child: const Center(
+                                      child: AnimatedLogoSpinner(
+                                        size: 60,
+                                      ),
                                     ),
-                                  )
-                                : Image.asset(
-                                    'assets/img/items/No_Image_Available.jpg',
-                                    fit: BoxFit.cover,
                                   ),
-                          )
-                        : CachedNetworkImage(
-                            imageUrl: thisImage,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                            placeholder: (context, url) => Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              color: Colors.grey[200],
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                                  errorWidget: (context, url, error) =>
+                                      Image.asset('assets/img/items/No_Image_Available.jpg', fit: BoxFit.cover),
                                 ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                Image.asset('assets/img/items/No_Image_Available.jpg', fit: BoxFit.cover),
-                          ),
-                  ),
+                        ),
                   Positioned(
                     top: 6,
                     right: 6,
@@ -298,11 +338,13 @@ class _ItemCardState extends State<ItemCard> {
             SizedBox(height: width * (widget.item.bookingType == 'both' ? 0.005 : 0.01)), // Conditional spacing
             StyledBodyStrikeout('RRP ${widget.item.rrp}$symbol',
                 weight: FontWeight.normal,
-                fontSize: widget.item.bookingType == 'both' ? width * 0.025 : null), // Smaller RRP text for 'both'
-          ],
-        ),
-      ),
-    ),
+                fontSize: widget.item.bookingType == 'both' ? width * 0.025 : null),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

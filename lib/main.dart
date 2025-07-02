@@ -19,6 +19,7 @@ import 'package:revivals/screens/help_centre/who_are_we.dart';
 import 'package:revivals/screens/home_page.dart';
 import 'package:revivals/screens/splash/custom_splash_screen.dart';
 import 'package:revivals/services/notification_service.dart';
+import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/theme.dart';
 
 import 'firebase_options.dart';
@@ -78,6 +79,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Preload logo for better spinner performance
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      LogoImageCache.preloadLogo(context);
+    });
+    
     return MaterialApp(
       useInheritedMediaQuery: true,
       // locale: DevicePreview.locale(context),

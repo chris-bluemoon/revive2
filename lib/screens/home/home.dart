@@ -35,7 +35,10 @@ class _HomeState extends State<Home> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
       itemStore.fetchRentersOnce().then((_) {
-        itemStore.fetchItemsOnce();
+        itemStore.fetchItemsOnce().then((_) {
+          // Fetch images after items are loaded
+          itemStore.fetchImages();
+        });
         itemStore.fetchItemRentersOnce();
         // itemStore.fetchFittingRentersOnce();
         itemStore.fetchLedgersOnce();
@@ -71,7 +74,7 @@ class _HomeState extends State<Home> {
           actions: Provider.of<ItemStoreProvider>(context, listen: false).loggedIn
               ? [
                   Padding(
-                    padding: const EdgeInsets.only(right: 16.0, top: 8.0),
+                    padding: const EdgeInsets.only(right: 16.0),
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -119,10 +122,11 @@ class _HomeState extends State<Home> {
           title: const Text(
             'VELAA',
             style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 28,
+              fontFamily: 'Lovelo',
+              fontWeight: FontWeight.normal,
+              fontSize: 32,
               color: Colors.black,
-              letterSpacing: 2,
+              letterSpacing: 3.0,
             ),
           ),
         ),

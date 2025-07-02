@@ -74,7 +74,7 @@ dependency_overrides:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/logos/velaa_logo_image_only.png"
+  image_path: "assets/logos/new_velaa_logo_transparent.png"
 
 flutter:
   uses-material-design: true
@@ -98,11 +98,11 @@ flutter:
 flutter_native_splash:
   android: true
   ios: true
-  image: "assets/logos/velaa_logo_image_only.png"
+  image: "assets/logos/new_velaa_logo_transparent.png"
   color: "#ebe2e2"
   
   android_12: 
     color: "#ebe2e2"
-    image: "assets/logos/velaa_logo_image_only.png"
+    image: "assets/logos/new_velaa_logo_transparent.png"
     
   ios_content_mode: center

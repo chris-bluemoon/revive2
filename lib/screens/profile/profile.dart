@@ -19,6 +19,7 @@ import 'package:revivals/screens/profile/renter_dashboard/renter_dashboard.dart'
 import 'package:revivals/screens/to_rent/to_rent.dart';
 import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/settings.dart';
+import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/item_results.dart';
 import 'package:revivals/shared/line.dart';
 import 'package:revivals/shared/styled_text.dart';
@@ -347,7 +348,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               child: SizedBox(
                                 width: width * 0.06,
                                 height: width * 0.06,
-                                child: const CircularProgressIndicator(strokeWidth: 2),
+                                child: AnimatedLogoSpinner(size: width * 0.12),
                               ),
                             ),
                             errorWidget: (context, url, error) =>
@@ -695,7 +696,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                 child: SizedBox(
                                   width: 24,
                                   height: 24,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: FastLogoSpinner(size: 40),
                                 ),
                               ),
                               errorWidget: (context, url, error) => Container(
@@ -719,7 +720,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                 child: SizedBox(
                                   width: 24,
                                   height: 24,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: FastLogoSpinner(size: 40),
                                 ),
                               ),
                               errorWidget: (context, url, error) => Container(
@@ -740,7 +741,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                   child: SizedBox(
                                     width: 24,
                                     height: 24,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: FastLogoSpinner(size: 40),
                                   ),
                                 );
                               }
@@ -757,7 +758,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       child: SizedBox(
                                         width: 24,
                                         height: 24,
-                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                        child: FastLogoSpinner(size: 40),
                                       ),
                                     ),
                                     errorWidget: (context, url, error) => Container(
