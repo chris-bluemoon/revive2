@@ -97,12 +97,12 @@ flutter:
 
 flutter_native_splash:
   android: true
-  ios: true
+  ios: false
   color: "#ffffff"
-  image: assets/logos/new_velaa_logo_transparent.png
+  # image: assets/logos/new_velaa_logo_transparent.png
   
   android_12: 
     color: "#ffffff"
     image: assets/logos/new_velaa_logo_transparent.png
     
-  ios_content_mode: center
+  # ios_content_mode: center
