@@ -24,108 +24,108 @@ class FaqAccordion extends StatelessWidget //__
 
   final List<Item> general_faqs = [
     Item(
-        header: StyledHeading("How does the clothing rental marketplace work?",
+        header: StyledHeading("How does dress rental work?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Our platform connects clothing owners with renters. Browse items from verified lenders, select your size and rental period, make payment, and arrange pickup or delivery. After your event, return the item to the owner. It's fashion sharing made simple!",
+        content: StyledHeading(
+            "Browse our collection, select your size and rental period, make payment, and we'll deliver your dress. After your event, simply return it using our prepaid return bag. No dry cleaning needed!",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("What types of clothing can I rent?",
+        header: StyledHeading("What rental periods do you offer?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "You can rent dresses, suits, jackets, designer bags, shoes, formal wear, party outfits, and more! Our lenders offer everything from everyday wear to luxury designer pieces for special occasions.",
+        content: StyledHeading(
+            "We offer flexible rental periods from 3 to 14 days. Choose the duration that best fits your needs when booking your dress.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("How do I become a clothing lender?",
+        header: StyledHeading("How much does delivery cost?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Sign up as a lender, upload photos of your clothing items, set rental prices and availability, and start earning! We handle payments and provide guidelines for successful rentals. It's a great way to monetize your wardrobe.",
+        content: StyledHeading(
+            "Delivery within Bangkok is 100฿. We offer same-day delivery for orders placed before 2 PM, or next-day delivery for later orders.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("What rental periods are available?",
+        header: StyledHeading("What if my dress doesn't fit?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Rental periods vary by lender and typically range from 3 to 14 days. Each item listing shows available rental durations. Choose what works best for your event or occasion.",
+        content: StyledHeading(
+            "We offer a backup size service for 200฿ extra. If your dress doesn't fit, contact us immediately and we'll arrange an exchange if available. Check our size guide before ordering!",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("How are pickup and delivery arranged?",
+        header: StyledHeading("Can I cancel or change my order?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Lenders set their own pickup/delivery preferences. Some offer delivery within Bangkok for a fee (usually around 100฿), others prefer pickup. Check each listing for specific arrangements and contact the lender directly to coordinate.",
+        content: StyledHeading(
+            "You can cancel up to 24 hours before your delivery date for a full refund. Changes to size or style depend on availability. Contact us on LINE for assistance.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("What if an item doesn't fit or I don't like it?",
+        header: StyledHeading("How do I know if a dress is available?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Always check size guides and communicate with lenders before booking. If there's an issue upon pickup, discuss it immediately with the lender. Our platform encourages fair resolution between renters and lenders.",
+        content: StyledHeading(
+            "Our app shows real-time availability. If you can add it to your cart and complete checkout, it's available for your selected dates.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("How do I know if an item is available?",
+        header: StyledHeading("What happens if I damage the dress?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Our app shows real-time availability based on each lender's calendar. If you can select your dates and complete booking, the item is available. Lenders manage their own availability schedules.",
+        content: StyledHeading(
+            "Minor wear and tear is expected. For significant damage or stains, we may charge a cleaning or replacement fee. We'll assess each case individually and contact you before any charges.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("What happens if I damage a rented item?",
+        header: StyledHeading("How are the dresses cleaned?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Normal wear is expected, but renters are responsible for any damage beyond typical use. Contact the lender immediately if damage occurs. We facilitate fair resolution and may charge for cleaning or repairs based on the situation.",
+        content: StyledHeading(
+            "All dresses are professionally dry cleaned, steamed, and quality checked between rentals. We use specialized cleaning techniques for different fabrics to ensure freshness and quality.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("How are items cleaned between rentals?",
+        header: StyledHeading("Can I purchase a dress I've rented?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Lenders are responsible for cleaning their items between rentals. Many use professional cleaning services to ensure quality. As a renter, you don't need to clean items before returning unless specified by the lender.",
+        content: StyledHeading(
+            "Yes! Many of our dresses are available for purchase. Contact us during your rental period and we'll provide purchase pricing and arrange the sale.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("Can I purchase an item I've rented?",
+        header: StyledHeading("What payment methods do you accept?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Many lenders are open to selling their items! Contact the lender directly during or after your rental to discuss purchase options. We can facilitate the transaction through our platform.",
+        content: StyledHeading(
+            "We accept all major credit cards, debit cards, and mobile payments through our secure Stripe payment system. Payment is required at the time of booking.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("What payment methods are accepted?",
+        header: StyledHeading("Do you offer alterations?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "We accept all major credit cards, debit cards, and mobile payments through our secure payment system. Payment is processed when you confirm your booking, and funds are released to lenders after successful rentals.",
+        content: StyledHeading(
+            "We don't provide alterations as our dresses need to fit multiple customers. However, we carry a wide range of sizes and styles to suit different body types.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("How do lenders set their prices?",
+        header: StyledHeading("What's your late return policy?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Lenders set their own rental prices based on item value, brand, condition, and market demand. Our platform provides pricing guidance, but lenders have full control over their rates and any additional fees.",
+        content: StyledHeading(
+            "Late returns incur a daily fee equal to one day's rental rate. Please contact us if you need to extend your rental period - we're often flexible if notified in advance.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("What's the cancellation policy?",
+        header: StyledHeading("How do I become a dress owner/lender?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Cancellation policies vary by lender. Most allow cancellations 24-48 hours before pickup for a full refund. Check each listing for specific terms. Emergency cancellations are handled case-by-case.",
+        content: StyledHeading(
+            "Join our community of dress owners! Upload photos of your designer dresses, set your rental prices, and earn money from your wardrobe. We handle payments, cleaning, and delivery.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("How do I contact lenders directly?",
+        header: StyledHeading("Need help with last-minute rentals?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "Once you book an item, you can message the lender directly through our in-app chat system. For urgent matters, contact us on LINE and we'll help facilitate communication.",
+        content: StyledHeading(
+            "For same-day or urgent rentals, contact us directly on LINE! We'll check availability and arrange express delivery if possible.",
             color: contentColor,
             weight: FontWeight.normal)),
     Item(
-        header: StyledHeading("What safety measures are in place?",
+        header: StyledHeading("What occasions are your dresses suitable for?",
             color: headerColor, weight: FontWeight.normal),
-        content: StyledBody(
-            "All lenders are verified through our registration process. We facilitate secure payments, provide user ratings and reviews, and offer customer support for any issues. Always meet in safe, public locations for exchanges.",
+        content: StyledHeading(
+            "Our collection includes dresses for weddings, cocktail parties, galas, business events, date nights, photoshoots, and any special occasion where you want to look amazing!",
             color: contentColor,
             weight: FontWeight.normal)),
   ];
