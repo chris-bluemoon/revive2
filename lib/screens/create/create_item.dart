@@ -191,7 +191,7 @@ class _CreateItemState extends State<CreateItem> {
                   final cip = Provider.of<CreateItemProvider>(context, listen: false);
                   cip.reset();
                   _hasBeenCleared = false; // Reset the flag for next time
-                  Navigator.of(context).pushReplacementNamed("/");
+                  Navigator.of(context).pushReplacementNamed("/home");
                 }
               },
             ),

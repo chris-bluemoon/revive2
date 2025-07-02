@@ -49,6 +49,10 @@ class _FavouritesState extends State<Favourites> {
               // TODO: Image is not centered in appbar with back arrow
               mainAxisAlignment: MainAxisAlignment.center,
               children: [StyledTitle('WISH LIST')]),
+          leading: IconButton(
+            icon: Icon(Icons.chevron_left, size: width * 0.08),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
         body: anyFavourites
             ? Container(

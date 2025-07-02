@@ -51,7 +51,7 @@ class _Register extends State<Register> {
               leading: IconButton(
                 icon: Icon(Icons.chevron_left, size: width * 0.08),
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/');
+                  Navigator.pushReplacementNamed(context, '/home');
                 },
               ),
               actions: [

@@ -17,6 +17,7 @@ import 'package:revivals/screens/help_centre/how_it_works.dart';
 import 'package:revivals/screens/help_centre/sizing_guide.dart';
 import 'package:revivals/screens/help_centre/who_are_we.dart';
 import 'package:revivals/screens/home_page.dart';
+import 'package:revivals/screens/splash/custom_splash_screen.dart';
 import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/theme.dart';
 
@@ -85,7 +86,8 @@ class MyApp extends StatelessWidget {
       theme: primaryTheme,
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
-        '/': (context) => const HomePage(),
+        '/': (context) => const CustomSplashScreen(),
+        '/home': (context) => const HomePage(),
         // When navigating to the "/second" route, build the SecondScreen widget.
         '/faqs': (context) => const FAQs(),
         '/howItWorks': (context) => const HowItWorks(),

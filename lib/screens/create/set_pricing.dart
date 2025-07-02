@@ -763,7 +763,7 @@ class _SetPricingState extends State<SetPricing> {
                 final cip = Provider.of<CreateItemProvider>(context, listen: false);
                 cip.reset();
                 
-                Navigator.of(context).pushReplacementNamed('/'); // Go to home/root
+                Navigator.of(context).pushReplacementNamed('/home'); // Go to home/root
               },
               child: const Text(
                 "OK",

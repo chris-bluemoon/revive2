@@ -23,6 +23,10 @@ ThemeData primaryTheme = ThemeData(
     foregroundColor: AppColors.textColor,
     surfaceTintColor: Colors.transparent,
     centerTitle: true,
+    iconTheme: IconThemeData(
+      color: AppColors.textColor,
+      size: 24, // Default size, will be overridden by custom implementations
+    ),
   ),
   textTheme: GoogleFonts.ralewayTextTheme().copyWith(
     bodyMedium: GoogleFonts.raleway(

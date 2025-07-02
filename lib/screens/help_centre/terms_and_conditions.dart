@@ -25,6 +25,7 @@ class TermsAndConditionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     final sections = [
       'Elegibility',
       'Account Registration',
@@ -104,7 +105,7 @@ Address: ''',
         preferredSize: const Size.fromHeight(140), // Increased height for full title visibility
         child: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.chevron_left, size: 32),
+            icon: Icon(Icons.chevron_left, size: width * 0.08),
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: const StyledTitle(

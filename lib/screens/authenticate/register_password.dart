@@ -441,7 +441,7 @@ class _RegisterPassword extends State<RegisterPassword> {
                                   // Reset loading state before navigation
                                   setState(() => loading = false);
                                   Navigator.of(context)
-                                      .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+                                      .pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
                                 }
                               } catch (error) {
                                 log('Error during user setup: $error');

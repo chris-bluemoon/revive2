@@ -162,7 +162,7 @@ class _SignIn extends State<SignIn> {
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/', // Navigate to home page
+                    '/home', // Navigate to home page
                     (route) => false,
                   );
                 },
@@ -177,7 +177,7 @@ class _SignIn extends State<SignIn> {
       log('🏠 NAVIGATING TO HOME PAGE FOR USER: $email');
       if (context.mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil(
-          '/', // Replace with your HomePage route name
+          '/home', // Replace with your HomePage route name
           (route) => false,
         );
       }

@@ -177,7 +177,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
           leading: IconButton(
             icon: Icon(Icons.chevron_left, size: width * 0.08),
             onPressed: () {
-              Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+              Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
 
           },
         ),
@@ -250,7 +250,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                             // Only navigate to home page if login was successful and user wasn't deleted
                             if (context.mounted && found == true && !_isProcessingLogin) {
                               Navigator.of(context).pushNamedAndRemoveUntil(
-                                '/', // Navigate to home page
+                                '/home', // Navigate to home page
                                 (route) => false,
                               );
                             } else if (context.mounted && _isProcessingLogin) {

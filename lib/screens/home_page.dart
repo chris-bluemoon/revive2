@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
 // import 'package:revivals/screens/addItems/addItems.dart';
@@ -22,17 +21,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  void initialization() async {
-    log('pausing..');
-    await Future.delayed(const Duration(seconds: 3));
-    log('unpausing...');
-    FlutterNativeSplash.remove();
-  }
-
   @override
   void initState() {
     super.initState();
-    initialization();
     // itemStore.fetchReviewsOnce(); // <-- Add this line
     // Provider.of<ItemStoreProvider>(context, listen: false)
     // .fetchRentersOnce();

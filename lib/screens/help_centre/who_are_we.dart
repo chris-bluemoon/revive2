@@ -14,7 +14,7 @@ class WhoAreWe extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, size: 32),
+          icon: Icon(Icons.chevron_left, size: width * 0.08),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const StyledTitle('Who Are We?'), 

@@ -5,10 +5,15 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: MediaQuery.of(context).size.width * 0.2,
+        toolbarHeight: width * 0.2,
         title: const Text('Settings'),
+        leading: IconButton(
+          icon: Icon(Icons.chevron_left, size: width * 0.08),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: const Center(
         child: Text(

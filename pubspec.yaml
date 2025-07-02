@@ -98,11 +98,11 @@ flutter:
 flutter_native_splash:
   android: true
   ios: true
-
-  background_image: "assets/logos/beige_background.png"
-  branding: "assets/logos/unearthed_logo_3.png"
-
+  image: "assets/logos/velaa_logo_image_only.png"
+  color: "#ebe2e2"
+  
   android_12: 
     color: "#ebe2e2"
-    image: "assets/logos/revive.png"
-    branding: "assets/logos/unearthed_logo_3.png"
+    image: "assets/logos/velaa_logo_image_only.png"
+    
+  ios_content_mode: center

@@ -158,7 +158,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         foregroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black), // Use the same back arrow as other pages
+          icon: Icon(Icons.chevron_left, size: width * 0.08, color: Colors.black), // Consistent with other pages
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
