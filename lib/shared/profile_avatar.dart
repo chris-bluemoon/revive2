@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
 
 class ProfileAvatar extends StatelessWidget {

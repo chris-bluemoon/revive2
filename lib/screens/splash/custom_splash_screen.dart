@@ -11,10 +11,8 @@ class CustomSplashScreen extends StatefulWidget {
 
 class _CustomSplashScreenState extends State<CustomSplashScreen>
     with TickerProviderStateMixin {
-  late AnimationController _iconController;
   late AnimationController _textController;
   late AnimationController _fadeController;
-  late Animation<double> _iconOpacity;
   late Animation<double> _textOpacity;
   late Animation<double> _textScale;
   late Animation<double> _fadeOpacity;
@@ -23,15 +21,7 @@ class _CustomSplashScreenState extends State<CustomSplashScreen>
   void initState() {
     super.initState();
 
-    // Remove the native splash screen immediately as we'll handle our own
-    FlutterNativeSplash.remove();
-
-    // Animation controllers
-    _iconController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
+    // Animation controllers - only need text and fade controllers now
     _textController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
@@ -41,15 +31,6 @@ class _CustomSplashScreenState extends State<CustomSplashScreen>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-
-    // Icon fade out animation
-    _iconOpacity = Tween<double>(
-      begin: 1.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: _iconController,
-      curve: Curves.easeInOut,
-    ));
 
     // Text fade in and scale animation
     _textOpacity = Tween<double>(
@@ -81,14 +62,14 @@ class _CustomSplashScreenState extends State<CustomSplashScreen>
   }
 
   void _startAnimationSequence() async {
-    // Wait 2 seconds to show the logo
-    await Future.delayed(const Duration(seconds: 2));
+    // Remove the native splash screen after a small delay to ensure smooth transition
+    await Future.delayed(const Duration(milliseconds: 100));
+    FlutterNativeSplash.remove();
     
-    // Start fading out the icon
-    _iconController.forward();
+    // Wait 1.5 seconds to show the logo (native splash already showed it)
+    await Future.delayed(const Duration(milliseconds: 1500));
     
-    // Wait for icon to fade out, then show text
-    await Future.delayed(const Duration(milliseconds: 800));
+    // Start showing text (logo will fade out automatically due to opacity animation)
     _textController.forward();
     
     // Wait for text animation to complete + 2 seconds for reading
@@ -127,7 +108,6 @@ class _CustomSplashScreenState extends State<CustomSplashScreen>
 
   @override
   void dispose() {
-    _iconController.dispose();
     _textController.dispose();
     _fadeController.dispose();
     super.dispose();
@@ -150,17 +130,17 @@ class _CustomSplashScreenState extends State<CustomSplashScreen>
               height: height,
               child: Stack(
                 children: [
-                  // Logo/Icon that fades out
+                  // Logo that stays visible until text appears
                   AnimatedBuilder(
-                    animation: _iconOpacity,
+                    animation: _textOpacity,
                     builder: (context, child) {
                       return Opacity(
-                        opacity: _iconOpacity.value,
+                        opacity: 1.0 - _textOpacity.value, // Fade out as text fades in
                         child: Center(
                           child: Image.asset(
                             'assets/logos/new_velaa_logo_transparent.png',
-                            width: width * 0.4,
-                            height: width * 0.4,
+                            width: 144, // Fixed size to match exactly with native splash
+                            height: 144, // Fixed size to match exactly with native splash
                             fit: BoxFit.contain,
                           ),
                         ),

@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:revivals/screens/messages/message_conversation_page.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
-import 'package:revivals/shared/styled_text.dart';
 import 'package:revivals/shared/profile_avatar.dart';
+import 'package:revivals/shared/styled_text.dart';
 
 class InboxPage extends StatefulWidget {
   final String currentUserId; // Pass the current user's ID

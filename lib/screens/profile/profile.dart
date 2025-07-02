@@ -20,9 +20,9 @@ import 'package:revivals/screens/to_rent/to_rent.dart';
 import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/settings.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
-import 'package:revivals/shared/profile_avatar.dart';
 import 'package:revivals/shared/item_results.dart';
 import 'package:revivals/shared/line.dart';
+import 'package:revivals/shared/profile_avatar.dart';
 import 'package:revivals/shared/styled_text.dart';
 import 'package:share_plus/share_plus.dart'; // Add this import at the top
 
