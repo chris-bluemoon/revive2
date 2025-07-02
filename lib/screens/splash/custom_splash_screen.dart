@@ -138,7 +138,7 @@ class _CustomSplashScreenState extends State<CustomSplashScreen>
                         opacity: 1.0 - _textOpacity.value, // Fade out as text fades in
                         child: Center(
                           child: Image.asset(
-                            'assets/logos/new_velaa_logo_transparent.png',
+                            'assets/logos/new_velaa_icon_1024.png',
                             width: 144, // Fixed size to match exactly with native splash
                             height: 144, // Fixed size to match exactly with native splash
                             fit: BoxFit.contain,

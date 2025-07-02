@@ -280,6 +280,10 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(8)),
                         ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
                         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       ),
                       // onSubmitted: (_) => _sendMessage(),

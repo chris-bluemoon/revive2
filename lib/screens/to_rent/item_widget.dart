@@ -85,14 +85,21 @@ class _ItemWidgetState extends State<ItemWidget> {
                   )));
         }
       },
-      child: thisImage.isNotEmpty 
-          ? CachedNetworkImage(
-              imageUrl: thisImage,
-              placeholder: (context, url) => const Loading(),
-              errorWidget: (context, url, error) =>
-                  Image.asset('assets/img/items/No_Image_Available.jpg'),
-            )
-          : Image.asset('assets/img/items/No_Image_Available.jpg'), // Fallback when no image URL
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12.0),
+        child: thisImage.isNotEmpty
+            ? CachedNetworkImage(
+                imageUrl: thisImage,
+                placeholder: (context, url) => const Loading(),
+                errorWidget: (context, url, error) =>
+                    Image.asset('assets/img/items/No_Image_Available.jpg'),
+                fit: BoxFit.cover,
+              )
+            : Image.asset(
+                'assets/img/items/No_Image_Available.jpg',
+                fit: BoxFit.cover,
+              ), // Fallback when no image URL
+      ),
     );
     // return Image.asset(setItemImage(), fit: BoxFit.contain);
     // child: Image.asset(setItemImage(),),

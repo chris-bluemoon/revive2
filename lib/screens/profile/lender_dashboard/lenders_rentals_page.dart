@@ -356,7 +356,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                                   backgroundColor: Colors.black,
                                   foregroundColor: Colors.white,
                                   shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.zero,
+                                    borderRadius: BorderRadius.all(Radius.circular(12)),
                                   ),
                                   padding: const EdgeInsets.symmetric(vertical: 12),
                                 ),
@@ -378,6 +378,9 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: const Text('ACCEPT'),
                   ),
@@ -428,7 +431,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                                   backgroundColor: Colors.black,
                                   foregroundColor: Colors.white,
                                   shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.zero,
+                                    borderRadius: BorderRadius.all(Radius.circular(12)),
                                   ),
                                   padding: const EdgeInsets.symmetric(vertical: 12),
                                 ),
@@ -450,6 +453,9 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: const Text('REJECT'),
                   ),
@@ -471,6 +477,9 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: const Text('CANCEL'),
                     ),

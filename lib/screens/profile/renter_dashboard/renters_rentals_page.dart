@@ -375,6 +375,9 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: const Text('MAKE PAYMENT'),
                   ),
@@ -435,13 +438,13 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                                   backgroundColor: Colors.black,
                                   foregroundColor: Colors.white,
                                   shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.zero,
+                                    borderRadius: BorderRadius.all(Radius.circular(12)),
                                   ),
                                   padding: const EdgeInsets.symmetric(vertical: 12),
                                 ),
                                 onPressed: () {
                                   Navigator.of(context).pop(); // Close dialog
-                                  Navigator.of(context).pop(); // Go back to previous page
+                                  // Navigator.of(context).pop(); // Go back to previous page
                                 },
                                 child: const Text(
                                   "OK",
@@ -458,6 +461,9 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: const Text('CANCEL'),
                   ),
@@ -586,7 +592,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                   foregroundColor: Colors.white,
                   shape: const RoundedRectangleBorder(
                     borderRadius:
-                        BorderRadius.all(Radius.circular(0)), // Square corners
+                        BorderRadius.all(Radius.circular(12)), // Rounded corners
                   ),
                 ),
                 child: const Text('LEAVE REVIEW'),
