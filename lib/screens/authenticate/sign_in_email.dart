@@ -340,35 +340,35 @@ class _SignIn extends State<SignIn> {
                                         filled: true,
                                         fillColor: Colors.grey[50],
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(12),
                                           borderSide: BorderSide(
                                             color: Colors.grey[200]!,
                                             width: 1,
                                           ),
                                         ),
                                         enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(12),
                                           borderSide: BorderSide(
                                             color: Colors.grey[200]!,
                                             width: 1,
                                           ),
                                         ),
                                         focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(12),
                                           borderSide: const BorderSide(
                                             color: Colors.black,
                                             width: 2,
                                           ),
                                         ),
                                         errorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(12),
                                           borderSide: const BorderSide(
                                             color: Colors.red,
                                             width: 1,
                                           ),
                                         ),
                                         focusedErrorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(12),
                                           borderSide: const BorderSide(
                                             color: Colors.red,
                                             width: 2,
@@ -423,35 +423,35 @@ class _SignIn extends State<SignIn> {
                                         filled: true,
                                         fillColor: Colors.grey[50],
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(12),
                                           borderSide: BorderSide(
                                             color: Colors.grey[200]!,
                                             width: 1,
                                           ),
                                         ),
                                         enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(12),
                                           borderSide: BorderSide(
                                             color: Colors.grey[200]!,
                                             width: 1,
                                           ),
                                         ),
                                         focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(12),
                                           borderSide: const BorderSide(
                                             color: Colors.black,
                                             width: 2,
                                           ),
                                         ),
                                         errorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(12),
                                           borderSide: const BorderSide(
                                             color: Colors.red,
                                             width: 1,
                                           ),
                                         ),
                                         focusedErrorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(12),
                                           borderSide: const BorderSide(
                                             color: Colors.red,
                                             width: 2,
@@ -552,7 +552,7 @@ class _SignIn extends State<SignIn> {
                                       elevation: 0,
                                       shadowColor: Colors.transparent,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
                                     child: Text(
@@ -649,7 +649,7 @@ class _SignIn extends State<SignIn> {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: const Text(
@@ -713,7 +713,7 @@ class _SignIn extends State<SignIn> {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: const Text(
@@ -777,7 +777,7 @@ class _SignIn extends State<SignIn> {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: const Text(

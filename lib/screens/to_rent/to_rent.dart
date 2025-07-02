@@ -9,7 +9,6 @@ import 'package:revivals/globals.dart' as globals;
 import 'package:revivals/models/item.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
-import 'package:revivals/screens/authenticate/sign_in_up.dart';
 import 'package:revivals/screens/create/create_item.dart';
 import 'package:revivals/screens/messages/message_conversation_page.dart';
 import 'package:revivals/screens/profile/profile.dart';
@@ -280,6 +279,13 @@ class _ToRentState extends State<ToRent> {
                         if (!isOwner)
                           IconButton(
                             onPressed: () {
+                              // Check if user is logged in
+                              final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+                              if (!itemStore.loggedIn) {
+                                showMessagingAlertDialog(context);
+                                return;
+                              }
+                              
                               final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
                               final ownerList = renters.where((r) => r.id == widget.item.owner).toList();
                               final owner = ownerList.isNotEmpty ? ownerList.first : null;
@@ -725,7 +731,7 @@ class _ToRentState extends State<ToRent> {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18), // Match RENT button padding
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(1.0),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           side: const BorderSide(width: 1.0, color: Colors.black),
                           minimumSize: const Size(100, 44), // Match RENT button minimumSize
@@ -869,7 +875,7 @@ class _ToRentState extends State<ToRent> {
                                       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 0), // More vertical padding, no horizontal
                                       backgroundColor: Colors.white,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(1.0),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
                                       side: const BorderSide(width: 1.0, color: Colors.red),
                                       minimumSize: const Size(120, 48), // Wider and taller minimum size
@@ -905,7 +911,7 @@ class _ToRentState extends State<ToRent> {
                                       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 0), // More vertical padding, no horizontal
                                       backgroundColor: Colors.black,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(1.0),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
                                       side: const BorderSide(width: 1.0, color: Colors.black),
                                       minimumSize: const Size(120, 48), // Wider and taller minimum size
@@ -934,14 +940,14 @@ class _ToRentState extends State<ToRent> {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => (RentThisWithDateSelecter(widget.item))));
                                 } else {
-                                  showAlertDialog(context);
+                                  showRentAlertDialog(context);
                                 }
                               },
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
                                 backgroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(1.0),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 side: const BorderSide(width: 1.0, color: Colors.black),
                                 minimumSize: const Size(100, 44),
@@ -970,7 +976,7 @@ class _ToRentState extends State<ToRent> {
   }
 }
 
-showAlertDialog(BuildContext context) {
+showMessagingAlertDialog(BuildContext context) {
   // Create button
   double width = MediaQuery.of(context).size.width;
 
@@ -980,15 +986,12 @@ showAlertDialog(BuildContext context) {
       foregroundColor: Colors.white, //change background color of button
       backgroundColor: Colors.black,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0.0),
+        borderRadius: BorderRadius.circular(12),
       ),
       side: const BorderSide(width: 1.0, color: Colors.black),
     ),
     onPressed: () {
-      // Navigator.of(context).pop();
-      // Navigator.of(context).popUntil((route) => route.isFirst);
-      Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => (const GoogleSignInScreen())));
+      Navigator.of(context).pop(); // Just close the dialog
     },
     child: const Center(child: StyledHeading("OK", color: Colors.white)),
   );
@@ -1015,7 +1018,70 @@ showAlertDialog(BuildContext context) {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              StyledHeading("to rent a dress"),
+              StyledHeading("to use messaging"),
+            ],
+          ),
+        ],
+      ),
+    ),
+    actions: [
+      okButton,
+    ],
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(0.0)),
+    ),
+  );
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}
+
+showRentAlertDialog(BuildContext context) {
+  // Create button
+  double width = MediaQuery.of(context).size.width;
+
+  Widget okButton = ElevatedButton(
+    style: OutlinedButton.styleFrom(
+      textStyle: const TextStyle(color: Colors.white),
+      foregroundColor: Colors.white, //change background color of button
+      backgroundColor: Colors.black,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      side: const BorderSide(width: 1.0, color: Colors.black),
+    ),
+    onPressed: () {
+      Navigator.of(context).pop(); // Just close the dialog
+    },
+    child: const Center(child: StyledHeading("OK", color: Colors.white)),
+  );
+  // Create AlertDialog
+  AlertDialog alert = AlertDialog(
+    backgroundColor: Colors.white,
+    title: const Center(child: StyledHeading("NOT LOGGED IN")),
+    content: SizedBox(
+      height: width * 0.2,
+      child: const Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              StyledHeading("Please log in"),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              StyledHeading("or register to continue"),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              StyledHeading("to rent this item"),
             ],
           ),
         ],

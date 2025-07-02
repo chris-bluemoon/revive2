@@ -237,7 +237,7 @@ class _RegisterPassword extends State<RegisterPassword> {
                       elevation: 8,
                       shadowColor: Colors.black.withOpacity(0.1),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(24.0),
@@ -356,7 +356,7 @@ class _RegisterPassword extends State<RegisterPassword> {
                                           context: context,
                                           builder: (_) => AlertDialog(
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(16),
+                                              borderRadius: BorderRadius.circular(12),
                                             ),
                                             actions: [
                                               ElevatedButton(
@@ -364,7 +364,7 @@ class _RegisterPassword extends State<RegisterPassword> {
                                                   backgroundColor: Colors.black,
                                                   foregroundColor: Colors.white,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderRadius: BorderRadius.circular(12),
                                                   ),
                                                 ),
                                                 onPressed: () {

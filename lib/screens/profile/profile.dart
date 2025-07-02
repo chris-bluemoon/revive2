@@ -548,6 +548,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () {
+                              // Check if user is logged in
+                              final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+                              if (!itemStore.loggedIn) {
+                                showAlertDialog(context);
+                                return;
+                              }
+                              
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) => MessageConversationPage(
@@ -1035,4 +1042,67 @@ Future<void> logOut(BuildContext context) async {
   } catch (e) {
     log(' Logout failed: $e');
   }
+}
+
+showAlertDialog(BuildContext context) {
+  // Create button
+  double width = MediaQuery.of(context).size.width;
+
+  Widget okButton = ElevatedButton(
+    style: OutlinedButton.styleFrom(
+      textStyle: const TextStyle(color: Colors.white),
+      foregroundColor: Colors.white, //change background color of button
+      backgroundColor: Colors.black,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+      ),
+      side: const BorderSide(width: 1.0, color: Colors.black),
+    ),
+    onPressed: () {
+      Navigator.of(context).pop(); // Just close the dialog
+    },
+    child: const Center(child: Text("OK", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+  );
+  // Create AlertDialog
+  AlertDialog alert = AlertDialog(
+    backgroundColor: Colors.white,
+    title: const Center(child: Text("NOT LOGGED IN", style: TextStyle(fontWeight: FontWeight.bold))),
+    content: SizedBox(
+      height: width * 0.2,
+      child: const Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Please log in", style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("or register to continue", style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("to send messages", style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          )
+        ],
+      ),
+    ),
+    actions: [
+      okButton,
+    ],
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(0.0)),
+    ),
+  );
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
 }
