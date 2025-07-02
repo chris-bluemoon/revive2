@@ -393,7 +393,7 @@ class _ToRentState extends State<ToRent> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   StyledBody(
-                                    "Daily Price",
+                                    "Daily Rental Price",
                                     weight: FontWeight.bold,
                                     color: Colors.grey,
                                     fontSize: width * 0.042,
