@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:revivals/screens/authenticate/register_location.dart';
-import 'package:revivals/services/auth.dart';
-import 'package:revivals/shared/constants.dart';
 import 'package:revivals/shared/loading.dart';
-import 'package:revivals/shared/styled_text.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:uuid/uuid.dart';
 
 var uuid = const Uuid();
@@ -20,7 +19,6 @@ class RegisterName extends StatefulWidget {
 
 class _RegisterName extends State<RegisterName> {
   bool found = false;
-  final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
 
@@ -31,149 +29,151 @@ class _RegisterName extends State<RegisterName> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-
     return loading ? const Loading() : Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        toolbarHeight: width * 0.2,
-        // centerTitle: true,
-        title: const StyledTitle('REGISTER NAME'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 70,
         leading: IconButton(
-          icon: Icon(Icons.chevron_left, size: width * 0.08),
+          icon: Icon(Icons.chevron_left, color: Colors.black, size: width * 0.08),
           onPressed: () {
+            HapticFeedback.lightImpact();
             Navigator.pop(context);
           },
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 0, horizontal: width * 0.04),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const StyledHeading(
-              'Enter your name',
-              weight: FontWeight.normal,
-            ),
-            Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 30, horizontal: 50),
-                child: Form(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Logo
+              Center(
+                child: Container(
+                  width: 80.0,
+                  height: 80.0,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/logos/velaa_logo_image_only.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40.0),
+              
+              // Title
+              const Text(
+                'What\'s your name?',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8.0),
+              const Text(
+                'Please enter your full name',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40.0),
+              
+              // Form Card
+              Card(
+                elevation: 8,
+                shadowColor: Colors.black.withOpacity(0.1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Form(
                     key: _formKey,
                     child: Column(
-                      children: <Widget>[
-                        const SizedBox(height: 20),
+                      children: [
                         TextFormField(
-                          decoration: textInputDecoration.copyWith(
+                          decoration: InputDecoration(
                             hintText: 'Name',
+                            hintStyle: TextStyle(color: Colors.grey[400]),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.black, width: 2),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                           ),
-                          validator: (val) =>
-                              val!.isEmpty ? 'Enter your name' : null,
+                          validator: (val) => val!.isEmpty ? 'Enter your name' : null,
                           onChanged: (val) {
                             setState(() {
                               name = val;
-                              ready = true;
-                              if (val.isEmpty) {ready = false;}
+                              ready = val.isNotEmpty;
                             });
                           },
                         ),
+                        const SizedBox(height: 30.0),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ready ? Colors.black : Colors.grey[300],
+                              foregroundColor: ready ? Colors.white : Colors.grey[500],
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: ready ? () async {
+                              if (_formKey.currentState!.validate()) {
+                                HapticFeedback.lightImpact();
+                                Navigator.push(
+                                  context,
+                                  SmoothPageRoute(
+                                    child: RegisterLocation(email: widget.email, name: name),
+                                  ),
+                                );
+                              }
+                            } : null,
+                            child: const Text(
+                              'Continue',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (error != 'Error: ') ...[
+                          const SizedBox(height: 16.0),
+                          Text(
+                            error,
+                            style: const TextStyle(color: Colors.red, fontSize: 14.0),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ],
-                    ))),
-          ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.black.withOpacity(0.3), width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
-              spreadRadius: 3,
-            )
-          ],
-        ),
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                if (!ready) Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                    },
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(1.0),
-                      ),
-                      side: const BorderSide(width: 1.0, color: Colors.black),
-                      ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: StyledHeading('CONTINUE', weight: FontWeight.bold, color: Colors.grey),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 5),
-                if (ready) Expanded(
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => (RegisterLocation(email: widget.email, name: name))));
-                        // Navigator.of(context).push(MaterialPageRoute(builder: (context) => (RegisterPassword(email: widget.email, name: name))));
-                      }
-                      // ready = false;
-                    },
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(1.0),
-                    ),
-                      side: const BorderSide(width: 1.0, color: Colors.black),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: StyledHeading('CONTINUE', color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),   
-      // bottomNavigationBar: Container(
-      //   // height: 300,
-      //   decoration: BoxDecoration(
-      //     color: Colors.white,
-      //     border: Border.all(color: Colors.black.withOpacity(0.3), width: 1),
-      //     boxShadow: [
-      //       BoxShadow(
-      //         color: Colors.black.withOpacity(0.2),
-      //         blurRadius: 10,
-      //         spreadRadius: 3,
-      //       )
-      //     ],
-      //   ),
-      //   padding: const EdgeInsets.all(10),
-      //   child: Row(
-      //     children: [
-      //       Expanded(
-      //         child: OutlinedButton(
-      //           onPressed: () async {
-      //             if (_formKey.currentState!.validate()) {
-      //               Navigator.of(context).push(MaterialPageRoute(builder: (context) => (RegisterPassword(email: widget.email, name: name))));
-      //             }
-      //           },
-      //           style: OutlinedButton.styleFrom(
-      //             padding: const EdgeInsets.all(10),
-      //             backgroundColor: Colors.black,
-      //             shape: RoundedRectangleBorder(
-      //               borderRadius: BorderRadius.circular(1.0),
-      //             ),
-      //             side: const BorderSide(width: 1.0, color: Colors.black),
-      //           ),
-      //           child: const StyledHeading('CONTINUE', color: Colors.white),
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
 }

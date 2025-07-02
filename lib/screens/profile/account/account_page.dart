@@ -2,12 +2,14 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/profile/account/vacation_page.dart';
 import 'package:revivals/screens/profile/edit_profile_page.dart';
+import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/styled_text.dart';
 
 
@@ -37,79 +39,104 @@ class AccountPage extends StatelessWidget {
               return false; // Prevent default back navigation
             }
             return true; // Allow normal back navigation
-          },
-          child: Scaffold(
-            appBar: AppBar(
-              toolbarHeight: width * 0.2,
-              leading: IconButton(
-                icon: Icon(Icons.chevron_left, size: width * 0.08),
-                onPressed: () {
-                  log('Back chevron pressed - loggedIn: ${provider.loggedIn}, userName: ${provider.renter.name}');
-                  // Check if user is still logged in when trying to go back
-                  if (!provider.loggedIn || provider.renter.name == 'no_user') {
-                    log('Redirecting to sign-in from back chevron');
-                    // If not logged in, redirect to sign-in instead of going back
-                    Navigator.of(context).pushNamedAndRemoveUntil('/sign_in', (route) => false);
-                  } else {
-                    // Normal back navigation
-                    Navigator.of(context).pop();
-                  }
-                },
+          },            child: Scaffold(
+              backgroundColor: Colors.grey.shade50,
+              appBar: AppBar(
+                toolbarHeight: width * 0.2,
+                leading: IconButton(
+                  icon: Icon(Icons.chevron_left, size: width * 0.08),
+                  onPressed: () {
+                    log('Back chevron pressed - loggedIn: ${provider.loggedIn}, userName: ${provider.renter.name}');
+                    // Check if user is still logged in when trying to go back
+                    if (!provider.loggedIn || provider.renter.name == 'no_user') {
+                      log('Redirecting to sign-in from back chevron');
+                      // If not logged in, redirect to sign-in instead of going back
+                      Navigator.of(context).pushNamedAndRemoveUntil('/sign_in', (route) => false);
+                    } else {
+                      // Normal back navigation
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+                centerTitle: true,
+                backgroundColor: Colors.white,
+                title: const StyledTitle(
+                  "ACCOUNT",
+                ),
+                elevation: 0,
               ),
-              centerTitle: true,
-              backgroundColor: Colors.white,
-              title: const StyledTitle(
-                "ACCOUNT",
-              ),
-              elevation: 0,
-            ),
-            body: Stack(
-              children: [
-                ListView(
-                  padding: const EdgeInsets.only(bottom: 40), // Add padding so version is not overlapped
-                  children: [
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.04), // 4% of screen height
-                    ListTile(
-                      leading: const Icon(Icons.edit),
-                      title: const Text('Edit Profile'),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => EditProfilePage(renter: renter)),
-                        );
-                      },
-                    ),
-                    const Divider(),
-                    // ListTile(
-                    //   leading: const Icon(Icons.person),
-                    //   title: const Text('Personal Information'),
-                    //   trailing: const Icon(Icons.chevron_right),
-                    //   onTap: () {},
-                    // ),
-                    // const Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.beach_access),
-                      title: const Text('Vacation Mode'),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const VacationPage()),
-                        ); 
-                      },
-                    ),
-                    const Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.delete_forever, color: Colors.red),
-                      title: const Text(
-                        'Delete Account',
-                        style: TextStyle(color: Colors.red),
+              body: Stack(
+                children: [
+                  ListView(
+                    padding: const EdgeInsets.only(top: 20, bottom: 60),
+                    children: [
+                      Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        elevation: 0,
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          leading: const Icon(Icons.edit, color: Colors.black87),
+                          title: const Text('Edit Profile', style: TextStyle(fontWeight: FontWeight.w500)),
+                          trailing: const Icon(Icons.chevron_right, color: Colors.black54),
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => EditProfilePage(renter: renter)),
+                            );
+                          },
+                        ),
                       ),
-                      trailing: const Icon(Icons.chevron_right, color: Colors.red),
-                      onTap: () => _showDeleteAccountDialog(context, renter),
-                    ),
-                  ],
+                      Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        elevation: 0,
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          leading: const Icon(Icons.beach_access, color: Colors.black87),
+                          title: const Text('Vacation Mode', style: TextStyle(fontWeight: FontWeight.w500)),
+                          trailing: const Icon(Icons.chevron_right, color: Colors.black54),
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const VacationPage()),
+                            ); 
+                          },
+                        ),
+                      ),
+                      Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        elevation: 0,
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Colors.red.shade200),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          leading: const Icon(Icons.delete_forever, color: Colors.red),
+                          title: const Text(
+                            'Delete Account',
+                            style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500),
+                          ),
+                          trailing: const Icon(Icons.chevron_right, color: Colors.red),
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            _showDeleteAccountDialog(context, renter);
+                          },
+                        ),
+                      ),
+                    ],
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
@@ -172,9 +199,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
           ? Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                ),
+                const FastLogoSpinner(),
                 const SizedBox(height: 16),
                 Text(
                   _statusMessage,

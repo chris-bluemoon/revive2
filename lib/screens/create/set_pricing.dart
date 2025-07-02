@@ -170,7 +170,7 @@ class _SetPricingState extends State<SetPricing> {
                 centerTitle: true,
                 title: const StyledTitle('SET PRICING'),
                 leading: IconButton(
-                  icon: Icon(Icons.chevron_left, size: width * 0.08),
+                  icon: Icon(Icons.chevron_left, color: Colors.black, size: width * 0.08),
                   onPressed: () {
                     // Clear all fields before navigating back
                     spp.clearAllFields();

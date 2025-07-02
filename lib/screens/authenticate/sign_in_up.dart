@@ -169,19 +169,17 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
+        backgroundColor: Colors.grey[50],
         appBar: AppBar(
-          toolbarHeight: width * 0.2,
-          title: const StyledTitle('SIGN IN/UP'),
-          centerTitle: true,
           backgroundColor: Colors.white,
+          elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.chevron_left, size: width * 0.08),
+            icon: Icon(Icons.chevron_left, color: Colors.black, size: width * 0.08),
             onPressed: () {
               Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
-
-          },
+            },
+          ),
         ),
-      ),
         // title: const Text('', style: TextStyle(fontSize: 22, color: Colors.black)),
         body: ValueListenableBuilder(
           valueListenable: userCredential,

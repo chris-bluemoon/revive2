@@ -27,6 +27,13 @@ class _LendersRentalsPageState extends State<LendersRentalsPage> {
   @override
   void initState() {
     super.initState();
+    // Delay data loading to allow smooth transition
+    _delayedLoadData();
+  }
+
+  void _delayedLoadData() async {
+    // Wait for the transition to complete before loading data
+    await Future.delayed(const Duration(milliseconds: 500));
     _refreshItemRenters();
   }
 
@@ -34,16 +41,15 @@ class _LendersRentalsPageState extends State<LendersRentalsPage> {
     await Provider.of<ItemStoreProvider>(context, listen: false)
         .fetchItemRentersAgain();
     log('Loaded item renters');
-    setState(() {
-      _loading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const CenteredLogoSpinner(size: 80);
-    }
     final width = MediaQuery.of(context).size.width;
     final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
     final String userId = itemStore.renter.id;
@@ -79,12 +85,14 @@ class _LendersRentalsPageState extends State<LendersRentalsPage> {
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            // Rentals Tab
-            rentals.isEmpty
-                ? const Center(child: Text('No rentals found.'))
-                : ListView.separated(
+        body: _loading
+            ? const Center(child: AnimatedLogoSpinner(size: 60))
+            : TabBarView(
+                children: [
+                  // Rentals Tab
+                  rentals.isEmpty
+                      ? const Center(child: Text('No rentals found.'))
+                      : ListView.separated(
                     itemCount: rentals.length,
                     separatorBuilder: (context, index) => const Divider(),
                     itemBuilder: (context, index) {
@@ -128,24 +136,24 @@ class _LendersRentalsPageState extends State<LendersRentalsPage> {
                       );
                     },
                   ),
-            // Purchases Tab
-            purchases.isEmpty
-                ? const Center(child: Text('No purchases found.'))
-                : ListView.separated(
-                    itemCount: purchases.length,
-                    separatorBuilder: (context, index) => const Divider(),
-                    itemBuilder: (context, index) {
-                      final purchase = purchases[index];
-                      return ListTile(
-                        title: Text(purchase.itemId),
-                        subtitle: Text(
-                          'Date: ${purchase.endDate}/${purchase.endDate}/${purchase.endDate}',
+                  // Purchases Tab
+                  purchases.isEmpty
+                      ? const Center(child: Text('No purchases found.'))
+                      : ListView.separated(
+                          itemCount: purchases.length,
+                          separatorBuilder: (context, index) => const Divider(),
+                          itemBuilder: (context, index) {
+                            final purchase = purchases[index];
+                            return ListTile(
+                              title: Text(purchase.itemId),
+                              subtitle: Text(
+                                'Date: ${purchase.endDate}/${purchase.endDate}/${purchase.endDate}',
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-          ],
-        ),
+                ],
+              ),
       ),
     );
   }
