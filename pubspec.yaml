@@ -58,6 +58,7 @@ dependencies:
   # dio: ^5.8.0+1
   package_info_plus: ^8.3.0
   share_plus: ^11.0.0
+  curved_navigation_bar: ^1.0.6
   # device_preview: ^1.2.0
   firebase_messaging: ^15.2.7
   flutter_local_notifications: ^19.3.0

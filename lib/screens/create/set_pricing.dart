@@ -165,10 +165,20 @@ class _SetPricingState extends State<SetPricing> {
         return Stack(
           children: [
             Scaffold(
+              backgroundColor: Colors.grey[50],
               appBar: AppBar(
-                toolbarHeight: width * 0.2,
+                backgroundColor: Colors.white,
+                elevation: 0,
+                toolbarHeight: 70,
                 centerTitle: true,
-                title: const StyledTitle('SET PRICING'),
+                title: const Text(
+                  'SET PRICING',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
                 leading: IconButton(
                   icon: Icon(Icons.chevron_left, color: Colors.black, size: width * 0.08),
                   onPressed: () {
@@ -243,20 +253,20 @@ class _SetPricingState extends State<SetPricing> {
                             spp.checkFormComplete();
                           },
                           decoration: InputDecoration(
-                            isDense: true,
+                            hintStyle: TextStyle(color: Colors.grey[400]),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
+                            ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.black, width: 2),
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[300]!),
                             ),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: const BorderSide(color: Colors.black)),
-                            filled: true,
-                            hintStyle: TextStyle(color: Colors.grey[800], fontSize: width * 0.03),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                             hintText: (() {
                               // Remove any currency symbol and commas, then parse
                               String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^\d.]'), '');
@@ -270,7 +280,8 @@ class _SetPricingState extends State<SetPricing> {
                               }
                               return "e.g. $suggested";
                             })(),
-                            fillColor: Colors.white70,
+                            filled: true,
+                            fillColor: Colors.white,
                           ),
                         ),
                         const StyledBody('3 Day Price'),
@@ -594,7 +605,7 @@ class _SetPricingState extends State<SetPricing> {
                   ],
                 ),
                 padding: const EdgeInsets.all(10),
-                child: OutlinedButton(
+                child: ElevatedButton(
                   onPressed: spp.isCompleteForm
                       ? () async {
                           setState(() {
@@ -607,17 +618,24 @@ class _SetPricingState extends State<SetPricing> {
                           // Do not pop here! Navigation is handled in the dialog.
                         }
                       : null,
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: spp.isCompleteForm ? Colors.black : Colors.white,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: spp.isCompleteForm ? Colors.black : Colors.grey[300],
+                    foregroundColor: spp.isCompleteForm ? Colors.white : Colors.grey[500],
+                    elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(1.0),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    side: const BorderSide(width: 1.0, color: Colors.black),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: StyledHeading('SUBMIT',
-                        color: spp.isCompleteForm ? Colors.white : Colors.grey),
+                    padding: const EdgeInsets.all(12.0),
+                    child: Text(
+                      'SUBMIT',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: spp.isCompleteForm ? Colors.white : Colors.grey[500],
+                      ),
+                    ),
                   ),
                 ),
               ),

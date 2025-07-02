@@ -179,10 +179,13 @@ class _CreateItemState extends State<CreateItem> {
       // }
 
       return Scaffold(
+          backgroundColor: Colors.grey[50],
           appBar: AppBar(
-            toolbarHeight: width * 0.2,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            toolbarHeight: 70,
             leading: IconButton(
-              icon: Icon(Icons.chevron_left, size: width * 0.08),
+              icon: Icon(Icons.chevron_left, color: Colors.black, size: width * 0.08),
               onPressed: () {
                 if (isEditItemActive) {
                   Navigator.of(context).pop();
@@ -196,7 +199,14 @@ class _CreateItemState extends State<CreateItem> {
               },
             ),
             centerTitle: true,
-            title: StyledTitle(widget.item != null ? 'EDIT ITEM' : 'LIST ITEM'),
+            title: Text(
+              widget.item != null ? 'EDIT ITEM' : 'LIST ITEM',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
             // leading: IconButton(
             //   icon: Icon(Icons.chevron_left, size: width * 0.08),
             //   onPressed: () {
@@ -818,7 +828,7 @@ class _CreateItemState extends State<CreateItem> {
               ],
             ),
             padding: const EdgeInsets.all(10),
-            child: OutlinedButton(
+            child: ElevatedButton(
               onPressed: cip.isCompleteForm
                   ? () async {
                       Navigator.of(context).push(MaterialPageRoute(
@@ -845,18 +855,23 @@ class _CreateItemState extends State<CreateItem> {
                       ));
                     }
                   : null,
-              style: OutlinedButton.styleFrom(
-                backgroundColor: cip.isCompleteForm ? Colors.black : Colors.white,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: cip.isCompleteForm ? Colors.black : Colors.grey[300],
+                foregroundColor: cip.isCompleteForm ? Colors.white : Colors.grey[500],
+                elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(1.0),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                side: const BorderSide(width: 1.0, color: Colors.black),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: StyledHeading(
+                padding: const EdgeInsets.all(12.0),
+                child: Text(
                   'CONTINUE',
-                  color: cip.isCompleteForm ? Colors.white : Colors.grey,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: cip.isCompleteForm ? Colors.white : Colors.grey[500],
+                  ),
                 ),
               ),
             ),
