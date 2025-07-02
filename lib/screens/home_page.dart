@@ -62,47 +62,23 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: pages[_pageIndex],
+      body: Container(
+        margin: EdgeInsets.only(bottom: screenHeight * 0.04), // 4% of screen height
+        child: pages[_pageIndex],
+      ),
       bottomNavigationBar: CurvedNavigationBar(
         index: _pageIndex,
         height: 75.0,
         items: const <Widget>[
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.home_outlined, size: 24, color: Colors.black),
-              SizedBox(height: 2),
-              Text('Home', style: TextStyle(fontSize: 10, color: Colors.black)),
-            ],
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.menu_book_outlined, size: 24, color: Colors.black),
-              SizedBox(height: 2),
-              Text('Browse', style: TextStyle(fontSize: 10, color: Colors.black)),
-            ],
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.add_box_outlined, size: 24, color: Colors.black),
-              SizedBox(height: 2),
-              Text('List', style: TextStyle(fontSize: 10, color: Colors.black)),
-            ],
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.account_circle_outlined, size: 24, color: Colors.black),
-              SizedBox(height: 2),
-              Text('Profile', style: TextStyle(fontSize: 10, color: Colors.black)),
-            ],
-          ),
+          Icon(Icons.home_outlined, size: 30, color: Colors.white),
+          Icon(Icons.menu_book_outlined, size: 30, color: Colors.white),
+          Icon(Icons.add_box_outlined, size: 30, color: Colors.white),
+          Icon(Icons.account_circle_outlined, size: 30, color: Colors.white),
         ],
-        color: Colors.grey[100]!,
-        buttonBackgroundColor: Colors.white,
+        color: Colors.black,
+        buttonBackgroundColor: Colors.black,
         backgroundColor: Colors.white,
         animationCurve: Curves.easeInOutCubic,
         animationDuration: const Duration(milliseconds: 400),
