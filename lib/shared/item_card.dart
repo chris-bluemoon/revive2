@@ -181,11 +181,18 @@ class _ItemCardState extends State<ItemCard> {
         List currListOfFavs = itemStore.favourites;
         isFav = isAFav(widget.item, currListOfFavs);
         
-        // Reset thisImage if it's the default placeholder
-        String displayImage = thisImage;
-        if (displayImage == 'assets/img/items/No_Image_Available.jpg') {
-          displayImage = '';
+        // Determine what to show: actual image URL, spinner, or fallback
+        String displayImage = '';
+        bool showSpinner = false;
+        
+        if (thisImage != 'assets/img/items/No_Image_Available.jpg' && thisImage.isNotEmpty) {
+          // We have an actual image URL to display
+          displayImage = thisImage;
+        } else if (widget.item.imageId.isNotEmpty) {
+          // We should have an image but it's not loaded yet, show spinner
+          showSpinner = true;
         }
+        // If no imageId, we'll show the fallback image
         
         return Card(
           shape: BeveledRectangleBorder(
@@ -206,40 +213,42 @@ class _ItemCardState extends State<ItemCard> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: displayImage.isEmpty
+                          child: showSpinner
                               ? Container(
                                   width: double.infinity,
                                   height: double.infinity,
                                   color: Colors.grey[200],
-                                  child: widget.item.imageId.isNotEmpty
-                                      ? const Center(
+                                  child: const Center(
+                                    child: AnimatedLogoSpinner(
+                                      size: 60,
+                                    ),
+                                  ),
+                                )
+                              : displayImage.isNotEmpty
+                                  ? CachedNetworkImage(
+                                      imageUrl: displayImage,
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      placeholder: (context, url) => Container(
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        color: Colors.grey[200],
+                                        child: const Center(
                                           child: AnimatedLogoSpinner(
                                             size: 60,
                                           ),
-                                        )
-                                      : Image.asset(
-                                          'assets/img/items/No_Image_Available.jpg',
-                                          fit: BoxFit.cover,
                                         ),
-                                )
-                              : CachedNetworkImage(
-                                  imageUrl: displayImage,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  placeholder: (context, url) => Container(
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    color: Colors.grey[200],
-                                    child: const Center(
-                                      child: AnimatedLogoSpinner(
-                                        size: 60,
                                       ),
+                                      errorWidget: (context, url, error) =>
+                                          Image.asset('assets/img/items/No_Image_Available.jpg', fit: BoxFit.cover),
+                                    )
+                                  : Image.asset(
+                                      'assets/img/items/No_Image_Available.jpg',
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
                                     ),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Image.asset('assets/img/items/No_Image_Available.jpg', fit: BoxFit.cover),
-                                ),
                         ),
                   Positioned(
                     top: 6,

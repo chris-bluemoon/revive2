@@ -66,14 +66,11 @@ class _CustomSplashScreenState extends State<CustomSplashScreen>
     await Future.delayed(const Duration(milliseconds: 100));
     FlutterNativeSplash.remove();
     
-    // Wait 1.5 seconds to show the logo (native splash already showed it)
-    await Future.delayed(const Duration(milliseconds: 1500));
-    
-    // Start showing text (logo will fade out automatically due to opacity animation)
+    // Start showing text immediately (no logo delay since native splash already showed it)
     _textController.forward();
     
     // Wait for text animation to complete + 2 seconds for reading
-    await Future.delayed(const Duration(milliseconds: 1200 + 2000));
+    await Future.delayed(const Duration(milliseconds: 1000 + 2000));
     
     // Start fading out the entire splash screen
     _fadeController.forward();
@@ -124,56 +121,37 @@ class _CustomSplashScreenState extends State<CustomSplashScreen>
         animation: _fadeOpacity,
         builder: (context, child) {
           return Opacity(
-            opacity: _fadeOpacity.value,
-            child: SizedBox(
-              width: width,
-              height: height,
-              child: Stack(
-                children: [
-                  // Logo that stays visible until text appears
-                  AnimatedBuilder(
-                    animation: _textOpacity,
-                    builder: (context, child) {
-                      return Opacity(
-                        opacity: 1.0 - _textOpacity.value, // Fade out as text fades in
-                        child: Center(
-                          child: Image.asset(
-                            'assets/logos/new_velaa_icon_1024.png',
-                            width: 144, // Fixed size to match exactly with native splash
-                            height: 144, // Fixed size to match exactly with native splash
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  
-                  // Thai text "เวลา" that fades in
-                  AnimatedBuilder(
-                    animation: _textController,
-                    builder: (context, child) {
-                      return Opacity(
-                        opacity: _textOpacity.value,
-                        child: Transform.scale(
-                          scale: _textScale.value,
-                          child: Center(
-                            child: Text(
-                              'เวลา',
-                              style: TextStyle(
-                                fontSize: width * 0.15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                letterSpacing: 4,
+            opacity: _fadeOpacity.value,              child: SizedBox(
+                width: width,
+                height: height,
+                child: Stack(
+                  children: [
+                    // Thai text "เวลา" that fades in
+                    AnimatedBuilder(
+                      animation: _textController,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _textOpacity.value,
+                          child: Transform.scale(
+                            scale: _textScale.value,
+                            child: Center(
+                              child: Text(
+                                'เวลา',
+                                style: TextStyle(
+                                  fontSize: width * 0.15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                  letterSpacing: 4,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
           );
         },
       ),
