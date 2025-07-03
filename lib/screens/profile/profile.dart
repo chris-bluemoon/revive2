@@ -473,7 +473,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               ),
               // --- End Last seen row ---
               // --- Add avgReview display here ---
-              const SizedBox(height: 6),
+              SizedBox(height: width * 0.03), // Changed from fixed 12 to responsive width-based
               Builder(
                 builder: (context) {
                   final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
