@@ -144,11 +144,38 @@ class _LendersRentalsPageState extends State<LendersRentalsPage> {
                           separatorBuilder: (context, index) => const Divider(),
                           itemBuilder: (context, index) {
                             final purchase = purchases[index];
-                            return ListTile(
-                              title: Text(purchase.itemId),
-                              subtitle: Text(
-                                'Date: ${purchase.endDate}/${purchase.endDate}/${purchase.endDate}',
-                              ),
+                            // Find the item by ID - use nullable approach
+                            final Item? item = items.cast<Item?>().firstWhere(
+                              (it) => it?.id == purchase.itemId,
+                              orElse: () => null,
+                            );
+
+                            // Format dates using intl package for better readability
+                            final DateTime startDate = DateTime.parse(purchase.startDate);
+                            final DateTime endDate = DateTime.parse(purchase.endDate);
+                            final formattedStartDate = DateFormat('d MMM yyyy').format(startDate);
+                            final formattedEndDate = DateFormat('d MMM yyyy').format(endDate);
+                            final status = purchase.status;
+                            // Handle null item gracefully
+                            final itemType = item?.type ?? 'Unknown Type';
+                            final itemName = item?.name ?? 'Unknown Item';
+
+                            // Find the renter by ID - use nullable approach
+                            final Renter? renter = itemStore.renters.cast<Renter?>().firstWhere(
+                              (r) => r?.id == purchase.renterId,
+                              orElse: () => null,
+                            );
+                            final renterName = renter?.name ?? 'Unknown Renter';
+
+                            return PurchaseCardLender(
+                              itemRenter: purchase,
+                              itemName: itemName,
+                              itemType: itemType,
+                              startDate: formattedStartDate,
+                              endDate: formattedEndDate,
+                              status: status,
+                              renterName: renterName,
+                              price: purchase.price,
                             );
                           },
                         ),
@@ -486,6 +513,146 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                   ],
                 ),
             // Add this to show CANCELLED status
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Create a custom widget to display purchase details for lenders (status only, no buttons)
+class PurchaseCardLender extends StatelessWidget {
+  final ItemRenter itemRenter;
+  final String itemName;
+  final String itemType;
+  final String status;
+  final String startDate;
+  final String endDate;
+  final String renterName;
+  final int price;
+
+  const PurchaseCardLender({
+    super.key,
+    required this.itemRenter,
+    required this.itemName,
+    required this.itemType,
+    required this.status,
+    required this.startDate,
+    required this.endDate,
+    required this.renterName,
+    required this.price,
+  });
+
+  Color _statusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'accepted':
+        return Colors.green;
+      case 'rejected':
+        return Colors.red;
+      case 'paid':
+        return Colors.green;
+      case 'completed':
+        return Colors.blue;
+      case 'requested':
+        return Colors.orange;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final formattedPrice = NumberFormat("#,##0", "en_US").format(price);
+
+    return Card(
+      color: Colors.white,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    itemName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 19,
+                      color: Colors.black,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _statusColor(itemRenter.status).withOpacity(0.13),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    itemRenter.status.toLowerCase() == "cancelledlender" ||
+                    itemRenter.status.toLowerCase() == "cancelledrenter"
+                        ? "CANCELLED"
+                        : itemRenter.status.toUpperCase(),
+                    style: TextStyle(
+                      color: _statusColor(itemRenter.status),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Item type and renter
+            Row(
+              children: [
+                Icon(Icons.category, size: 17, color: Colors.grey[700]),
+                const SizedBox(width: 6),
+                Text(
+                  itemType,
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+                const SizedBox(width: 16),
+                Icon(Icons.person, size: 17, color: Colors.grey[700]),
+                const SizedBox(width: 6),
+                Text(
+                  renterName,
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // Dates
+            Row(
+              children: [
+                Icon(Icons.calendar_today, size: 15, color: Colors.grey[700]),
+                const SizedBox(width: 4),
+                Text(
+                  '$startDate - $endDate',
+                  style: const TextStyle(fontSize: 13, color: Colors.black87),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(child: Container()), // pushes the price to the right
+                Text(
+                  '฿$formattedPrice',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+              ],
+            ),
+            // No action buttons for purchases - only status display
           ],
         ),
       ),
