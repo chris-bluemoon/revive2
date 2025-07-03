@@ -409,8 +409,8 @@ class _RegisterPassword extends State<RegisterPassword> {
                                           setState(() {
                                             loadingMessage = 'Welcome! Taking you to the app...';
                                           });
-                                          // Small delay to show the welcome message
-                                          await Future.delayed(const Duration(milliseconds: 500));
+                                          // Longer delay to show the welcome message
+                                          await Future.delayed(const Duration(milliseconds: 1500));
                                           // Reset loading state before navigation
                                           setState(() => loading = false);
                                           Navigator.of(context)
