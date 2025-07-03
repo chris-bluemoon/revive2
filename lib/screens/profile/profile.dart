@@ -169,158 +169,184 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         backgroundColor: Colors.white,
         centerTitle: true,
         title: StyledTitle(profileOwner.name),
-        actions: isOwnProfile
-            ? [
-                IconButton(
-                  icon: const Icon(Icons.more_vert),
-                  onPressed: () {
-                    // Actions menu logic
-                    showModalBottomSheet(
-                      backgroundColor: Colors.white,
-                      context: context,
-                      isScrollControlled: true,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                      ),
-                      builder: (context) => DraggableScrollableSheet(
-                        expand: false,
-                        initialChildSize: 0.85,
-                        minChildSize: 0.5,
-                        maxChildSize: 0.95,
-                        builder: (context, scrollController) => Column(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.symmetric(vertical: 12),
-                              width: 40,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                            ),
-                            Expanded(
-                              child: ListView(
-                                controller: scrollController,
-                                children: [
-                                  // ListTile(
-                                  //   leading: const Icon(Icons.settings),
-                                  //   title: const Text('Settings'),
-                                  //   onTap: () {
-                                  //     Navigator.pop(context);
-                                  //     Navigator.push(
-                                  //       context,
-                                  //       MaterialPageRoute(builder: (context) => const SettingsPage()),
-                                  //     );
-                                  //   },
-                                  // ),
-                                  ListTile(
-                                    leading: const Icon(Icons.group_add),
-                                    title: const Text('Invite Friends'),
-                                    onTap: () async {
-                                      const shareText = 'Check out Revive! Download the app here: https://your-app-link.com';
-                                      await Share.share(shareText);
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.account_circle),
-                                    title: const Text('Account'),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      Navigator.push(
-                                        context,
-                                        SmoothTransitions.luxury(const AccountPage()),
-                                      );
-                                    },
-                                  ),
-                                  // 2. In your ListView of the modal bottom sheet, replace the Notifications ListTile with a SwitchListTile:
-                                  ListTile(
-                                    leading: const Icon(Icons.account_circle),
-                                    title: const Text('Notifications'),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      Navigator.push(
-                                        context,
-                                        SmoothTransitions.luxury(const NotificationsPage()),
-                                      );
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.list),
-                                    title: const Text('My Listings'),
-                                    onTap: () {
-                                      Navigator.push(context,
-                                        SmoothTransitions.luxury(ItemResults('myItems', profileOwnerId)),
-                                      );
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.dashboard),
-                                    title: const Text('Renter Dashboard'),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        SmoothTransitions.luxury(const RenterDashboard()),
-                                      );
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.dashboard),
-                                    title: const Text('Lender Dashboard'),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        SmoothTransitions.luxury(const LenderDashboard()),
-                                      );
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.favorite),
-                                    title: const Text('Favourites'),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        SmoothTransitions.luxury(const SettingsPage()),
-                                      );
-                                    }
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.chat),
-                                    title: const Text('Chat With Us'),
-                                    onTap: () async {
-                                      Navigator.pop(context);
-                                      await chatWithUsLine(context);
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(Icons.logout),
-                                    title: const Text('Log Out'),
-                                    onTap: () async {
-                                      Navigator.pop(context);
-                                      await logOut(context);
-                                    },
-                                  ),
-                                  // --- Admin menu item ---
-                                  if (Provider.of<ItemStoreProvider>(context, listen: false).renter.type == "ADMIN")
-                                    ListTile(
-                                      leading: const Icon(Icons.admin_panel_settings),
-                                      title: const Text('Admin'),
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                            SmoothTransitions.luxury(const AdminPage()),
-                                        );
-                                      },
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
+        actions: isLoggedIn ? [
+          IconButton(
+            icon: const Icon(Icons.more_vert),
+            onPressed: () {
+              if (isOwnProfile) {
+                // Actions menu logic for own profile
+                showModalBottomSheet(
+                  backgroundColor: Colors.white,
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                  builder: (context) => DraggableScrollableSheet(
+                    expand: false,
+                    initialChildSize: 0.85,
+                    minChildSize: 0.5,
+                    maxChildSize: 0.95,
+                    builder: (context, scrollController) => Column(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 12),
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
-                      ));
-                  },
-                ),
-              ]
-            : [],
+                        Expanded(
+                          child: ListView(
+                            controller: scrollController,
+                            children: [
+                              // ListTile(
+                              //   leading: const Icon(Icons.settings),
+                              //   title: const Text('Settings'),
+                              //   onTap: () {
+                              //     Navigator.pop(context);
+                              //     Navigator.push(
+                              //       context,
+                              //       MaterialPageRoute(builder: (context) => const SettingsPage()),
+                              //     );
+                              //   },
+                              // ),
+                              ListTile(
+                                leading: const Icon(Icons.group_add),
+                                title: const Text('Invite Friends'),
+                                onTap: () async {
+                                  const shareText = 'Check out Revive! Download the app here: https://your-app-link.com';
+                                  await Share.share(shareText);
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.account_circle),
+                                title: const Text('Account'),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Navigator.push(
+                                    context,
+                                    SmoothTransitions.luxury(const AccountPage()),
+                                  );
+                                },
+                              ),
+                              // 2. In your ListView of the modal bottom sheet, replace the Notifications ListTile with a SwitchListTile:
+                              ListTile(
+                                leading: const Icon(Icons.account_circle),
+                                title: const Text('Notifications'),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Navigator.push(
+                                    context,
+                                    SmoothTransitions.luxury(const NotificationsPage()),
+                                  );
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.list),
+                                title: const Text('My Listings'),
+                                onTap: () {
+                                  Navigator.push(context,
+                                    SmoothTransitions.luxury(ItemResults('myItems', profileOwnerId)),
+                                  );
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.dashboard),
+                                title: const Text('Renter Dashboard'),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    SmoothTransitions.luxury(const RenterDashboard()),
+                                  );
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.dashboard),
+                                title: const Text('Lender Dashboard'),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    SmoothTransitions.luxury(const LenderDashboard()),
+                                  );
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.favorite),
+                                title: const Text('Favourites'),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    SmoothTransitions.luxury(const SettingsPage()),
+                                  );
+                                }
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.chat),
+                                title: const Text('Chat With Us'),
+                                onTap: () async {
+                                  Navigator.pop(context);
+                                  await chatWithUsLine(context);
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.logout),
+                                title: const Text('Log Out'),
+                                onTap: () async {
+                                  Navigator.pop(context);
+                                  await logOut(context);
+                                },
+                              ),
+                              // --- Admin menu item ---
+                              if (Provider.of<ItemStoreProvider>(context, listen: false).renter.type == "ADMIN")
+                                ListTile(
+                                  leading: const Icon(Icons.admin_panel_settings),
+                                  title: const Text('Admin'),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                        SmoothTransitions.luxury(const AdminPage()),
+                                    );
+                                  },
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              } else {
+                // Actions menu logic for other users' profiles
+                showModalBottomSheet(
+                  backgroundColor: Colors.white,
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                  builder: (context) => Wrap(
+                    children: <Widget>[
+                      ListTile(
+                        leading: const Icon(Icons.report),
+                        title: const Text('Report User'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          // TODO: Implement actual report functionality
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('User reported (not really).')),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
+        ] : [],
       ),
       backgroundColor: Colors.white,
       body: Column(
@@ -463,7 +489,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       Icon(Icons.star, color: Colors.amber, size: width * 0.05),
                       const SizedBox(width: 6),
                       StyledBody(
-                        (profileOwner.avgReview ?? 0.0).toStringAsFixed(1),
+                        (profileOwner.avgReview).toStringAsFixed(1),
                         color: Colors.black,
                         weight: FontWeight.bold,
                       ),
@@ -553,10 +579,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               Navigator.of(context).push(
                                 SmoothTransitions.luxury(MessageConversationPage(
                                     currentUserId: currentRenter.id,
-                                    otherUserId: profileOwner.id ?? '',
+                                    otherUserId: profileOwner.id,
                                     otherUser: {
-                                      'name': profileOwner.name ?? '',
-                                      'profilePicUrl': profileOwner.profilePicUrl ?? '',
+                                      'name': profileOwner.name,
+                                      'profilePicUrl': profileOwner.profilePicUrl,
                                     },
                                   )),
                               );
@@ -575,7 +601,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           child: OutlinedButton(
                             onPressed: () async {
                               // Implement follow/unfollow logic
-                              final isFollowing = profileOwner.followers.contains(currentRenter.id) ?? false;
+                              final isFollowing = profileOwner.followers.contains(currentRenter.id);
                               final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
 
                               if (isFollowing) {

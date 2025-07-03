@@ -25,6 +25,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String? imagePath;
   bool _isUploading = false; // <-- Add this line
   bool _isSaving = false; // <-- Add this line for save loading state
+  bool _hasChanges = false; // <-- Add this line to track changes
 
   // Add this list at the top of your _EditProfilePageState class:
   final List<String> thailandCities = [
@@ -54,10 +55,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
         : 'Bangkok';
     selectedCity = thailandCities.contains(initialCity) ? initialCity : 'Bangkok';
     imagePath = widget.renter.imagePath; // Use imagePath directly instead of profilePicUrl
+
+    // Add listeners to track changes
+    nameController.addListener(_checkForChanges);
+    bioController.addListener(_checkForChanges);
+  }
+
+  void _checkForChanges() {
+    final bool hasChanged = nameController.text != widget.renter.name ||
+        bioController.text != widget.renter.bio ||
+        selectedCity != widget.renter.location ||
+        imagePath != widget.renter.imagePath;
+
+    if (hasChanged != _hasChanges) {
+      setState(() {
+        _hasChanges = hasChanged;
+      });
+    }
   }
 
   @override
   void dispose() {
+    nameController.removeListener(_checkForChanges);
+    bioController.removeListener(_checkForChanges);
     bioController.dispose();
     nameController.dispose();
     super.dispose();
@@ -92,6 +112,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (url != null) {
         setState(() {
           imagePath = url;
+          _checkForChanges(); // Check for changes after image is updated
         });
       }
     }
@@ -285,6 +306,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               onChanged: (value) {
                 setState(() {
                   selectedCity = value;
+                  _checkForChanges(); // Check for changes when city is updated
                 });
               },
             ),
@@ -330,14 +352,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _isSaving ? null : saveProfile, // Disable button when saving
+                onPressed: _isSaving || !_hasChanges ? null : saveProfile, // Disable if saving or no changes
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _isSaving ? Colors.grey : Colors.black,
+                  backgroundColor: _isSaving || !_hasChanges ? Colors.grey : Colors.black, // Grey out if disabled
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(12), // Consistent corner radius
                   ),
                 ),
-                child: _isSaving 
+                child: _isSaving
                   ? const SizedBox(
                       height: 20,
                       width: 20,
