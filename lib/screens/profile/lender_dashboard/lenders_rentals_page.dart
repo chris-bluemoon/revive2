@@ -243,6 +243,8 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
     // Show ACCEPT/REJECT only if status is "requested" AND startDate is today or in the future
     final bool showAcceptReject = widget.itemRenter.status == "requested" &&
         (rentalStartDate.isAtSameMomentAs(DateTime.now()) || rentalStartDate.isAfter(DateTime.now()));
+    
+    final double width = MediaQuery.of(context).size.width;
 
     return Card(
       color: Colors.white,
@@ -258,9 +260,9 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                 Expanded(
                   child: Text(
                     widget.itemName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 19,
+                      fontSize: width * 0.045, // Reduced and responsive
                       color: Colors.black,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -563,6 +565,7 @@ class PurchaseCardLender extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formattedPrice = NumberFormat("#,##0", "en_US").format(price);
+    final double width = MediaQuery.of(context).size.width;
 
     return Card(
       color: Colors.white,
@@ -578,9 +581,9 @@ class PurchaseCardLender extends StatelessWidget {
                 Expanded(
                   child: Text(
                     itemName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 19,
+                      fontSize: width * 0.045, // Reduced and responsive
                       color: Colors.black,
                     ),
                     overflow: TextOverflow.ellipsis,

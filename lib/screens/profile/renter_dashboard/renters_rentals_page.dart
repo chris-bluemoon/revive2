@@ -261,6 +261,8 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
       }
     }
 
+    final double width = MediaQuery.of(context).size.width;
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
       color: Colors.white,
@@ -276,9 +278,9 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                 Expanded(
                   child: Text(
                     widget.itemName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 19,
+                      fontSize: width * 0.045, // Reduced and responsive
                       color: Colors.black,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -677,6 +679,7 @@ class PurchaseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formattedPrice = NumberFormat("#,##0", "en_US").format(price);
+    final double width = MediaQuery.of(context).size.width;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
@@ -693,9 +696,9 @@ class PurchaseCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     itemName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 19,
+                      fontSize: width * 0.045, // Reduced and responsive
                       color: Colors.black,
                     ),
                     overflow: TextOverflow.ellipsis,
