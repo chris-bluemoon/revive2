@@ -1,5 +1,7 @@
 // firebase
 // import 'package:device_preview/device_preview.dart';
+import 'dart:developer';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,6 +31,7 @@ Future main() async {
 
   await dotenv.load(fileName: ".env");
   Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'] ?? '';
+  log('Stripe publishable key: ${Stripe.publishableKey}');
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // Allow only portrait mode

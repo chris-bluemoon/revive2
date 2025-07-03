@@ -42,10 +42,7 @@ class _ItemCardState extends State<ItemCard> {
     });
   }
 
-  String convertedRentPrice = '-1';
-  String convertedBuyPrice = '-1';
-  String convertedRRPPrice = '-1';
-  String symbol = '?';
+  String symbol = globals.thb;
 
   Image? myImage;
 
@@ -145,21 +142,6 @@ class _ItemCardState extends State<ItemCard> {
     return oneDayPrice;
   }
 
-  void setPrice() {
-      String country = 'BANGKOK';
-    if (country == 'BANGKOK') {
-      convertedRentPrice = getPricePerDay(5).toString();
-      convertedBuyPrice = convertFromTHB(widget.item.buyPrice, country);
-      convertedRRPPrice = convertFromTHB(widget.item.rrp, country);
-      symbol = getCurrencySymbol(country);
-    } else {
-      convertedRentPrice = getPricePerDay(5).toString();
-      convertedBuyPrice = widget.item.buyPrice.toString();
-      convertedRRPPrice = widget.item.rrp.toString();
-      symbol = globals.thb;
-    }
-  }
-
   String getSize(sizeArray) {
     String formattedSize = 'N/A';
     if (sizeArray.length == 1) {
@@ -198,7 +180,6 @@ class _ItemCardState extends State<ItemCard> {
         double width = MediaQuery.of(context).size.width;
         List currListOfFavs = itemStore.favourites;
         isFav = isAFav(widget.item, currListOfFavs);
-        setPrice();
         
         // Reset thisImage if it's the default placeholder
         String displayImage = thisImage;
@@ -321,7 +302,7 @@ class _ItemCardState extends State<ItemCard> {
             // Show rental price for "rental" or "both" booking types
             if (widget.item.bookingType == 'rental' || widget.item.bookingType == 'both')
               StyledBody(
-                'Rent from $convertedRentPrice$symbol',
+                'Rent from ${getPricePerDay(5)}$symbol',
                 weight: FontWeight.bold,
                 color: Colors.black,
                 fontSize: widget.item.bookingType == 'both' ? width * 0.03 : null, // Smaller text for 'both'
@@ -330,7 +311,7 @@ class _ItemCardState extends State<ItemCard> {
             if (widget.item.bookingType == 'buy' || widget.item.bookingType == 'both') ...[
               if (widget.item.bookingType == 'both') SizedBox(height: width * 0.005), // Even smaller spacing
               StyledBody(
-                'Buy for $convertedBuyPrice$symbol',
+                'Buy for ${widget.item.buyPrice}$symbol',
                 weight: FontWeight.normal,
                 fontSize: widget.item.bookingType == 'both' ? width * 0.03 : null, // Smaller text for 'both'
               ),
