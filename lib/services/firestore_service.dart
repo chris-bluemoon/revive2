@@ -7,6 +7,7 @@ import 'package:revivals/models/item_renter.dart';
 import 'package:revivals/models/ledger.dart';
 import 'package:revivals/models/message.dart';
 import 'package:revivals/models/renter.dart';
+import 'package:revivals/models/report.dart';
 import 'package:revivals/models/review.dart';
 import 'package:revivals/services/notification_service.dart';
 
@@ -52,6 +53,9 @@ class FirestoreService {
       .withConverter<Message>(
           fromFirestore: Message.fromFirestore,
           toFirestore: (Message m, _) => m.toFirestore());
+
+  static final CollectionReference refReport = FirebaseFirestore.instance
+      .collection('reports');
 
   // add a new message
   static Future<void> addLedger(Ledger ledger) async {
@@ -350,6 +354,17 @@ class FirestoreService {
       
     } catch (error) {
       log('Error cleaning up deleted user from follow lists: $error');
+      rethrow;
+    }
+  }
+
+  // Submit a new report
+  static Future<void> submitReport(Report report) async {
+    try {
+      await refReport.doc(report.id).set(report.toMap());
+      log('Report submitted successfully: ${report.id} - ${report.reason}');
+    } catch (error) {
+      log('Error submitting report: $error');
       rethrow;
     }
   }

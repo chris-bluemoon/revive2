@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:revivals/screens/messages/message_conversation_page.dart';
+import 'package:revivals/screens/profile/report_page.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/profile_avatar.dart';
 import 'package:revivals/shared/smooth_page_route.dart';
@@ -176,7 +177,7 @@ class _InboxPageState extends State<InboxPage> {
                                   ),
                                   const Divider(height: 1),
                                   InkWell(
-                                    onTap: () => Navigator.of(context).pop('delete'),
+                                    onTap: () => Navigator.of(context).pop('delete_report'),
                                     child: const Padding(
                                       padding: EdgeInsets.symmetric(vertical: 18.0),
                                       child: Center(
@@ -224,9 +225,25 @@ class _InboxPageState extends State<InboxPage> {
 
                         return true;
                       } else if (action == 'delete_report') {
-                        // Handle report logic here if needed
-                        // For now, also delete:137
-                        // You can call your report function here
+                        // Navigate to report page first, then delete the conversation
+                        log('Delete and report conversation for user ${preview.userId}');
+                        // Get user data for report page
+                        final userData = await FirebaseFirestore.instance
+                            .collection('renter')
+                            .doc(preview.userId)
+                            .get();
+                        final reportedUserName = userData.exists 
+                            ? (userData.data() as Map<String, dynamic>)['name'] ?? preview.userId 
+                            : preview.userId;
+                        
+                        if (context.mounted) {
+                          Navigator.of(context).push(
+                            SmoothTransitions.luxury(ReportPage(
+                              reportedUserId: preview.userId,
+                              reportedUserName: reportedUserName,
+                            )),
+                          );
+                        }
                         return true;
                       }
                       // Cancel or dismissed

@@ -28,6 +28,7 @@ import 'package:revivals/shared/styled_text.dart';
 import 'package:share_plus/share_plus.dart'; // Add this import at the top
 
 import 'edit_profile_page.dart';
+import 'report_page.dart';
 
 class Profile extends StatefulWidget {
   final String? userN;
@@ -334,9 +335,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                         title: const Text('Report User'),
                         onTap: () {
                           Navigator.pop(context);
-                          // TODO: Implement actual report functionality
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('User reported (not really).')),
+                          Navigator.of(context).push(
+                            SmoothTransitions.luxury(ReportPage(
+                              reportedUserId: profileOwner.id,
+                              reportedUserName: profileOwner.name,
+                            )),
                           );
                         },
                       ),
