@@ -338,7 +338,9 @@ class _ItemResultsState extends State<ItemResults> {
                     );
                   }),
                 )
-              : const NoItemsFound(),
+              : NoItemsFound(
+                  isMyItems: widget.attribute == 'myItems' && !filterOn,
+                ),
           floatingActionButton: null);
     });
   }

@@ -44,11 +44,10 @@ class _FavouritesState extends State<Favourites> {
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: width * 0.2,
-          // centerTitle: true,
-          title: const Row(
-              // TODO: Image is not centered in appbar with back arrow
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [StyledTitle('WISH LIST')]),
+          centerTitle: true,
+          title: const StyledTitle('WISH LIST'),
+          backgroundColor: Colors.white,
+          elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.chevron_left, size: width * 0.08),
             onPressed: () => Navigator.of(context).pop(),

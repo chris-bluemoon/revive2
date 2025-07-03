@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/screens/favourites/favourites.dart';
 import 'package:revivals/screens/messages/message_conversation_page.dart';
 import 'package:revivals/screens/profile/account/account_page.dart';
 import 'package:revivals/screens/profile/admin/admin_page.dart';
@@ -18,7 +19,6 @@ import 'package:revivals/screens/profile/notifications/notifications_page.dart';
 import 'package:revivals/screens/profile/renter_dashboard/renter_dashboard.dart';
 import 'package:revivals/screens/to_rent/to_rent.dart';
 import 'package:revivals/services/notification_service.dart';
-import 'package:revivals/settings.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/item_results.dart';
 import 'package:revivals/shared/line.dart';
@@ -280,7 +280,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                 onTap: () {
                                   Navigator.push(
                                     context,
-                                    SmoothTransitions.luxury(const SettingsPage()),
+                                    SmoothTransitions.luxury(const Favourites()),
                                   );
                                 }
                               ),
