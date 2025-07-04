@@ -331,31 +331,35 @@ class _ToRentState extends State<ToRent> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
-                                      if (!itemStore.loggedIn) {
-                                        showMessagingAlertDialog(context);
-                                        return;
-                                      }
-                                      final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
-                                      final ownerList = renters.where((r) => r.id == widget.item.owner).toList();
-                                      final owner = ownerList.isNotEmpty ? ownerList.first : null;
-                                      Navigator.of(context).push(
-                                        SmoothTransitions.luxury(MessageConversationPage(
-                                            currentUserId: Provider.of<ItemStoreProvider>(context, listen: false).renter.id,
-                                            otherUserId: widget.item.owner,
-                                            otherUser: {
-                                              'name': ownerName,
-                                              'profilePicUrl': owner?.imagePath ?? '',
-                                            },
-                                          )),
-                                      );
-                                    },
-                                    icon: Icon(Icons.email_outlined, size: width * 0.05),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+                                          if (!itemStore.loggedIn) {
+                                            showMessagingAlertDialog(context);
+                                            return;
+                                          }
+                                          final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
+                                          final ownerList = renters.where((r) => r.id == widget.item.owner).toList();
+                                          final owner = ownerList.isNotEmpty ? ownerList.first : null;
+                                          Navigator.of(context).push(
+                                            SmoothTransitions.luxury(MessageConversationPage(
+                                                currentUserId: Provider.of<ItemStoreProvider>(context, listen: false).renter.id,
+                                                otherUserId: widget.item.owner,
+                                                otherUser: {
+                                                  'name': ownerName,
+                                                  'profilePicUrl': owner?.imagePath ?? '',
+                                                },
+                                              )),
+                                          );
+                                        },
+                                        icon: Icon(Icons.email_outlined, size: width * 0.05),
+                                      ),
+                                      const SizedBox(width: 2), // Less space between icons
+                                      BookmarkButton(item: widget.item),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
-                                  BookmarkButton(item: widget.item),
                                 ],
                               ),
                             ),

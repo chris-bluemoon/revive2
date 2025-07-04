@@ -4,12 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:revivals/globals.dart' as globals;
 import 'package:revivals/models/item.dart';
 import 'package:revivals/models/item_image.dart';
-import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/screens/to_rent/_bookmark_button.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/get_country_price.dart';
 import 'package:revivals/shared/styled_text.dart';
-import 'package:revivals/screens/to_rent/_bookmark_button.dart';
 
 // ignore: must_be_immutable
 class ItemCard extends StatefulWidget {
@@ -21,10 +20,9 @@ class ItemCard extends StatefulWidget {
   State<ItemCard> createState() => _ItemCardState();
 }
 
+
 class _ItemCardState extends State<ItemCard> {
-
-
-
+  // Removed isFav and isAFav, now handled by BookmarkButton
   String symbol = globals.thb;
 
   Image? myImage;
@@ -161,8 +159,7 @@ class _ItemCardState extends State<ItemCard> {
         }
         
         double width = MediaQuery.of(context).size.width;
-        List currListOfFavs = itemStore.favourites;
-        isFav = isAFav(widget.item, currListOfFavs);
+        // No longer need to track isFav or currListOfFavs here
         
         // Determine what to show: actual image URL, spinner, or fallback
         String displayImage = '';

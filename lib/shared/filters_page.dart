@@ -87,7 +87,7 @@ class _FiltersPage extends State<FiltersPage> {
             shape: BoxShape.rectangle,
             color: (selected) ? Colors.black : Colors.white,
             border: Border.all(color: Colors.black),
-            borderRadius: BorderRadius.circular(40),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: (selected)
               ? Center(
@@ -114,7 +114,7 @@ class _FiltersPage extends State<FiltersPage> {
             shape: BoxShape.rectangle,
             color: (selected) ? Colors.black : Colors.white,
             border: Border.all(color: Colors.black),
-            borderRadius: BorderRadius.circular(40),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: (selected)
               ? Center(
@@ -142,7 +142,7 @@ class _FiltersPage extends State<FiltersPage> {
               shape: BoxShape.rectangle,
               color: (selected) ? Colors.black : Colors.white,
               border: Border.all(color: Colors.black),
-              borderRadius: BorderRadius.circular(40),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: (selected)
                 ? Center(
@@ -640,7 +640,7 @@ class _FiltersPage extends State<FiltersPage> {
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.all(10),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(1.0),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 side: const BorderSide(width: 1.0, color: Colors.black),
               ),
@@ -674,7 +674,7 @@ class _FiltersPage extends State<FiltersPage> {
                 padding: const EdgeInsets.all(10),
                 backgroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(1.0),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 side: const BorderSide(width: 1.0, color: Colors.black),
               ),
