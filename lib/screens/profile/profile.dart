@@ -351,8 +351,19 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           ),
         ] : [],
       ),
-      backgroundColor: Colors.white,
-      body: Column(
+      backgroundColor: Colors.grey[50],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.white,
+              Colors.grey[50]!,
+            ],
+          ),
+        ),
+        child: Column(
         children: [
           const SizedBox(height: 24),
           // Profile Info Card with border
@@ -997,8 +1008,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             ),
           ),
         ],
-      ),
-    );
+        ), // Close Container child Column
+      ), // Close Container
+    ); // Close Scaffold
   }
 
   Future<String> uploadAndGetDownloadUrl(File file, String storagePath) async {
