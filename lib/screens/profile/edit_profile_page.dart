@@ -340,7 +340,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 filled: true,
                 fillColor: Colors.white,
                 counterText: "${bioController.text.length}/200", // Show used/total
-                hintText: "Describe yourself",
+                hintText: "Share a bit about yourself...",
                 hintStyle: TextStyle(
                   color: Colors.grey[800],
                   fontSize: MediaQuery.of(context).size.width * 0.03,
