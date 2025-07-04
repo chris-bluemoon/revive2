@@ -13,6 +13,7 @@ import 'package:revivals/screens/create/create_item.dart';
 import 'package:revivals/screens/messages/message_conversation_page.dart';
 import 'package:revivals/screens/profile/profile.dart';
 import 'package:revivals/screens/summary/summary_purchase.dart';
+import 'package:revivals/screens/to_rent/_bookmark_button.dart';
 import 'package:revivals/screens/to_rent/item_widget.dart';
 import 'package:revivals/screens/to_rent/rent_this_with_date_selecter.dart';
 import 'package:revivals/screens/to_rent/user_card.dart';
@@ -241,15 +242,28 @@ class _ToRentState extends State<ToRent> {
                           ],
                         ),
                   SizedBox(height: width * 0.03),
+                  // DotsIndicator and BookmarkButton on the same line
                   if (items.length > 1)
-                    Center(
-                      child: DotsIndicator(
-                        dotsCount: items.length,
-                        position: currentIndex,
-                        decorator: DotsDecorator(
-                          colors: dotColours,
-                          activeColor: Colors.black,
-                        ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: width * 0.05),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: DotsIndicator(
+                                dotsCount: items.length,
+                                position: currentIndex,
+                                decorator: DotsDecorator(
+                                  colors: dotColours,
+                                  activeColor: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                          BookmarkButton(item: widget.item),
+                        ],
                       ),
                     ),
                   SizedBox(height: width * 0.03),
@@ -263,7 +277,7 @@ class _ToRentState extends State<ToRent> {
                             final ownerList = renters.where((r) => r.name == ownerName).toList();
                             final owner = ownerList.isNotEmpty ? ownerList.first : null;
                             if (owner != null && owner.name.isNotEmpty) {
-                              log('Owner name: ${owner.name}');
+                              log('Owner name: \\${owner.name}');
                               Navigator.of(context).push(
                                 SmoothTransitions.luxury(Profile(userN: owner.name, canGoBack: true,)),
                               );
@@ -284,18 +298,16 @@ class _ToRentState extends State<ToRent> {
                                 showMessagingAlertDialog(context);
                                 return;
                               }
-                              
                               final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
                               final ownerList = renters.where((r) => r.id == widget.item.owner).toList();
                               final owner = ownerList.isNotEmpty ? ownerList.first : null;
-                              
                               Navigator.of(context).push(
                                 SmoothTransitions.luxury(MessageConversationPage(
                                     currentUserId: Provider.of<ItemStoreProvider>(context, listen: false).renter.id,
                                     otherUserId: widget.item.owner,
                                     otherUser: {
                                       'name': ownerName,
-                                      'profilePicUrl': owner?.imagePath ?? '', // Use owner's imagePath or empty string as fallback
+                                      'profilePicUrl': owner?.imagePath ?? '',
                                     },
                                   )),
                               );

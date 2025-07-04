@@ -255,10 +255,10 @@ class _ItemCardState extends State<ItemCard> {
                     right: 6,
                     child: IconButton(
                       icon: Icon(
-                        isFav ? Icons.favorite : Icons.favorite_border_outlined,
+                        isFav ? Icons.bookmark : Icons.bookmark_border,
                         size: width * 0.07,
                       ),
-                      color: isFav ? Colors.red : Colors.black54,
+                      color: isFav ? Colors.blueAccent : Colors.black54,
                       onPressed: () {
                         _toggleFav();
                         Renter toSave = Provider.of<ItemStoreProvider>(

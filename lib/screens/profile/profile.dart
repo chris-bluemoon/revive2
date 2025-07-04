@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,7 +18,7 @@ import 'package:revivals/screens/profile/notifications/notifications_page.dart';
 import 'package:revivals/screens/profile/renter_dashboard/renter_dashboard.dart';
 import 'package:revivals/screens/to_rent/to_rent.dart';
 import 'package:revivals/services/notification_service.dart';
-import 'package:revivals/shared/animated_logo_spinner.dart';
+import 'package:revivals/shared/item_card.dart';
 import 'package:revivals/shared/item_results.dart';
 import 'package:revivals/shared/line.dart';
 import 'package:revivals/shared/profile_avatar.dart';
@@ -740,169 +739,83 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   );
                 }
                 
-                return Column(
-                  children: myItems.map((item) {
-                    final dynamic imageId = (item.imageId != null && item.imageId.isNotEmpty) ? item.imageId[0] : null;
-
-                    bool isDirectUrl(dynamic id) =>
-                        id is String && (id.startsWith('http://') || id.startsWith('https://'));
-                    bool isMapWithUrl(dynamic id) =>
-                        id is Map && id['url'] != null && (id['url'] as String).startsWith('http');
-
-                    Widget imageWidget;
-
-                    if (isDirectUrl(imageId)) {
-                      imageWidget = ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: CachedNetworkImage(
-                          imageUrl: imageId,
-                          width: 56,
-                          height: 56,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: FastLogoSpinner(size: 40),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            width: 56,
-                            height: 56,
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.error, color: Colors.grey),
-                          ),
-                        ),
-                      );
-                    } else if (isMapWithUrl(imageId)) {
-                      final url = imageId['url'];
-                      imageWidget = ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: CachedNetworkImage(
-                          imageUrl: url,
-                          width: 56,
-                          height: 56,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: FastLogoSpinner(size: 40),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            width: 56,
-                            height: 56,
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.error, color: Colors.grey),
-                          ),
-                        ),
-                      );
-                    } else if (imageId is String && imageId.isNotEmpty) {
-                      _imageUrlFutures[imageId] ??= getDownloadUrlFromPath(imageId);
-                      imageWidget = FutureBuilder<String?>(
-                        future: _imageUrlFutures[imageId],
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(
-                              child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: FastLogoSpinner(size: 40),
-                              ),
-                            );
-                          }
-                          final url = snapshot.data;
-                          if (url != null) {
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: CachedNetworkImage(
-                                imageUrl: url,
-                                width: 56,
-                                height: 56,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => const Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: FastLogoSpinner(size: 40),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Container(
-                                  width: 56,
-                                  height: 56,
-                                  color: Colors.grey[300],
-                                  child: const Icon(Icons.error, color: Colors.grey),
-                                ),
-                              ),
-                            );
-                          }
-                          return Container(
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.image, color: Colors.white),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.5,
+                      crossAxisSpacing: 8.0,
+                      mainAxisSpacing: 12.0,
+                    ),
+                    itemCount: myItems.length,
+                    itemBuilder: (context, index) {
+                      final item = myItems[index];
+                      final width = MediaQuery.of(context).size.width;
+                      return GestureDetector(
+                        onTap: () async {
+                          await Navigator.of(context).push(
+                            SmoothTransitions.luxury(ToRent(item)),
                           );
                         },
-                      );
-                    } else {
-                      imageWidget = Container(
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.image, color: Colors.white),
-                      );
-                    }
-
-                    return Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () async {
-                            // Check if current profile is the owner of the item
-                            if (item.owner == profileOwnerId) {
-                              log("Item owner is the current profile, navigating to edit page");
-                              log(item.owner.toString());
-                              log(profileOwner.id.toString());
-                              final result = await Navigator.of(context).push(
-                                SmoothTransitions.luxury(ToRent(item)),
-                              );
-                              if (result == true) {
-                                setState(() {});
-                              }
-                            } else {
-                              await Navigator.of(context).push(
-                                SmoothTransitions.luxury(ToRent(item)), // Make sure ToRent accepts the item
-                              );
-                            }
-                          },
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                            leading: SizedBox(
-                              width: 56,
-                              height: 56,
-                              child: imageWidget,
-                            ),
-                            title: StyledHeading(item.name, weight: FontWeight.bold),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                StyledBody('฿${item.rentPriceDaily} per day', color: Colors.black, weight: FontWeight.normal),
-                                StyledBody('${item.type}', color: Colors.grey[700] ?? Colors.grey, weight: FontWeight.normal),
-                              ],
-                            ),
-                          ),
+                        child: SizedBox(
+                          width: width * 0.5,
+                          child: ItemCard(item),
                         ),
-                        if (item != myItems.last) const Divider(height: 1),
-                      ],
-                    );
-                  }).toList(),
+                      );
+                    },
+                  ),
                 );
               } else if (_tabController.index == 1) {
                 // SAVED tab content
-                return const Padding(
-                  padding: EdgeInsets.all(40.0),
-                  child: Center(
-                    child: StyledBody(
-                      'No saved items yet',
-                      color: Colors.grey,
-                      weight: FontWeight.normal,
+                final savedItems = items.where((item) {
+                  // Show items that are in the current user's favourites and have "accepted" status
+                  final currentUser = isOwnProfile ? profileOwner : itemStore.renter;
+                  return currentUser.favourites.contains(item.id) && item.status == 'accepted';
+                }).toList();
+
+                if (savedItems.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.all(40.0),
+                    child: Center(
+                      child: StyledBody(
+                        'No saved items yet',
+                        color: Colors.grey,
+                        weight: FontWeight.normal,
+                      ),
                     ),
+                  );
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.5,
+                      crossAxisSpacing: 8.0,
+                      mainAxisSpacing: 12.0,
+                    ),
+                    itemCount: savedItems.length,
+                    itemBuilder: (context, index) {
+                      final item = savedItems[index];
+                      final width = MediaQuery.of(context).size.width;
+                      return GestureDetector(
+                        onTap: () async {
+                          await Navigator.of(context).push(
+                            SmoothTransitions.luxury(ToRent(item)),
+                          );
+                        },
+                        child: SizedBox(
+                          width: width * 0.5,
+                          child: ItemCard(item),
+                        ),
+                      );
+                    },
                   ),
                 );
               } else {
