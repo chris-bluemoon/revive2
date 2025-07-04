@@ -363,11 +363,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             ],
           ),
         ),
-        child: Column(
-        children: [
-          const SizedBox(height: 24),
-          // Profile Info Card with border
-          Container(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 8),
+              // Profile Info Card with border
+              Container(
             margin: EdgeInsets.symmetric(horizontal: width * 0.04),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -397,113 +398,126 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               children: [
                 // Profile picture and stats
                 Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(width: width * 0.06),
-                ProfileAvatar(
-                  imageUrl: profileOwner.profilePicUrl,
-                  userName: profileOwner.name,
-                  radius: width * 0.09,
-                ),
-                SizedBox(width: width * 0.04),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ProfileAvatar(
+                      imageUrl: profileOwner.profilePicUrl,
+                      userName: profileOwner.name,
+                      radius: width * 0.09,
+                    ),
+                    SizedBox(width: width * 0.03),
+                    Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: width * 0.03), // Increased right padding for better spacing
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Changed to spaceEvenly for better distribution
+                      children: [
                       // Items count
-                      GestureDetector(
-                        onTap: null,
-                        child: Column(
-                          children: [
-                            StyledHeading(myItemsCount.toString(), weight: FontWeight.bold),
-                            const SizedBox(height: 2),
-                            const StyledBody("Items", color: Colors.black, weight: FontWeight.normal),
-                          ],
+                      Flexible(
+                        child: GestureDetector(
+                          onTap: null,
+                          child: Column(
+                            children: [
+                              StyledHeading(myItemsCount.toString(), weight: FontWeight.bold),
+                              const SizedBox(height: 2),
+                              const StyledBody("Items", color: Colors.black, weight: FontWeight.normal),
+                            ],
+                          ),
                         ),
                       ),
                       // Following count
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            SmoothTransitions.luxury(FollowListScreen(
-                                followersIds: profileOwner.followers,
-                                followingIds: profileOwner.following,
-                              )),
-                          );
-                          setState(() {});
-                        },
-                        child: Column(
-                          children: [
-                            StyledHeading(
-                              profileOwner.following.length.toString(),
-                              weight: FontWeight.bold,
-                            ),
-                            const SizedBox(height: 2),
-                            const StyledBody("Following", color: Colors.black, weight: FontWeight.normal),
-                          ],
+                      Flexible(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              SmoothTransitions.luxury(FollowListScreen(
+                                  followersIds: profileOwner.followers,
+                                  followingIds: profileOwner.following,
+                                )),
+                            );
+                            setState(() {});
+                          },
+                          child: Column(
+                            children: [
+                              StyledHeading(
+                                profileOwner.following.length.toString(),
+                                weight: FontWeight.bold,
+                              ),
+                              const SizedBox(height: 2),
+                              const FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: StyledBody("Following", color: Colors.black, weight: FontWeight.normal),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       // Followers count
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            SmoothTransitions.luxury(FollowListScreen(
-                                followersIds: profileOwner.followers,
-                                followingIds: profileOwner.following,
-                              )),
-                          );
-                          setState(() {});
-                        },
-                        child: Column(
-                          children: [
-                            StyledHeading(
-                              profileOwner.followers.length.toString(),
-                              weight: FontWeight.bold,
-                            ),
-                            const SizedBox(height: 2),
-                            const StyledBody("Followers", color: Colors.black, weight: FontWeight.normal),
-                          ],
+                      Flexible(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              SmoothTransitions.luxury(FollowListScreen(
+                                  followersIds: profileOwner.followers,
+                                  followingIds: profileOwner.following,
+                                )),
+                            );
+                            setState(() {});
+                          },
+                          child: Column(
+                            children: [
+                              StyledHeading(
+                                profileOwner.followers.length.toString(),
+                                weight: FontWeight.bold,
+                              ),
+                              const SizedBox(height: 2),
+                              const FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: StyledBody("Followers", color: Colors.black, weight: FontWeight.normal),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
+                  ),
+                  ],
+                ),
                 const SizedBox(height: 18),
                 // Name, Location, and bio section  
                 const SizedBox(height: 2),
-                if (profileOwner.location.isNotEmpty)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Icons.location_on, color: Colors.grey[700] ?? Colors.grey, size: width * 0.05),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: StyledBody(
-                          profileOwner.location,
-                          color: Colors.grey[700] ?? Colors.grey,
-                          weight: FontWeight.normal,
-                        ),
-                      ),
-                    ],
-                  ),
-                if (profileOwner.location.isNotEmpty)
-                  const SizedBox(height: 6), // <-- Add this gap
-              // --- Add Last seen row here ---
+            if (profileOwner.location.isNotEmpty)
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.access_time, color: Colors.grey[700] ?? Colors.grey, size: width * 0.05),
+                  Icon(Icons.location_on, color: Colors.grey[700] ?? Colors.grey, size: width * 0.05),
                   const SizedBox(width: 6),
-                  StyledBody(
-                    'Last seen: ${formatLastSeen(profileOwner.lastLogin)}',
-                    color: Colors.grey[700] ?? Colors.grey,
-                    weight: FontWeight.normal,
+                  Expanded(
+                    child: StyledBody(
+                      profileOwner.location,
+                      color: Colors.grey[700] ?? Colors.grey,
+                      weight: FontWeight.normal,
+                    ),
                   ),
                 ],
               ),
-              // --- End Last seen row ---
+            if (profileOwner.location.isNotEmpty)
+              const SizedBox(height: 6),
+            // Last seen row
+            Row(
+              children: [
+                Icon(Icons.access_time, color: Colors.grey[700] ?? Colors.grey, size: width * 0.05),
+                const SizedBox(width: 6),
+                StyledBody(
+                  'Last seen: ${formatLastSeen(profileOwner.lastLogin)}',
+                  color: Colors.grey[700] ?? Colors.grey,
+                  weight: FontWeight.normal,
+                ),
+              ],
+            ),
               // --- Add avgReview display here ---
               SizedBox(height: width * 0.03), // Changed from fixed 12 to responsive width-based
               Builder(
@@ -700,142 +714,145 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               ],
             ),
           ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                // ITEMS tab
-                Builder(
-                  builder: (context) {
-                    final myItems = items.where((item) {
-                      // Only show items that belong to the profile owner and have "accepted" status
-                      if (item.owner != profileOwner.id) return false;
-                      if (item.status == 'accepted') return true;
-                      return false;
-                    }).toList();
-                    if (myItems.isEmpty) {
-                      return const Center(
-                        child: StyledBody(
-                          'No items yet',
-                          color: Colors.grey,
-                          weight: FontWeight.normal,
+          // Tab content - shows different content based on selected tab
+          AnimatedBuilder(
+            animation: _tabController,
+            builder: (context, child) {
+              if (_tabController.index == 0) {
+                // ITEMS tab content
+                final myItems = items.where((item) {
+                  // Only show items that belong to the profile owner and have "accepted" status
+                  if (item.owner != profileOwner.id) return false;
+                  if (item.status == 'accepted') return true;
+                  return false;
+                }).toList();
+                
+                if (myItems.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.all(40.0),
+                    child: Center(
+                      child: StyledBody(
+                        'No items yet',
+                        color: Colors.grey,
+                        weight: FontWeight.normal,
+                      ),
+                    ),
+                  );
+                }
+                
+                return Column(
+                  children: myItems.map((item) {
+                    final dynamic imageId = (item.imageId != null && item.imageId.isNotEmpty) ? item.imageId[0] : null;
+
+                    bool isDirectUrl(dynamic id) =>
+                        id is String && (id.startsWith('http://') || id.startsWith('https://'));
+                    bool isMapWithUrl(dynamic id) =>
+                        id is Map && id['url'] != null && (id['url'] as String).startsWith('http');
+
+                    Widget imageWidget;
+
+                    if (isDirectUrl(imageId)) {
+                      imageWidget = ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(
+                          imageUrl: imageId,
+                          width: 56,
+                          height: 56,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => const Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: FastLogoSpinner(size: 40),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            width: 56,
+                            height: 56,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error, color: Colors.grey),
+                          ),
                         ),
                       );
-                    }
-                    return ListView.separated(
-                      itemCount: myItems.length,
-                      separatorBuilder: (context, i) => const Divider(height: 1),
-                      itemBuilder: (context, i) {
-                        final item = myItems[i];
-                        final dynamic imageId = (item.imageId != null && item.imageId.isNotEmpty) ? item.imageId[0] : null;
-
-                        bool isDirectUrl(dynamic id) =>
-                            id is String && (id.startsWith('http://') || id.startsWith('https://'));
-                        bool isMapWithUrl(dynamic id) =>
-                            id is Map && id['url'] != null && (id['url'] as String).startsWith('http');
-
-                        Widget imageWidget;
-
-                        if (isDirectUrl(imageId)) {
-                          imageWidget = ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: CachedNetworkImage(
-                              imageUrl: imageId,
-                              width: 56,
-                              height: 56,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => const Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: FastLogoSpinner(size: 40),
-                                ),
+                    } else if (isMapWithUrl(imageId)) {
+                      final url = imageId['url'];
+                      imageWidget = ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(
+                          imageUrl: url,
+                          width: 56,
+                          height: 56,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => const Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: FastLogoSpinner(size: 40),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            width: 56,
+                            height: 56,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.error, color: Colors.grey),
+                          ),
+                        ),
+                      );
+                    } else if (imageId is String && imageId.isNotEmpty) {
+                      _imageUrlFutures[imageId] ??= getDownloadUrlFromPath(imageId);
+                      imageWidget = FutureBuilder<String?>(
+                        future: _imageUrlFutures[imageId],
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: FastLogoSpinner(size: 40),
                               ),
-                              errorWidget: (context, url, error) => Container(
+                            );
+                          }
+                          final url = snapshot.data;
+                          if (url != null) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: CachedNetworkImage(
+                                imageUrl: url,
                                 width: 56,
                                 height: 56,
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.error, color: Colors.grey),
-                              ),
-                            ),
-                          );
-                        } else if (isMapWithUrl(imageId)) {
-                          final url = imageId['url'];
-                          imageWidget = ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: CachedNetworkImage(
-                              imageUrl: url,
-                              width: 56,
-                              height: 56,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => const Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: FastLogoSpinner(size: 40),
-                                ),
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                width: 56,
-                                height: 56,
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.error, color: Colors.grey),
-                              ),
-                            ),
-                          );
-                        } else if (imageId is String && imageId.isNotEmpty) {
-                          _imageUrlFutures[imageId] ??= getDownloadUrlFromPath(imageId);
-                          imageWidget = FutureBuilder<String?>(
-                            future: _imageUrlFutures[imageId],
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const Center(
                                   child: SizedBox(
                                     width: 24,
                                     height: 24,
                                     child: FastLogoSpinner(size: 40),
                                   ),
-                                );
-                              }
-                              final url = snapshot.data;
-                              if (url != null) {
-                                return ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: CachedNetworkImage(
-                                    imageUrl: url,
-                                    width: 56,
-                                    height: 56,
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, url) => const Center(
-                                      child: SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: FastLogoSpinner(size: 40),
-                                      ),
-                                    ),
-                                    errorWidget: (context, url, error) => Container(
-                                      width: 56,
-                                      height: 56,
-                                      color: Colors.grey[300],
-                                      child: const Icon(Icons.error, color: Colors.grey),
-                                    ),
-                                  ),
-                                );
-                              }
-                              return Container(
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.image, color: Colors.white),
-                              );
-                            },
-                          );
-                        } else {
-                          imageWidget = Container(
+                                ),
+                                errorWidget: (context, url, error) => Container(
+                                  width: 56,
+                                  height: 56,
+                                  color: Colors.grey[300],
+                                  child: const Icon(Icons.error, color: Colors.grey),
+                                ),
+                              ),
+                            );
+                          }
+                          return Container(
                             color: Colors.grey[300],
                             child: const Icon(Icons.image, color: Colors.white),
                           );
-                        }
+                        },
+                      );
+                    } else {
+                      imageWidget = Container(
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.image, color: Colors.white),
+                      );
+                    }
 
-                        return GestureDetector(
+                    return Column(
+                      children: [
+                        GestureDetector(
                           onTap: () async {
                             // Check if current profile is the owner of the item
                             if (item.owner == profileOwnerId) {
@@ -867,77 +884,80 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               children: [
                                 StyledBody('฿${item.rentPriceDaily} per day', color: Colors.black, weight: FontWeight.normal),
                                 StyledBody('${item.type}', color: Colors.grey[700] ?? Colors.grey, weight: FontWeight.normal),
-                                // StyledBody('Status: ${item.status}', color: Colors.blueGrey, weight: FontWeight.normal), // <-- Added line
                               ],
                             ),
                           ),
-                        );
-                      },
-                    );
-                  },
-                ),
-                // SAVED tab
-                const Center(
-                  child: StyledBody(
-                    'No saved items yet',
-                    color: Colors.grey,
-                    weight: FontWeight.normal,
-                  ),
-                ),
-                // REVIEWS tab
-                Builder(
-                  builder: (context) {
-                    final itemStore = Provider.of<ItemStoreProvider>(context);
-
-                    // Filter reviews where reviewedUserId matches the profile owner's id
-                    final reviews = itemStore.reviews.where(
-                      (review) => review.reviewedUserId == profileOwner.id,
-                    ).toList();
-
-                    if (reviews.isEmpty) {
-                      return const Center(
-                        child: StyledBody(
-                          'No reviews yet',
-                          color: Colors.grey,
-                          weight: FontWeight.normal,
                         ),
-                      );
-                    }
+                        if (item != myItems.last) const Divider(height: 1),
+                      ],
+                    );
+                  }).toList(),
+                );
+              } else if (_tabController.index == 1) {
+                // SAVED tab content
+                return const Padding(
+                  padding: EdgeInsets.all(40.0),
+                  child: Center(
+                    child: StyledBody(
+                      'No saved items yet',
+                      color: Colors.grey,
+                      weight: FontWeight.normal,
+                    ),
+                  ),
+                );
+              } else {
+                // REVIEWS tab content
+                final itemStore = Provider.of<ItemStoreProvider>(context);
+                final reviews = itemStore.reviews.where(
+                  (review) => review.reviewedUserId == profileOwner.id,
+                ).toList();
 
-                    return ListView.separated(
-                      itemCount: reviews.length,
-                      separatorBuilder: (context, i) => const Divider(height: 1),
-                      itemBuilder: (context, i) {
-                        final review = reviews[i];
-                        final reviewer = itemStore.renters.firstWhere(
-                          (r) => r.id == review.reviewerId,
-                          orElse: () => Renter(
-                            id: '',
-                            name: 'Unknown',
-                            imagePath: '',
-                            bio: '',
-                            location: '',
-                            followers: [],
-                            following: [],
-                            avgReview: 0.0,
-                            email: '',
-                            type: '',
-                            size: 0,
-                            address: '',
-                            countryCode: '',
-                            phoneNum: '',
-                            favourites: [],
-                            verified: 'false',
-                            creationDate: DateTime.now().toString(),
-                            status:'not active', 
-                            lastLogin: DateTime.now(), 
-                            vacations: [], // <-- Added status field
-                          ),
-                        );
-                        final reviewerPic = reviewer?.profilePicUrl ?? '';
-                        final reviewerName = reviewer?.name ?? 'Unknown';
+                if (reviews.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.all(40.0),
+                    child: Center(
+                      child: StyledBody(
+                        'No reviews yet',
+                        color: Colors.grey,
+                        weight: FontWeight.normal,
+                      ),
+                    ),
+                  );
+                }
 
-                        return GestureDetector(
+                return Column(
+                  children: reviews.map((review) {
+                    final reviewer = itemStore.renters.firstWhere(
+                      (r) => r.id == review.reviewerId,
+                      orElse: () => Renter(
+                        id: '',
+                        name: 'Unknown',
+                        imagePath: '',
+                        bio: '',
+                        location: '',
+                        followers: [],
+                        following: [],
+                        avgReview: 0.0,
+                        email: '',
+                        type: '',
+                        size: 0,
+                        address: '',
+                        countryCode: '',
+                        phoneNum: '',
+                        favourites: [],
+                        verified: 'false',
+                        creationDate: DateTime.now().toString(),
+                        status:'not active', 
+                        lastLogin: DateTime.now(), 
+                        vacations: [],
+                      ),
+                    );
+                    final reviewerPic = reviewer?.profilePicUrl ?? '';
+                    final reviewerName = reviewer?.name ?? 'Unknown';
+
+                    return Column(
+                      children: [
+                        GestureDetector(
                           onTap: () {
                             if (reviewer.id.isNotEmpty) {
                               Navigator.of(context).pushReplacement(
@@ -999,15 +1019,18 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               ],
                             ),
                           ),
-                        );
-                      },
+                        ),
+                        if (review != reviews.last) const Divider(height: 1),
+                      ],
                     );
-                  },
-                ),
-              ],
-            ),
+                  }).toList(),
+                );
+              }
+            },
           ),
+          const SizedBox(height: 20), // Add some bottom padding
         ],
+        ), // Close SingleChildScrollView child Column
         ), // Close Container child Column
       ), // Close Container
     ); // Close Scaffold
