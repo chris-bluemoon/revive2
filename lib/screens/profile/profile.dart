@@ -355,10 +355,37 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       body: Column(
         children: [
           const SizedBox(height: 24),
-          // Profile picture and stats
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: width * 0.04),
-            child: Row(
+          // Profile Info Card with border
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: width * 0.04),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.grey.withOpacity(0.2),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                  spreadRadius: 0,
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Profile picture and stats
+                Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -433,14 +460,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 18),
-          // Name, Location, and bio
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: width * 0.08),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+                const SizedBox(height: 18),
+                // Name, Location, and bio section  
                 const SizedBox(height: 2),
                 if (profileOwner.location.isNotEmpty)
                   Row(
@@ -515,6 +536,15 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     weight: FontWeight.normal,
                   ),
                 ),
+              ], // Close Container Column children
+            ),   // Close Container Column  
+          ),     // Close Container
+          const SizedBox(height: 16),
+          // Buttons section outside the border
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: width * 0.04),
+            child: Column(
+              children: [
                 // Show EDIT button if viewing own profile, otherwise show FOLLOW/UNFOLLOW and MESSAGE
                 if (isOwnProfile)
                   Padding(
@@ -639,9 +669,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       ],
                     ),
                   ),
-              ],
-            ),
-          ),
+              ], // Close buttons Column children
+            ),   // Close buttons Column  
+          ),     // Close buttons Padding
           const SizedBox(height: 20),
           Divider(thickness: 1, color: Colors.grey[300]),
           // --- Tabs Section ---
