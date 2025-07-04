@@ -9,6 +9,7 @@ import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/get_country_price.dart';
 import 'package:revivals/shared/styled_text.dart';
+import 'package:revivals/screens/to_rent/_bookmark_button.dart';
 
 // ignore: must_be_immutable
 class ItemCard extends StatefulWidget {
@@ -22,25 +23,7 @@ class ItemCard extends StatefulWidget {
 
 class _ItemCardState extends State<ItemCard> {
 
-  bool isFav = false;
 
-  bool isAFav(Item d, List favs) {
-    if (favs.contains(d)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  void _toggleFav() {
-    setState(() {
-      if (isFav == true) {
-        isFav = false;
-      } else {
-        isFav = true;
-      }
-    });
-  }
 
   String symbol = globals.thb;
 
@@ -253,36 +236,7 @@ class _ItemCardState extends State<ItemCard> {
                   Positioned(
                     top: 6,
                     right: 6,
-                    child: IconButton(
-                      icon: Icon(
-                        isFav ? Icons.bookmark : Icons.bookmark_border,
-                        size: width * 0.07,
-                      ),
-                      color: isFav ? Colors.blueAccent : Colors.black54,
-                      onPressed: () {
-                        _toggleFav();
-                        Renter toSave = Provider.of<ItemStoreProvider>(
-                          context,
-                          listen: false,
-                        ).renter;
-                        if (isFav) {
-                          toSave.favourites.add(widget.item.id);
-                          Provider.of<ItemStoreProvider>(context, listen: false)
-                              .saveRenter(toSave);
-                          Provider.of<ItemStoreProvider>(context, listen: false)
-                              .addFavourite(widget.item);
-                        } else {
-                          toSave.favourites.remove(widget.item.id);
-                          Provider.of<ItemStoreProvider>(context, listen: false)
-                              .saveRenter(toSave);
-                          Provider.of<ItemStoreProvider>(context, listen: false)
-                              .removeFavourite(widget.item);
-                        }
-                      },
-                      splashRadius: width * 0.07,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
+                    child: BookmarkButton(item: widget.item),
                   ),
                 ],
               ),

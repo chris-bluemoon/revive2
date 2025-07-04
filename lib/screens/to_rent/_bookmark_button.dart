@@ -37,8 +37,8 @@ class _BookmarkButtonState extends State<BookmarkButton> {
       icon: Icon(
         isFav ? Icons.bookmark : Icons.bookmark_border,
         size: width * 0.05,
+        color: isFav ? Colors.amber : Colors.grey[400], // More visually appealing colors
       ),
-      color: isFav ? Colors.blueAccent : Colors.black54,
       onPressed: _toggleFav,
       tooltip: isFav ? 'Remove from saved' : 'Save as favourite',
     );
