@@ -95,8 +95,19 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       body: Container(
-        margin: EdgeInsets.only(bottom: screenHeight * 0.04), // 4% of screen height
+        margin: EdgeInsets.only(bottom: screenHeight * 0.03), // 3% of screen height
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.white,
+              Colors.grey[50]!,
+            ],
+          ),
+        ),
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           transitionBuilder: (Widget child, Animation<double> animation) {
@@ -120,22 +131,33 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: CurvedNavigationBar(
-        index: _pageIndex,
-        height: 75.0,
-        items: const <Widget>[
-          Icon(Icons.home_outlined, size: 30, color: Colors.white),
-          Icon(Icons.menu_book_outlined, size: 30, color: Colors.white),
-          Icon(Icons.add_box_outlined, size: 30, color: Colors.white),
-          Icon(Icons.account_circle_outlined, size: 30, color: Colors.white),
-        ],
-        color: Colors.black,
-        buttonBackgroundColor: Colors.black,
-        backgroundColor: Colors.white,
-        animationCurve: Curves.easeInOutCubic,
-        animationDuration: const Duration(milliseconds: 400),
-        letIndexChange: (index) => !_isAnimating, // Prevent navigation during animation
-        onTap: _onNavBarTap,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: CurvedNavigationBar(
+          index: _pageIndex,
+          height: 70.0,
+          items: const <Widget>[
+            Icon(Icons.home_rounded, size: 28, color: Colors.white),
+            Icon(Icons.search_rounded, size: 28, color: Colors.white),
+            Icon(Icons.add_circle_outline_rounded, size: 28, color: Colors.white),
+            Icon(Icons.person_rounded, size: 28, color: Colors.white),
+          ],
+          color: Colors.black,
+          buttonBackgroundColor: Colors.black87,
+          backgroundColor: Colors.transparent,
+          animationCurve: Curves.easeInOutCubic,
+          animationDuration: const Duration(milliseconds: 350),
+          letIndexChange: (index) => !_isAnimating, // Prevent navigation during animation
+          onTap: _onNavBarTap,
+        ),
       ),
     );
   }

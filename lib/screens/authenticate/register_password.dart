@@ -410,11 +410,12 @@ class _RegisterPassword extends State<RegisterPassword> {
                                             loadingMessage = 'Welcome! Taking you to the app...';
                                           });
                                           // Longer delay to show the welcome message
-                                          await Future.delayed(const Duration(milliseconds: 1500));
-                                          // Reset loading state before navigation
-                                          setState(() => loading = false);
+                                          await Future.delayed(const Duration(milliseconds: 2500));
+                                          // Navigate first, then reset loading state
                                           Navigator.of(context)
                                               .pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
+                                          // Reset loading state after navigation
+                                          setState(() => loading = false);
                                         }
                                       } catch (error) {
                                         log('Error during user setup: $error');

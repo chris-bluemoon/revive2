@@ -15,7 +15,6 @@ import 'package:revivals/screens/home/to_buy_home_widget.dart';
 import 'package:revivals/screens/messages/inbox_page.dart';
 import 'package:revivals/shared/item_results.dart';
 import 'package:revivals/shared/smooth_page_route.dart';
-import 'package:revivals/shared/styled_text.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -69,28 +68,38 @@ class _HomeState extends State<Home> {
     }
 
     return Scaffold(
+        backgroundColor: Colors.grey[50], // Light background for luxury feel
         appBar: AppBar(
           automaticallyImplyLeading: false, // Never show back chevron on home page
-          toolbarHeight: width * 0.2,
+          toolbarHeight: width * 0.25, // Slightly taller AppBar
+          backgroundColor: Colors.white,
+          elevation: 0, // Remove shadow for clean look
+          shadowColor: Colors.transparent,
           actions: Provider.of<ItemStoreProvider>(context, listen: false).loggedIn
               ? [
                   Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
+                    padding: const EdgeInsets.only(right: 20.0),
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.chat_bubble_outline, color: Colors.black, size: 30),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              SmoothTransitions.luxury(InboxPage(currentUserId: userId)),
-                            );
-                          },
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.chat_bubble_outline, color: Colors.black, size: 28),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                SmoothTransitions.luxury(InboxPage(currentUserId: userId)),
+                              );
+                            },
+                          ),
                         ),
                         if (unreadSenders.isNotEmpty)
                           Positioned(
-                            right: 4,
-                            top: 4,
+                            right: 6,
+                            top: 6,
                             child: Container(
                               padding: const EdgeInsets.all(4),
                               decoration: const BoxDecoration(
@@ -98,15 +107,15 @@ class _HomeState extends State<Home> {
                                 shape: BoxShape.circle,
                               ),
                               constraints: const BoxConstraints(
-                                minWidth: 20,
-                                minHeight: 20,
+                                minWidth: 18,
+                                minHeight: 18,
                               ),
                               child: Center(
                                 child: Text(
                                   unreadSenders.length.toString(),
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -118,243 +127,281 @@ class _HomeState extends State<Home> {
                   ),
                 ]
               : [],
-          title: const Text(
-            'VELAA',
-            style: TextStyle(
-              fontFamily: 'Lovelo',
-              fontWeight: FontWeight.normal,
-              fontSize: 32,
-              color: Colors.black,
-              letterSpacing: 3.0,
+          title: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: const Text(
+              'VELAA',
+              style: TextStyle(
+                fontFamily: 'Lovelo',
+                fontWeight: FontWeight.normal,
+                fontSize: 36,
+                color: Colors.black,
+                letterSpacing: 4.0,
+              ),
             ),
           ),
+          centerTitle: true,
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Version number at the top
-
-              CarouselSlider(
-                carouselController: buttonCarouselSliderController,
-                options: CarouselOptions(
-                    viewportFraction: 1,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        currentIndex = index;
-                      });
-                    },
-                    height: height * 0.2,
-                    autoPlay: true),
-                items: items.map((i) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return const OfferWidget();
-                    },
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: width * 0.02),
-              // Display dot indicators for carousel
-
-              Center(
-                child: DotsIndicator(
-                  dotsCount: items.length,
-                  position: currentIndex,
-                  decorator: const DotsDecorator(
-                    colors: [Colors.grey, Colors.grey],
-                    activeColor: Colors.black,
-                    // colors: [Colors.grey[300], Colors.grey[600], Colors.grey[900]], // Inactive dot colors
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.white,
+                Colors.grey[50]!,
+              ],
+            ),
+          ),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Premium carousel section
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: width * 0.03, vertical: width * 0.02),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: CarouselSlider(
+                      carouselController: buttonCarouselSliderController,
+                      options: CarouselOptions(
+                          viewportFraction: 1,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              currentIndex = index;
+                            });
+                          },
+                          height: height * 0.22,
+                          autoPlay: true,
+                          autoPlayInterval: const Duration(seconds: 4),
+                          enlargeCenterPage: false),
+                      items: items.map((i) {
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return const OfferWidget();
+                          },
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
-              ),
-
-              // // Now display the first home page widget, for now a simple icon button
-              // SizedBox(height: width * 0.02),
-              // const Padding(
-              //   padding: EdgeInsets.only(left: 12.0),
-              //   child: StyledHeading(
-              //     'ALL ITEMS',
-              //   ),
-              // ),
-              // GestureDetector(
-              //   onTap: () {
-              //     Navigator.of(context).push(MaterialPageRoute(builder: (context) => (const ItemResults('occasion', 'party'))));
-              //   },
-              //   child: const AllItemsHomeWidget()),
-
-              SizedBox(height: width * 0.02),
-              const Padding(
-                padding: EdgeInsets.only(left: 12.0),
-                child: StyledHeading(
-                  'TO RENT',
+                
+                SizedBox(height: width * 0.015),
+                
+                // Enhanced dot indicators
+                Center(
+                  child: DotsIndicator(
+                    dotsCount: items.length,
+                    position: currentIndex,
+                    decorator: DotsDecorator(
+                      colors: [Colors.grey[300]!, Colors.grey[300]!],
+                      activeColor: Colors.black,
+                      size: const Size.square(8.0),
+                      activeSize: const Size(20.0, 8.0),
+                      activeShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(SmoothTransitions.luxury(
-                        const ItemResults('bookingType', 'rental')));
-                  },
-                  child: const RentalHomeWidget()),
-              SizedBox(height: width * 0.02),
-              const Padding(
-                padding: EdgeInsets.only(left: 12.0),
-                child: StyledHeading(
-                  'NEW ARRIVALS',
+
+                SizedBox(height: width * 0.06),
+                
+                // Section: TO RENT
+                _buildSectionHeader('TO RENT', width),
+                GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(SmoothTransitions.luxury(
+                          const ItemResults('bookingType', 'rental')));
+                    },
+                    child: const RentalHomeWidget()),
+                    
+                SizedBox(height: width * 0.06),
+                
+                // Section: NEW ARRIVALS
+                _buildSectionHeader('NEW ARRIVALS', width),
+                SizedBox(height: width * 0.02),
+                GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(SmoothTransitions.luxury(
+                          const ItemResults('dateAdded', '01-01-2020')));
+                    },
+                    child: const NewArrivalsCarousel()),
+
+                SizedBox(height: width * 0.06),
+                
+                // Section: TO BUY
+                _buildSectionHeader('TO BUY', width),
+                GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(SmoothTransitions.luxury(
+                          const ItemResults('bookingType', 'buy')));
+                    },
+                    child: const ToBuyHomeWidget()),
+
+                SizedBox(height: width * 0.08),
+
+                // Section: HELP CENTRE
+                _buildSectionHeader('HELP CENTRE', width),
+                const SizedBox(height: 15),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: width * 0.03),
+                  height: height * 0.12,
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    children: <Widget>[
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/faqs');
+                          },
+                          child: const HomePageBottomCard('General FAQs')),
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/whatIs');
+                          },
+                          child: const HomePageBottomCard('Who Are We?')),
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/howItWorks');
+                          },
+                          child: const HomePageBottomCard('How It Works')),
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/sizingGuide');
+                          },
+                          child: const HomePageBottomCard('Sizing Guide')),
+                      const SizedBox(width: 8),
+                    ],
+                  ),
                 ),
-              ),
-              // const NewArrivalsHomeWidget(),
-              SizedBox(height: width * 0.02),
-              GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(SmoothTransitions.luxury(
-                        const ItemResults('dateAdded', '01-01-2020')));
-                  },
-                  child: const NewArrivalsCarousel()),
-
-              SizedBox(height: width * 0.05),
-              const Padding(
-                padding: EdgeInsets.only(left: 12.0),
-                child: StyledHeading(
-                  'TO BUY',
-                ),
-              ),
-              GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(SmoothTransitions.luxury(
-                        const ItemResults('bookingType', 'buy')));
-                  },
-                  child: const ToBuyHomeWidget()),
-
-              SizedBox(height: width * 0.02),
-
-              // const Padding(
-              //   padding: EdgeInsets.only(left: 12.0),
-              //   child: StyledHeading(
-              //     'BOOK A FITTING ',
-              //   ),
-              // ),
-              // GestureDetector(
-              //   onTap: () {
-              //     // Navigator.of(context).push(MaterialPageRoute(builder: (context) => (const Fitting2())));
-              //     bool loggedIn = Provider.of<ItemStoreProvider>(context, listen: false).loggedIn;
-              //     (loggedIn) ? Navigator.of(context).push(MaterialPageRoute(builder: (context) => (const ItemResults('fitting','dummy'))))
-              //       : showAlertDialog(context);
-              //   },
-              //   child: const FittingHomeWidget()),
-
-              const SizedBox(height: 20),
-              const Padding(
-                padding: EdgeInsets.only(left: 12.0),
-                child: StyledHeading('HELP CENTRE'),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: height * 0.10,
-                child: ListView(
-                  // This next line does the trick.
-                  scrollDirection: Axis.horizontal,
-                  children: <Widget>[
-                    const SizedBox(width: 4),
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     Navigator.of(context).push(MaterialPageRoute(builder: (context) => (const HygienePolicy())));
-                    //   },
-                    //   child: const HomePageBottomCard('Our Hygiene Policy')),
-                    GestureDetector(
-                        onTap: () {
-                          // Navigator.of(context).push(MaterialPageRoute(builder: (context) => (const FAQs())));
-                          Navigator.pushNamed(context, '/faqs');
-                        },
-                        child: const HomePageBottomCard('General FAQs')),
-                    GestureDetector(
-                        onTap: () {
-                          // Navigator.of(context).push(MaterialPageRoute(builder: (context) => (const WhatIs())));
-                          Navigator.pushNamed(context, '/whatIs');
-                        },
-                        child: const HomePageBottomCard('Who Are We?')),
-                    GestureDetector(
-                        onTap: () {
-                          // Navigator.of(context).push(MaterialPageRoute(builder: (context) => (const HowItWorks())));
-                          Navigator.pushNamed(context, '/howItWorks');
-                        },
-                        child: const HomePageBottomCard('How It Works')),
-                    GestureDetector(
-                        onTap: () {
-                          // Navigator.of(context).push(MaterialPageRoute(builder: (context) => (const SizingGuide())));
-                          Navigator.pushNamed(context, '/sizingGuide');
-                        },
-                        child: const HomePageBottomCard('Sizing Guide')),
-                    const SizedBox(width: 4),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
+                SizedBox(height: width * 0.06),
+              ],
+            ),
           ),
         ));
   }
 
+  // Helper method for consistent section headers
+  Widget _buildSectionHeader(String title, double width) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: width * 0.05),
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 24,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   showAlertDialog(BuildContext context) {
-    // Create button
     double width = MediaQuery.of(context).size.width;
 
-    Widget okButton = ElevatedButton(
-      style: OutlinedButton.styleFrom(
-        textStyle: const TextStyle(color: Colors.white),
-        foregroundColor: Colors.white, //change background color of button
-        backgroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(0.0),
+    Widget okButton = Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 16),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          elevation: 0,
         ),
-        side: const BorderSide(width: 1.0, color: Colors.black),
+        onPressed: () {
+          Navigator.of(context).push(SmoothTransitions.luxury(
+              const GoogleSignInScreen()));
+        },
+        child: const Text(
+          "SIGN IN",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+            color: Colors.white,
+          ),
+        ),
       ),
-      onPressed: () {
-        // Navigator.of(context).pop();
-        // Navigator.of(context).popUntil((route) => route.isFirst);
-        Navigator.of(context).push(SmoothTransitions.luxury(
-            const GoogleSignInScreen()));
-      },
-      child: const Center(child: StyledHeading("OK", color: Colors.white)),
     );
-    // Create AlertDialog
+
     AlertDialog alert = AlertDialog(
       backgroundColor: Colors.white,
-      title: const Center(child: StyledHeading("NOT LOGGED IN")),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+      ),
+      contentPadding: const EdgeInsets.all(24),
+      title: const Center(
+        child: Text(
+          "LOGIN REQUIRED",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.0,
+            color: Colors.black87,
+          ),
+        ),
+      ),
       content: SizedBox(
-        height: width * 0.2,
-        child: const Column(
+        width: width * 0.8,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                StyledHeading("Please log in"),
-              ],
+            Icon(
+              Icons.lock_outline_rounded,
+              size: 48,
+              color: Colors.grey[600],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                StyledHeading("or register to continue"),
-              ],
+            const SizedBox(height: 16),
+            const Text(
+              "Please log in or register to continue",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+                height: 1.4,
+              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                StyledHeading("to book a fitting"),
-              ],
-            )
+            okButton,
           ],
         ),
       ),
-      actions: [
-        okButton,
-      ],
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
-      ),
     );
+
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return alert;
       },
