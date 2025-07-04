@@ -883,7 +883,7 @@ class _ToRentState extends State<ToRent> {
                                                       backgroundColor: Colors.white,
                                                       side: const BorderSide(color: Colors.black, width: 1),
                                                       shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(0),
+                                                        borderRadius: BorderRadius.circular(12),
                                                       ),
                                                       padding: const EdgeInsets.symmetric(vertical: 12),
                                                     ),
@@ -911,7 +911,7 @@ class _ToRentState extends State<ToRent> {
                                                       backgroundColor: Colors.red,
                                                       side: const BorderSide(color: Colors.red, width: 1),
                                                       shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(0),
+                                                        borderRadius: BorderRadius.circular(12),
                                                       ),
                                                       padding: const EdgeInsets.symmetric(vertical: 12),
                                                     ),
