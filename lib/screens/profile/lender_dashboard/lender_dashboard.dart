@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:revivals/screens/profile/lender_dashboard/balance_page.dart';
 import 'package:revivals/screens/profile/lender_dashboard/earnings_page.dart';
 import 'package:revivals/screens/profile/lender_dashboard/insights_page.dart';
-import 'package:revivals/screens/profile/lender_dashboard/lenders_rentals_page.dart';
+import 'package:revivals/screens/profile/lender_dashboard/lenders_transactions_page.dart';
 import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
 

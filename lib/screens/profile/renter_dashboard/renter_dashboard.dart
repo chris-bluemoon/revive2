@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:revivals/screens/profile/renter_dashboard/renters_rentals_page.dart';
+import 'package:revivals/screens/profile/renter_dashboard/renters_transactions_page.dart';
 import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
 

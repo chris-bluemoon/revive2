@@ -230,6 +230,10 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
         return Colors.orange;
       case 'expired':
         return Colors.grey;
+      case 'reviewedbyrenter':
+      case 'reviewedbylender':
+      case 'reviewedbyboth':
+        return Colors.purple;
       default:
         return Colors.grey;
     }
@@ -297,6 +301,12 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     effectiveStatus.toLowerCase() == "cancelledrenter" ||
                     effectiveStatus.toLowerCase() == "cancelledlender"
                         ? "CANCELLED"
+                        : effectiveStatus.toLowerCase() == "reviewedbylender"
+                        ? "REVIEWED BY LENDER"
+                        : effectiveStatus.toLowerCase() == "reviewedbyrenter"
+                        ? "REVIEWED BY RENTER"
+                        : effectiveStatus.toLowerCase() == "reviewedbyboth"
+                        ? "BOTH REVIEWED"
                         : effectiveStatus.toUpperCase(),
                     style: TextStyle(
                       color: _statusColor(effectiveStatus),
@@ -501,11 +511,21 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
               ),
             if (DateTime.parse(widget.itemRenter.endDate)
                     .isBefore(DateTime.now()) &&
-                widget.itemRenter.status != "reviewed")
-              ElevatedButton(
-                onPressed: () async {
+                widget.itemRenter.status != "reviewedByRenter" && 
+                widget.itemRenter.status != "reviewedByBoth")
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                  String newStatus;
+                  if (widget.itemRenter.status == "reviewedByLender") {
+                    newStatus = "reviewedByBoth";
+                  } else {
+                    newStatus = "reviewedByRenter";
+                  }
+                  
                   setState(() {
-                    widget.itemRenter.status = "reviewed";
+                    widget.itemRenter.status = newStatus;
                   });
                   // Update in itemStore (if using Provider or similar)
                   Provider.of<ItemStoreProvider>(context, listen: false)
@@ -523,56 +543,112 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                       final reviewController = TextEditingController();
                       return StatefulBuilder(
                         builder: (context, setState) => AlertDialog(
-                          backgroundColor:
-                              Colors.white, // Set dialog background to white
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(
-                                Radius.circular(12)),
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
+                          title: const Text(
+                            'Leave a Review',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: List.generate(5, (index) {
-                                  return IconButton(
-                                    icon: Icon(
-                                      index < selectedStars
-                                          ? Icons.star
-                                          : Icons.star_border,
-                                      color: Colors.amber,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        selectedStars = index + 1;
-                                      });
-                                    },
-                                  );
-                                }),
+                              const Text(
+                                'How was your experience?',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              const SizedBox(height: 12),
-                              TextField(
-                                controller: reviewController,
-                                maxLines: 4,
-                                decoration: const InputDecoration(
-                                  hintText: 'Write your review here...',
-                                  border: OutlineInputBorder(),
+                              const SizedBox(height: 20),
+                              Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade50,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: List.generate(5, (index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedStars = index + 1;
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        child: Icon(
+                                          index < selectedStars
+                                              ? Icons.star_rounded
+                                              : Icons.star_border_rounded,
+                                          color: index < selectedStars 
+                                              ? Colors.amber.shade600
+                                              : Colors.grey.shade400,
+                                          size: 32,
+                                        ),
+                                      ),
+                                    );
+                                  }),
                                 ),
                               ),
+                              const SizedBox(height: 20),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: TextField(
+                                  controller: reviewController,
+                                  maxLines: 4,
+                                  decoration: InputDecoration(
+                                    hintText: 'Share your thoughts about this rental...',
+                                    hintStyle: TextStyle(color: Colors.grey.shade500),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.all(16),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
                             ],
                           ),
+                          actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
                           actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text(
-                                'Cancel',
-                                style: TextStyle(color: Colors.black),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      side: BorderSide(color: Colors.grey.shade400),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () {
                                 if (selectedStars == 0) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
@@ -606,10 +682,23 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                                 Navigator.of(context).pop();
                                 setState(() {});
                               },
-                              child: const Text(
-                                'Submit',
-                                style: TextStyle(color: Colors.black),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
+                              child: const Text(
+                                'Submit Review',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -626,6 +715,8 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                   ),
                 ),
                 child: const Text('LEAVE REVIEW'),
+              ),
+                ],
               ),
           ],
         ),
@@ -671,6 +762,10 @@ class PurchaseCard extends StatelessWidget {
         return Colors.orange;
       case 'expired':
         return Colors.grey;
+      case 'reviewedbyrenter':
+      case 'reviewedbylender':
+      case 'reviewedbyboth':
+        return Colors.purple;
       default:
         return Colors.grey;
     }
@@ -714,6 +809,12 @@ class PurchaseCard extends StatelessWidget {
                     itemRenter.status.toLowerCase() == "cancelledrenter" ||
                     itemRenter.status.toLowerCase() == "cancelledlender"
                         ? "CANCELLED"
+                        : itemRenter.status.toLowerCase() == "reviewedbylender"
+                        ? "REVIEWED BY LENDER"
+                        : itemRenter.status.toLowerCase() == "reviewedbyrenter"
+                        ? "REVIEWED BY RENTER"
+                        : itemRenter.status.toLowerCase() == "reviewedbyboth"
+                        ? "BOTH REVIEWED"
                         : itemRenter.status.toUpperCase(),
                     style: TextStyle(
                       color: _statusColor(itemRenter.status),

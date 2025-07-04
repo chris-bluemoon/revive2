@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:revivals/models/item.dart';
 import 'package:revivals/models/item_renter.dart';
 import 'package:revivals/models/renter.dart';
+import 'package:revivals/models/review.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
@@ -231,6 +232,12 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
         return Colors.blue;
       case 'requested':
         return Colors.orange;
+      case 'expired':
+        return Colors.grey;
+      case 'reviewedbyrenter':
+      case 'reviewedbylender':
+      case 'reviewedbyboth':
+        return Colors.purple;
       default:
         return Colors.grey;
     }
@@ -240,6 +247,27 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
     final formattedPrice = NumberFormat("#,##0", "en_US").format(widget.price);
     final DateTime rentalStartDate = DateTime.parse(widget.itemRenter.startDate);
     final bool canCancel = rentalStartDate.isAfter(DateTime.now().add(const Duration(days: 2)));
+    
+    // Check if the start date is today or in the future for expired status
+    final DateTime today = DateTime.now();
+    final DateTime startDateOnly = DateTime(rentalStartDate.year, rentalStartDate.month, rentalStartDate.day);
+    final DateTime todayOnly = DateTime(today.year, today.month, today.day);
+    final bool isExpired = startDateOnly.isBefore(todayOnly) || startDateOnly.isAtSameMomentAs(todayOnly);
+    
+    // Determine the effective status
+    String effectiveStatus = widget.itemRenter.status;
+    if (isExpired && effectiveStatus == "accepted") {
+      effectiveStatus = "expired";
+      // Update the database status if needed
+      if (widget.itemRenter.status != "expired") {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          widget.itemRenter.status = "expired";
+          Provider.of<ItemStoreProvider>(context, listen: false)
+              .saveItemRenter(widget.itemRenter);
+        });
+      }
+    }
+    
     // Show ACCEPT/REJECT only if status is "requested" AND startDate is today or in the future
     final bool showAcceptReject = widget.itemRenter.status == "requested" &&
         (rentalStartDate.isAtSameMomentAs(DateTime.now()) || rentalStartDate.isAfter(DateTime.now()));
@@ -271,16 +299,22 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: _statusColor(widget.itemRenter.status).withOpacity(0.13),
+                    color: _statusColor(effectiveStatus).withOpacity(0.13),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    widget.itemRenter.status.toLowerCase() == "cancelledlender" ||
-                    widget.itemRenter.status.toLowerCase() == "cancelledrenter"
+                    effectiveStatus.toLowerCase() == "cancelledlender" ||
+                    effectiveStatus.toLowerCase() == "cancelledrenter"
                         ? "CANCELLED"
-                        : widget.itemRenter.status.toUpperCase(),
+                        : effectiveStatus.toLowerCase() == "reviewedbylender"
+                        ? "REVIEWED BY LENDER"
+                        : effectiveStatus.toLowerCase() == "reviewedbyrenter"
+                        ? "REVIEWED BY RENTER"
+                        : effectiveStatus.toLowerCase() == "reviewedbyboth"
+                        ? "BOTH REVIEWED"
+                        : effectiveStatus.toUpperCase(),
                     style: TextStyle(
-                      color: _statusColor(widget.itemRenter.status),
+                      color: _statusColor(effectiveStatus),
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       letterSpacing: 1,
@@ -514,6 +548,138 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     ),
                   ],
                 ),
+            // Add LEAVE REVIEW button condition
+            if (DateTime.parse(widget.itemRenter.endDate).isBefore(DateTime.now()) &&
+                widget.itemRenter.status != "reviewedByLender" && 
+                widget.itemRenter.status != "reviewedByBoth")
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Determine new status based on current status
+                      String newStatus;
+                      if (widget.itemRenter.status == "reviewedByRenter") {
+                        newStatus = "reviewedByBoth";
+                      } else {
+                        newStatus = "reviewedByLender";
+                      }
+                      
+                      setState(() {
+                        widget.itemRenter.status = newStatus;
+                      });
+                      // Update in itemStore
+                      Provider.of<ItemStoreProvider>(context, listen: false)
+                          .saveItemRenter(widget.itemRenter);
+
+                      await showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) {
+                          int selectedStars = 0;
+                          final reviewController = TextEditingController();
+                          return StatefulBuilder(
+                            builder: (context, setState) => AlertDialog(
+                              backgroundColor: Colors.white,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(12)),
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: List.generate(5, (index) {
+                                      return IconButton(
+                                        icon: Icon(
+                                          index < selectedStars
+                                              ? Icons.star
+                                              : Icons.star_border,
+                                          color: Colors.amber,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedStars = index + 1;
+                                          });
+                                        },
+                                      );
+                                    }),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  TextField(
+                                    controller: reviewController,
+                                    maxLines: 4,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Write your review here...',
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.black),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.black),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.black, width: 2),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    'Cancel',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    if (selectedStars == 0) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Please select a star rating.')),
+                                      );
+                                      return;
+                                    }
+                                    Provider.of<ItemStoreProvider>(context, listen: false)
+                                        .addReview(Review(
+                                      id: uuid.v4(),
+                                      reviewerId: Provider.of<ItemStoreProvider>(context, listen: false)
+                                          .renter
+                                          .id,
+                                      reviewedUserId: widget.itemRenter.renterId, // Reviewing the renter
+                                      itemRenterId: widget.itemRenter.id,
+                                      itemId: widget.itemRenter.itemId,
+                                      rating: selectedStars,
+                                      text: reviewController.text,
+                                      date: DateTime.now(),
+                                    ));
+                                    Navigator.of(context).pop();
+                                    setState(() {});
+                                  },
+                                  child: const Text(
+                                    'Submit',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                    ),
+                    child: const Text('LEAVE REVIEW'),
+                  ),
+                ],
+              ),
             // Add this to show CANCELLED status
           ],
         ),
@@ -522,8 +688,8 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
   }
 }
 
-// Create a custom widget to display purchase details for lenders (status only, no buttons)
-class PurchaseCardLender extends StatelessWidget {
+// Create a custom widget to display purchase details for lenders
+class PurchaseCardLender extends StatefulWidget {
   final ItemRenter itemRenter;
   final String itemName;
   final String itemType;
@@ -545,6 +711,12 @@ class PurchaseCardLender extends StatelessWidget {
     required this.price,
   });
 
+  @override
+  State<PurchaseCardLender> createState() => _PurchaseCardLenderState();
+}
+
+class _PurchaseCardLenderState extends State<PurchaseCardLender> {
+
   Color _statusColor(String status) {
     switch (status.toLowerCase()) {
       case 'accepted':
@@ -557,6 +729,12 @@ class PurchaseCardLender extends StatelessWidget {
         return Colors.blue;
       case 'requested':
         return Colors.orange;
+      case 'expired':
+        return Colors.grey;
+      case 'reviewedbyrenter':
+      case 'reviewedbylender':
+      case 'reviewedbyboth':
+        return Colors.purple;
       default:
         return Colors.grey;
     }
@@ -564,8 +742,21 @@ class PurchaseCardLender extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formattedPrice = NumberFormat("#,##0", "en_US").format(price);
+    final formattedPrice = NumberFormat("#,##0", "en_US").format(widget.price);
     final double width = MediaQuery.of(context).size.width;
+    
+    // Check if the start date is today or in the future for expired status
+    final DateTime purchaseStartDate = DateTime.parse(widget.itemRenter.startDate);
+    final DateTime today = DateTime.now();
+    final DateTime startDateOnly = DateTime(purchaseStartDate.year, purchaseStartDate.month, purchaseStartDate.day);
+    final DateTime todayOnly = DateTime(today.year, today.month, today.day);
+    final bool isExpired = startDateOnly.isBefore(todayOnly) || startDateOnly.isAtSameMomentAs(todayOnly);
+    
+    // Determine the effective status
+    String effectiveStatus = widget.itemRenter.status;
+    if (isExpired && effectiveStatus == "accepted") {
+      effectiveStatus = "expired";
+    }
 
     return Card(
       color: Colors.white,
@@ -580,7 +771,7 @@ class PurchaseCardLender extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    itemName,
+                    widget.itemName,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: width * 0.045, // Reduced and responsive
@@ -592,16 +783,22 @@ class PurchaseCardLender extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: _statusColor(itemRenter.status).withOpacity(0.13),
+                    color: _statusColor(effectiveStatus).withOpacity(0.13),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    itemRenter.status.toLowerCase() == "cancelledlender" ||
-                    itemRenter.status.toLowerCase() == "cancelledrenter"
+                    effectiveStatus.toLowerCase() == "cancelledlender" ||
+                    effectiveStatus.toLowerCase() == "cancelledrenter"
                         ? "CANCELLED"
-                        : itemRenter.status.toUpperCase(),
+                        : effectiveStatus.toLowerCase() == "reviewedbylender"
+                        ? "REVIEWED BY LENDER"
+                        : effectiveStatus.toLowerCase() == "reviewedbyrenter"
+                        ? "REVIEWED BY RENTER"
+                        : effectiveStatus.toLowerCase() == "reviewedbyboth"
+                        ? "BOTH REVIEWED"
+                        : effectiveStatus.toUpperCase(),
                     style: TextStyle(
-                      color: _statusColor(itemRenter.status),
+                      color: _statusColor(effectiveStatus),
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       letterSpacing: 1,
@@ -617,14 +814,14 @@ class PurchaseCardLender extends StatelessWidget {
                 Icon(Icons.category, size: 17, color: Colors.grey[700]),
                 const SizedBox(width: 6),
                 Text(
-                  itemType,
+                  widget.itemType,
                   style: const TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(width: 16),
                 Icon(Icons.person, size: 17, color: Colors.grey[700]),
                 const SizedBox(width: 6),
                 Text(
-                  renterName,
+                  widget.renterName,
                   style: const TextStyle(fontSize: 14, color: Colors.black54),
                 ),
               ],
@@ -636,7 +833,7 @@ class PurchaseCardLender extends StatelessWidget {
                 Icon(Icons.calendar_today, size: 15, color: Colors.grey[700]),
                 const SizedBox(width: 4),
                 Text(
-                  '$startDate - $endDate',
+                  '${widget.startDate} - ${widget.endDate}',
                   style: const TextStyle(fontSize: 13, color: Colors.black87),
                 ),
               ],
@@ -655,7 +852,139 @@ class PurchaseCardLender extends StatelessWidget {
                 ),
               ],
             ),
-            // No action buttons for purchases - only status display
+            // Add LEAVE REVIEW button condition for purchases
+            if (DateTime.parse(widget.itemRenter.endDate).isBefore(DateTime.now()) &&
+                widget.itemRenter.status != "reviewedByLender" && 
+                widget.itemRenter.status != "reviewedByBoth")
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Determine new status based on current status
+                      String newStatus;
+                      if (widget.itemRenter.status == "reviewedByRenter") {
+                        newStatus = "reviewedByBoth";
+                      } else {
+                        newStatus = "reviewedByLender";
+                      }
+                      
+                      setState(() {
+                        widget.itemRenter.status = newStatus;
+                      });
+                      // Update in itemStore
+                      Provider.of<ItemStoreProvider>(context, listen: false)
+                          .saveItemRenter(widget.itemRenter);
+
+                      await showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) {
+                          int selectedStars = 0;
+                          final reviewController = TextEditingController();
+                          return StatefulBuilder(
+                            builder: (context, setState) => AlertDialog(
+                              backgroundColor: Colors.white,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(12)),
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: List.generate(5, (index) {
+                                      return IconButton(
+                                        icon: Icon(
+                                          index < selectedStars
+                                              ? Icons.star
+                                              : Icons.star_border,
+                                          color: Colors.amber,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedStars = index + 1;
+                                          });
+                                        },
+                                      );
+                                    }),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  TextField(
+                                    controller: reviewController,
+                                    maxLines: 4,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Write your review here...',
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.black),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.black),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.black, width: 2),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    'Cancel',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    if (selectedStars == 0) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Please select a star rating.')),
+                                      );
+                                      return;
+                                    }
+                                    Provider.of<ItemStoreProvider>(context, listen: false)
+                                        .addReview(Review(
+                                      id: uuid.v4(),
+                                      reviewerId: Provider.of<ItemStoreProvider>(context, listen: false)
+                                          .renter
+                                          .id,
+                                      reviewedUserId: widget.itemRenter.renterId, // Reviewing the renter
+                                      itemRenterId: widget.itemRenter.id,
+                                      itemId: widget.itemRenter.itemId,
+                                      rating: selectedStars,
+                                      text: reviewController.text,
+                                      date: DateTime.now(),
+                                    ));
+                                    Navigator.of(context).pop();
+                                    setState(() {});
+                                  },
+                                  child: const Text(
+                                    'Submit',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                    ),
+                    child: const Text('LEAVE REVIEW'),
+                  ),
+                ],
+              ),
+            // No other action buttons for purchases
           ],
         ),
       ),
