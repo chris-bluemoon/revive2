@@ -5,8 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/renter.dart';
+import 'package:revivals/models/review.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/favourites/favourites.dart';
 import 'package:revivals/screens/messages/message_conversation_page.dart';
@@ -839,104 +841,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 }
 
                 return Column(
-                  children: reviews.map((review) {
-                    final reviewer = itemStore.renters.firstWhere(
-                      (r) => r.id == review.reviewerId,
-                      orElse: () => Renter(
-                        id: '',
-                        name: 'Unknown',
-                        imagePath: '',
-                        bio: '',
-                        location: '',
-                        followers: [],
-                        following: [],
-                        avgReview: 0.0,
-                        email: '',
-                        type: '',
-                        size: 0,
-                        address: '',
-                        countryCode: '',
-                        phoneNum: '',
-                        favourites: [],
-                        verified: 'false',
-                        creationDate: DateTime.now().toString(),
-                        status:'not active', 
-                        lastLogin: DateTime.now(), 
-                        vacations: [],
-                      ),
-                    );
-                    final reviewerPic = reviewer?.profilePicUrl ?? '';
-                    final reviewerName = reviewer?.name ?? 'Unknown';
-
-                    return Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            if (reviewer.id.isNotEmpty) {
-                              Navigator.of(context).pushReplacement(
-                                SmoothTransitions.luxury(Profile(userN: reviewer.name, canGoBack: true,)),
-                              );
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ProfileAvatar(
-                                  imageUrl: reviewerPic,
-                                  userName: reviewerName,
-                                  radius: 22,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: StyledHeading(
-                                              reviewerName,
-                                              weight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          StyledBody(
-                                            review.date.toString().split(' ').first,
-                                            color: Colors.grey,
-                                            weight: FontWeight.normal,
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Row(
-                                        children: List.generate(
-                                          5,
-                                          (star) => Icon(
-                                            Icons.star,
-                                            color: star < review.rating ? Colors.amber : Colors.grey[300],
-                                            size: 18,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      if (review.text.isNotEmpty)
-                                        StyledBody(
-                                          review.text,
-                                          color: Colors.black,
-                                          weight: FontWeight.normal,
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        if (review != reviews.last) const Divider(height: 1),
-                      ],
-                    );
-                  }).toList(),
+                  children: reviews.map<Widget>((review) => ReviewCard(review)).toList(),
                 );
               }
             },
@@ -985,6 +890,106 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         '${date.year}';
   }
 }}
+
+class ReviewCard extends StatelessWidget {
+  final Review review;
+  const ReviewCard(this.review, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+    final reviewer = itemStore.renters.firstWhere(
+      (r) => r.id == review.reviewerId,
+      orElse: () => Renter(
+        id: '',
+        name: 'Unknown',
+        bio: '',
+        imagePath: '',
+        location: '',
+        lastLogin: DateTime.now(),
+        followers: [],
+        following: [],
+        favourites: [],
+        type: '',
+        email: '',
+        size: 0,
+        address: '',
+        countryCode: '',
+        phoneNum: '',
+        verified: 'not started',
+        creationDate: DateTime.now().toIso8601String(),
+        avgReview: 0.0,
+        vacations: const [],
+        status: '',
+      ),
+    );
+    final dateStr = DateFormat('d MMM yyyy').format(review.date);
+    final width = MediaQuery.of(context).size.width;
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.withOpacity(0.13)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ProfileAvatar(
+            imageUrl: reviewer.profilePicUrl,
+            userName: reviewer.name,
+            radius: width * 0.06,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    StyledHeading(
+                      reviewer.name,
+                      weight: FontWeight.bold,
+                    ),
+                    const SizedBox(width: 8),
+                    Row(
+                      children: List.generate(5, (i) => Icon(
+                        i < review.rating ? Icons.star_rounded : Icons.star_border_rounded,
+                        color: i < review.rating ? Colors.amber.shade700 : Colors.grey.shade300,
+                        size: width * 0.045,
+                      )),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                StyledBody(
+                  review.text.isNotEmpty ? review.text : '(No comment)',
+                  color: Colors.black87,
+                  weight: FontWeight.normal,
+                ),
+                const SizedBox(height: 8),
+                StyledBody(
+                  dateStr,
+                  color: Colors.grey[600] ?? Colors.grey,
+                ) 
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
 
 Future<void> logOut(BuildContext context) async {
   if (!context.mounted) return;
