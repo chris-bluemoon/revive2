@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:revivals/globals.dart' as globals;
 import 'package:revivals/models/item.dart';
 import 'package:revivals/models/item_image.dart';
-import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/screens/to_rent/_bookmark_button.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/get_country_price.dart';
 import 'package:revivals/shared/styled_text.dart';
@@ -20,28 +20,9 @@ class ItemCard extends StatefulWidget {
   State<ItemCard> createState() => _ItemCardState();
 }
 
+
 class _ItemCardState extends State<ItemCard> {
-
-  bool isFav = false;
-
-  bool isAFav(Item d, List favs) {
-    if (favs.contains(d)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  void _toggleFav() {
-    setState(() {
-      if (isFav == true) {
-        isFav = false;
-      } else {
-        isFav = true;
-      }
-    });
-  }
-
+  // Removed isFav and isAFav, now handled by BookmarkButton
   String symbol = globals.thb;
 
   Image? myImage;
@@ -178,8 +159,7 @@ class _ItemCardState extends State<ItemCard> {
         }
         
         double width = MediaQuery.of(context).size.width;
-        List currListOfFavs = itemStore.favourites;
-        isFav = isAFav(widget.item, currListOfFavs);
+        // No longer need to track isFav or currListOfFavs here
         
         // Determine what to show: actual image URL, spinner, or fallback
         String displayImage = '';
@@ -253,36 +233,7 @@ class _ItemCardState extends State<ItemCard> {
                   Positioned(
                     top: 6,
                     right: 6,
-                    child: IconButton(
-                      icon: Icon(
-                        isFav ? Icons.bookmark : Icons.bookmark_border,
-                        size: width * 0.07,
-                      ),
-                      color: isFav ? Colors.blueAccent : Colors.black54,
-                      onPressed: () {
-                        _toggleFav();
-                        Renter toSave = Provider.of<ItemStoreProvider>(
-                          context,
-                          listen: false,
-                        ).renter;
-                        if (isFav) {
-                          toSave.favourites.add(widget.item.id);
-                          Provider.of<ItemStoreProvider>(context, listen: false)
-                              .saveRenter(toSave);
-                          Provider.of<ItemStoreProvider>(context, listen: false)
-                              .addFavourite(widget.item);
-                        } else {
-                          toSave.favourites.remove(widget.item.id);
-                          Provider.of<ItemStoreProvider>(context, listen: false)
-                              .saveRenter(toSave);
-                          Provider.of<ItemStoreProvider>(context, listen: false)
-                              .removeFavourite(widget.item);
-                        }
-                      },
-                      splashRadius: width * 0.07,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
+                    child: BookmarkButton(item: widget.item),
                   ),
                 ],
               ),

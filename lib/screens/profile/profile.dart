@@ -1025,7 +1025,7 @@ showAlertDialog(BuildContext context) {
       foregroundColor: Colors.white, //change background color of button
       backgroundColor: Colors.black,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0.0),
+        borderRadius: BorderRadius.circular(12),
       ),
       side: const BorderSide(width: 1.0, color: Colors.black),
     ),

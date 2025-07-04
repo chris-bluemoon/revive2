@@ -284,7 +284,7 @@ class _ToRentSubmissionState extends State<ToRentSubmission> {
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.all(10),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(1.0),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 side: const BorderSide(width: 1.0, color: Colors.black),
               ),
@@ -303,7 +303,7 @@ class _ToRentSubmissionState extends State<ToRentSubmission> {
                   padding: const EdgeInsets.all(10),
                   backgroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(1.0),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   side: const BorderSide(width: 1.0, color: Colors.black),
                 ),
@@ -327,7 +327,7 @@ showAlertDialog(BuildContext context) {
       foregroundColor: Colors.white, //change background color of button
       backgroundColor: Colors.black,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0.0),
+        borderRadius: BorderRadius.circular(12),
       ),
       side: const BorderSide(width: 1.0, color: Colors.black),
     ),
