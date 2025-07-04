@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Add this import at the top
@@ -21,6 +22,7 @@ import 'package:revivals/shared/get_country_price.dart';
 import 'package:revivals/shared/item_card.dart';
 import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/styled_text.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
 var uuid = const Uuid();
@@ -188,12 +190,75 @@ class _ToRentState extends State<ToRent> {
         ),
         actions: [
           IconButton(
-              onPressed: () =>
-                  {Navigator.of(context).popUntil((route) => route.isFirst)},
-              icon: Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, width * 0.01, 0),
-                child: Icon(Icons.close, size: width * 0.06),
-              )),
+            icon: Icon(Icons.more_vert, size: width * 0.08),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (context) {
+                  return SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.share),
+                          title: const Text('Share'),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            final shareText = 'Check out this item on Revive: ${widget.item.name}';
+                            try {
+                              await Share.share(shareText);
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Failed to share: $e')),
+                              );
+                            }
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.report),
+                          title: const Text('Report as inappropriate'),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            // Add report to Firebase (Firestore)
+                            try {
+                              final report = {
+                                'itemId': widget.item.id,
+                                'itemName': widget.item.name,
+                                'reportedUserId': widget.item.owner,
+                                'reportedUserName': ownerName,
+                                'reason': 'Item Report',
+                                'timestamp': DateTime.now().toIso8601String(),
+                              };
+                              // Use Firebase Firestore
+                              // ignore: avoid_dynamic_calls
+                              await FirebaseFirestore.instance.collection('reports').add(report);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Reported. Thank you!')),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Failed to report: $e')),
+                              );
+                            }
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.close),
+                          title: const Text('Cancel'),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ],
       ),
       body: (!itemCheckComplete)
@@ -242,16 +307,16 @@ class _ToRentState extends State<ToRent> {
                           ],
                         ),
                   SizedBox(height: width * 0.03),
-                  // DotsIndicator and BookmarkButton on the same line
+                  // DotsIndicator, Email, and BookmarkButton on the same line
                   if (items.length > 1)
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: width * 0.05),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.center,
+                      child: SizedBox(
+                        height: width * 0.09,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Center(
                               child: DotsIndicator(
                                 dotsCount: items.length,
                                 position: currentIndex,
@@ -261,9 +326,41 @@ class _ToRentState extends State<ToRent> {
                                 ),
                               ),
                             ),
-                          ),
-                          BookmarkButton(item: widget.item),
-                        ],
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+                                      if (!itemStore.loggedIn) {
+                                        showMessagingAlertDialog(context);
+                                        return;
+                                      }
+                                      final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
+                                      final ownerList = renters.where((r) => r.id == widget.item.owner).toList();
+                                      final owner = ownerList.isNotEmpty ? ownerList.first : null;
+                                      Navigator.of(context).push(
+                                        SmoothTransitions.luxury(MessageConversationPage(
+                                            currentUserId: Provider.of<ItemStoreProvider>(context, listen: false).renter.id,
+                                            otherUserId: widget.item.owner,
+                                            otherUser: {
+                                              'name': ownerName,
+                                              'profilePicUrl': owner?.imagePath ?? '',
+                                            },
+                                          )),
+                                      );
+                                    },
+                                    icon: Icon(Icons.email_outlined, size: width * 0.05),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  BookmarkButton(item: widget.item),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   SizedBox(height: width * 0.03),
@@ -289,31 +386,7 @@ class _ToRentState extends State<ToRent> {
                           },
                           child: UserCard(ownerName, location),
                         ),
-                        if (!isOwner)
-                          IconButton(
-                            onPressed: () {
-                              // Check if user is logged in
-                              final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
-                              if (!itemStore.loggedIn) {
-                                showMessagingAlertDialog(context);
-                                return;
-                              }
-                              final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
-                              final ownerList = renters.where((r) => r.id == widget.item.owner).toList();
-                              final owner = ownerList.isNotEmpty ? ownerList.first : null;
-                              Navigator.of(context).push(
-                                SmoothTransitions.luxury(MessageConversationPage(
-                                    currentUserId: Provider.of<ItemStoreProvider>(context, listen: false).renter.id,
-                                    otherUserId: widget.item.owner,
-                                    otherUser: {
-                                      'name': ownerName,
-                                      'profilePicUrl': owner?.imagePath ?? '',
-                                    },
-                                  )),
-                              );
-                            },
-                            icon: Icon(Icons.email_outlined, size: width * 0.05),
-                          ),
+                        // Email icon removed as requested
                       ],
                     ),
                   ),
