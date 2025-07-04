@@ -119,6 +119,7 @@ class FirestoreService {
       }).toList(),
       'fcmToken' : fcmToken,
       'status': renter.status,
+      'saved': renter.saved, // Ensure saved items are included
     });
   }
 

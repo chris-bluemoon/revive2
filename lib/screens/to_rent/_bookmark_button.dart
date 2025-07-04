@@ -12,19 +12,19 @@ class BookmarkButton extends StatefulWidget {
 }
 
 class _BookmarkButtonState extends State<BookmarkButton> {
-  bool get isFav {
+  bool get isSaved {
     final renter = Provider.of<ItemStoreProvider>(context, listen: false).renter;
-    return renter.favourites.contains(widget.item.id);
+    return renter.saved.contains(widget.item.id);
   }
 
-  void _toggleFav() {
+  void _toggleSaved() {
     final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
     final renter = itemStore.renter;
     setState(() {
-      if (isFav) {
-        renter.favourites.remove(widget.item.id);
+      if (isSaved) {
+        renter.saved.remove(widget.item.id);
       } else {
-        renter.favourites.add(widget.item.id);
+        renter.saved.add(widget.item.id);
       }
       itemStore.saveRenter(renter);
     });
@@ -35,12 +35,12 @@ class _BookmarkButtonState extends State<BookmarkButton> {
     double width = MediaQuery.of(context).size.width;
     return IconButton(
       icon: Icon(
-        isFav ? Icons.bookmark : Icons.bookmark_border,
+        isSaved ? Icons.bookmark : Icons.bookmark_border,
         size: width * 0.05, // Revert to original size
-        color: isFav ? Colors.amber : Colors.grey[400],
+        color: isSaved ? Colors.amber : Colors.grey[400],
       ),
-      onPressed: _toggleFav,
-      tooltip: isFav ? 'Remove from saved' : 'Save as favourite',
+      onPressed: _toggleSaved,
+      tooltip: isSaved ? 'Remove from saved' : 'Save as favourite',
     );
   }
 }

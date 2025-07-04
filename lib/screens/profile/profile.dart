@@ -409,82 +409,82 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     ),
                     SizedBox(width: width * 0.03),
                     Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(right: width * 0.03), // Increased right padding for better spacing
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Changed to spaceEvenly for better distribution
-                      children: [
-                      // Items count
-                      Flexible(
-                        child: GestureDetector(
-                          onTap: null,
-                          child: Column(
-                            children: [
-                              StyledHeading(myItemsCount.toString(), weight: FontWeight.bold),
-                              const SizedBox(height: 2),
-                              const StyledBody("Items", color: Colors.black, weight: FontWeight.normal),
-                            ],
-                          ),
+                      child: Padding(
+                        padding: EdgeInsets.only(right: width * 0.03),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            // Items count
+                            Flexible(
+                              child: GestureDetector(
+                                onTap: null,
+                                child: Column(
+                                  children: [
+                                    StyledHeading(myItemsCount.toString(), weight: FontWeight.bold),
+                                    const SizedBox(height: 2),
+                                    const StyledBody("Items", color: Colors.black, weight: FontWeight.normal),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // Following count
+                            Flexible(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    SmoothTransitions.luxury(FollowListScreen(
+                                        followersIds: profileOwner.followers,
+                                        followingIds: profileOwner.following,
+                                      )),
+                                  );
+                                  setState(() {});
+                                },
+                                child: Column(
+                                  children: [
+                                    StyledHeading(
+                                      profileOwner.following.length.toString(),
+                                      weight: FontWeight.bold,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    const FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: StyledBody("Following", color: Colors.black, weight: FontWeight.normal),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // Followers count
+                            Flexible(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    SmoothTransitions.luxury(FollowListScreen(
+                                        followersIds: profileOwner.followers,
+                                        followingIds: profileOwner.following,
+                                      )),
+                                  );
+                                  setState(() {});
+                                },
+                                child: Column(
+                                  children: [
+                                    StyledHeading(
+                                      profileOwner.followers.length.toString(),
+                                      weight: FontWeight.bold,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    const FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: StyledBody("Followers", color: Colors.black, weight: FontWeight.normal),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      // Following count
-                      Flexible(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              SmoothTransitions.luxury(FollowListScreen(
-                                  followersIds: profileOwner.followers,
-                                  followingIds: profileOwner.following,
-                                )),
-                            );
-                            setState(() {});
-                          },
-                          child: Column(
-                            children: [
-                              StyledHeading(
-                                profileOwner.following.length.toString(),
-                                weight: FontWeight.bold,
-                              ),
-                              const SizedBox(height: 2),
-                              const FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: StyledBody("Following", color: Colors.black, weight: FontWeight.normal),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Followers count
-                      Flexible(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              SmoothTransitions.luxury(FollowListScreen(
-                                  followersIds: profileOwner.followers,
-                                  followingIds: profileOwner.following,
-                                )),
-                            );
-                            setState(() {});
-                          },
-                          child: Column(
-                            children: [
-                              StyledHeading(
-                                profileOwner.followers.length.toString(),
-                                weight: FontWeight.bold,
-                              ),
-                              const SizedBox(height: 2),
-                              const FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: StyledBody("Followers", color: Colors.black, weight: FontWeight.normal),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                  ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 18),
@@ -776,9 +776,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               } else if (_tabController.index == 1) {
                 // SAVED tab content
                 final savedItems = items.where((item) {
-                  // Show items that are in the current user's favourites and have "accepted" status
+                  // Show items that are in the current user's saved list and have "accepted" status
                   final currentUser = isOwnProfile ? profileOwner : itemStore.renter;
-                  return currentUser.favourites.contains(item.id) && item.status == 'accepted';
+                  return currentUser.saved.contains(item.id) && item.status == 'accepted';
                 }).toList();
 
                 if (savedItems.isEmpty) {
@@ -927,6 +927,7 @@ class ReviewCard extends StatelessWidget {
         avgReview: 0.0,
         vacations: const [],
         status: '',
+        saved: [],
       ),
     );
     final dateStr = DateFormat('d MMM yyyy').format(review.date);

@@ -29,7 +29,8 @@ class AuthService {
             status: 'not active', 
             avgReview: 0, 
             lastLogin: DateTime.now(), 
-            vacations: [], // <-- Added status field
+            vacations: [],
+            saved: [], // <-- Added status field
           )
         : null;
   }

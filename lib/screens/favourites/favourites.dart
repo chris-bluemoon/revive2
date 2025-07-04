@@ -59,26 +59,24 @@ class _FavouritesState extends State<Favourites> {
                 child: Consumer<ItemStoreProvider>(
                     // child not required
                     builder: (context, value, child) {
-                  return (value.favourites.length != 0)
+                  // Get the current user's favourites list
+                  final currentUser = value.renter;
+                  final allItems = value.items;
+                  final favouriteItems = allItems.where((item) => currentUser.favourites.contains(item.id) && item.status == 'accepted').toList();
+
+                  return (favouriteItems.isNotEmpty)
                       ? GridView.builder(
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2, childAspectRatio: 0.5),
                           itemBuilder: (_, index) => GestureDetector(
-                              child: ItemCard(
-                                  value.favourites[index]),
+                              child: ItemCard(favouriteItems[index]),
                               onTap: () {
-                                // if (Provider.of<ItemStoreProvider>(context, listen: false).renters.length == 0) {
-                                //
-                                // Navigator.of(context).push(MaterialPageRoute(builder: (context) => (GoogleSignInScreen())));
-                                // } else {
-                                //
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) =>
-                                        (ToRent(value.favourites[index]))));
-                                // }
+                                        (ToRent(favouriteItems[index]))));
                               }),
-                          itemCount: value.favourites.length,
+                          itemCount: favouriteItems.length,
                         )
                       : const NoFavWidget();
                 }))

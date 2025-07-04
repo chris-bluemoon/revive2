@@ -148,6 +148,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         lastLogin: DateTime.now(), 
         vacations: [], 
         status: 'active',
+        saved: [],
       );
       
       // Add to database and local list

@@ -113,6 +113,7 @@ class _RegisterPassword extends State<RegisterPassword> {
           countryCode: '+66',
           phoneNum: '',
           favourites: [''],
+          saved: [],
           verified: 'not started',
           imagePath: '',
           creationDate: DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now()),
@@ -445,6 +446,7 @@ class _RegisterPassword extends State<RegisterPassword> {
               ),
             ),
           );
+  }}
                   // Container(
                   //     padding:
                   //         EdgeInsets.symmetric(vertical: width * 0.03, horizontal: width * 0.1),
@@ -476,5 +478,3 @@ class _RegisterPassword extends State<RegisterPassword> {
                   //             SizedBox(height: width * 0.03),
                   //             PasswordStrengthChecker(strength: passNotifier),
                   //
-  }
-}

@@ -6,6 +6,7 @@ import 'package:revivals/models/item.dart';
 import 'package:revivals/models/item_image.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/to_rent/_bookmark_button.dart';
+import 'package:revivals/screens/to_rent/_favourite_button.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/get_country_price.dart';
 import 'package:revivals/shared/styled_text.dart';
@@ -179,9 +180,10 @@ class _ItemCardState extends State<ItemCard> {
             borderRadius: BorderRadius.circular(10.0),
           ),
           color: Colors.white,
+          margin: EdgeInsets.symmetric(horizontal: width * 0.01), // Reduced margin
           child: IntrinsicHeight(
             child: Padding(
-              padding: EdgeInsets.all(width * 0.025),
+              padding: EdgeInsets.all(width * 0.012), // Reduced padding
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -231,9 +233,17 @@ class _ItemCardState extends State<ItemCard> {
                                     ),
                         ),
                   Positioned(
-                    top: 6,
-                    right: 6,
-                    child: BookmarkButton(item: widget.item),
+                    top: 2,
+                    right: 2,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        FavouriteButton(item: widget.item),
+                        SizedBox(height: 2), // Small vertical gap
+                        BookmarkButton(item: widget.item),
+                      ],
+                    ),
                   ),
                 ],
               ),

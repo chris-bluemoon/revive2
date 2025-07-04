@@ -23,6 +23,7 @@ class Renter {
     required this.lastLogin,
     required this.vacations,
     required this.status,
+    required this.saved,
   });
 
   String id;
@@ -46,6 +47,7 @@ class Renter {
   String? fcmToken;
   List<Map<String, DateTime>> vacations;
   String status; // <-- Added status field
+  List<String> saved;
 
   Renter copyWith({
     List<Map<String, DateTime>>? vacations,
@@ -75,6 +77,7 @@ class Renter {
       vacations: vacations ?? this.vacations,
       fcmToken: fcmToken,
       status: status,
+      saved: saved,
     );
   }
 
@@ -104,7 +107,8 @@ class Renter {
               })
           .toList(),
       'status': status, // <-- Added status field
-      'fcmToken' : fcmToken
+      'fcmToken' : fcmToken,
+      'saved': saved,
     };
   }
 
@@ -148,6 +152,7 @@ class Renter {
       vacations: vacationsList,
       fcmToken: data['fcmToken'],
       status: data['status']?.toString() ?? '', // <-- especially here!
+      saved: data['saved'] != null ? List<String>.from(data['saved']) : <String>[],
     );
 
     return renter;

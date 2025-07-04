@@ -100,7 +100,8 @@ class ItemStoreProvider extends ChangeNotifier {
     avgReview: 0.0,
     lastLogin: DateTime.now(),
     vacations: [],
-    status: 'not active', // <-- Added status field
+    status: 'not active',
+    saved: [], // <-- Added status field
   );
   bool _loggedIn = false;
   // String _region = 'BANGKOK';
@@ -811,7 +812,8 @@ class ItemStoreProvider extends ChangeNotifier {
       vacations: [],
       avgReview: 0.0,
       lastLogin: DateTime.now(),
-      status: 'not active'
+      status: 'not active',
+      saved: [],
     );
     
     // Reset logged in status
