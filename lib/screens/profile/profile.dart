@@ -756,15 +756,18 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     itemBuilder: (context, index) {
                       final item = myItems[index];
                       final width = MediaQuery.of(context).size.width;
-                      return GestureDetector(
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            SmoothTransitions.luxury(ToRent(item)),
-                          );
-                        },
-                        child: SizedBox(
-                          width: width * 0.5,
-                          child: ItemCard(item),
+                      return KeyedSubtree(
+                        key: ValueKey(item.id),
+                        child: GestureDetector(
+                          onTap: () async {
+                            await Navigator.of(context).push(
+                              SmoothTransitions.luxury(ToRent(item)),
+                            );
+                          },
+                          child: SizedBox(
+                            width: width * 0.5,
+                            child: ItemCard(item),
+                          ),
                         ),
                       );
                     },
@@ -806,15 +809,18 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     itemBuilder: (context, index) {
                       final item = savedItems[index];
                       final width = MediaQuery.of(context).size.width;
-                      return GestureDetector(
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            SmoothTransitions.luxury(ToRent(item)),
-                          );
-                        },
-                        child: SizedBox(
-                          width: width * 0.5,
-                          child: ItemCard(item),
+                      return KeyedSubtree(
+                        key: ValueKey(item.id),
+                        child: GestureDetector(
+                          onTap: () async {
+                            await Navigator.of(context).push(
+                              SmoothTransitions.luxury(ToRent(item)),
+                            );
+                          },
+                          child: SizedBox(
+                            width: width * 0.5,
+                            child: ItemCard(item),
+                          ),
                         ),
                       );
                     },

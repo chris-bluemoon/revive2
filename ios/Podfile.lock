@@ -1231,6 +1231,11 @@ PODS:
   - Firebase/Storage (11.13.0):
     - Firebase/CoreOnly
     - FirebaseStorage (~> 11.13.0)
+  - firebase_app_check (0.3.2-7):
+    - Firebase/CoreOnly (~> 11.13.0)
+    - firebase_core
+    - FirebaseAppCheck (~> 11.13.0)
+    - Flutter
   - firebase_auth (5.5.4):
     - Firebase/Auth (= 11.13.0)
     - firebase_core
@@ -1246,6 +1251,12 @@ PODS:
     - Firebase/Storage (= 11.13.0)
     - firebase_core
     - Flutter
+  - FirebaseAppCheck (11.13.0):
+    - AppCheckCore (~> 11.0)
+    - FirebaseAppCheckInterop (~> 11.0)
+    - FirebaseCore (~> 11.13.0)
+    - GoogleUtilities/Environment (~> 8.1)
+    - GoogleUtilities/UserDefaults (~> 8.1)
   - FirebaseAppCheckInterop (11.14.0)
   - FirebaseAuth (11.13.0):
     - FirebaseAppCheckInterop (~> 11.0)
@@ -1547,6 +1558,7 @@ DEPENDENCIES:
   - app_tracking_transparency (from `.symlinks/plugins/app_tracking_transparency/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - cloud_functions (from `.symlinks/plugins/cloud_functions/ios`)
+  - firebase_app_check (from `.symlinks/plugins/firebase_app_check/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
@@ -1572,6 +1584,7 @@ SPEC REPOS:
     - AppCheckCore
     - BoringSSL-GRPC
     - Firebase
+    - FirebaseAppCheck
     - FirebaseAppCheckInterop
     - FirebaseAuth
     - FirebaseAuthInterop
@@ -1614,6 +1627,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   cloud_functions:
     :path: ".symlinks/plugins/cloud_functions/ios"
+  firebase_app_check:
+    :path: ".symlinks/plugins/firebase_app_check/ios"
   firebase_auth:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
@@ -1658,10 +1673,12 @@ SPEC CHECKSUMS:
   cloud_firestore: 5c68298ed4398ab73ca3333ab99699add650ec1c
   cloud_functions: 9c4252b4a2372f96feb0bf5368e1b850c47505ca
   Firebase: 3435bc66b4d494c2f22c79fd3aae4c1db6662327
+  firebase_app_check: 9dd264a91837205c607bb2abc6bb3e71b5071bb7
   firebase_auth: 20e8d19009af204039cd2de28a4e2e642e7aba93
   firebase_core: 700bac7ed92bb754fd70fbf01d72b36ecdd6d450
   firebase_messaging: 860c017fcfbb5e27c163062d1d3135388f3ef954
   firebase_storage: 54cc3c866fe4cb619bacb774bb946014e7609625
+  FirebaseAppCheck: 6097c3bdf50028493a86b28297d0f1f3309c0741
   FirebaseAppCheckInterop: a92ba81d0ee3c4cddb1a2e52c668ea51dc63c3ae
   FirebaseAuth: 175cb5503dfdb52191b8ff81cdd52c1d9dee9ac9
   FirebaseAuthInterop: e25b58ecb90f3285085fa2118861a3c9dfdc62ad
