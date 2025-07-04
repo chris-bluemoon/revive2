@@ -1008,34 +1008,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   }
 }}
 
-Future<void> chatWithUsLine(BuildContext context) async {
-  try {
-    await openLineApp(context
-        // phone: '+6591682725',
-        // text: 'Hello Unearthed Support...',
-        );
-  } on Exception catch (e) {
-    if (context.mounted) {
-      showDialog(
-          context: context,
-          builder: (context) => CupertinoAlertDialog(
-                title: const Text("Attention"),
-                content: Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Text(e.toString()),
-                ),
-                actions: [
-                  CupertinoDialogAction(
-                    child: const Text('Close'),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ));
-    }
-  }
-}
-
-// Add this function to your file if not already present:
 Future<void> logOut(BuildContext context) async {
   if (!context.mounted) return;
 
@@ -1121,4 +1093,31 @@ showAlertDialog(BuildContext context) {
       return alert;
     },
   );
+}
+
+Future<void> chatWithUsLine(BuildContext context) async {
+  try {
+    await openLineApp(context
+        // phone: '+6591682725',
+        // text: 'Hello Unearthed Support...',
+        );
+  } on Exception catch (e) {
+    if (context.mounted) {
+      showDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+                title: const Text("Attention"),
+                content: Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Text(e.toString()),
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    child: const Text('Close'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ));
+    }
+  }
 }

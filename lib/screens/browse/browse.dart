@@ -13,69 +13,147 @@ class Browse extends StatefulWidget {
 
 class _BrowseState extends State<Browse> {
   String searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        toolbarHeight: width * 0.2,
-        title: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            StyledTitle('BROWSE'),
-          ],
+        backgroundColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: width * 0.22,
+        title: const Text(
+          'BROWSE',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2.0,
+            color: Colors.black,
+          ),
         ),
         centerTitle: true,
       ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(width * 0.05, width * 0.05, width * 0.05, 0),
-            child: Column(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.white,
+              Colors.grey[50]!,
+            ],
+          ),
+        ),
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(width * 0.05, width * 0.06, width * 0.05, width * 0.05),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Search bar
-                TextField(
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search),
-                    hintText: 'Search any keywords..',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.black),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.black, width: 2),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      searchQuery = value;
-                    });
-                  },
-                  onSubmitted: (value) {
-                    if (value.trim().isNotEmpty) {
-                      Navigator.of(context).push(
-                        SmoothTransitions.luxury(ItemResults(
-                            'search',
-                            '', // value is not used for search, only values is used
-                            values: value
-                                .split(RegExp(r'\s+|,'))
-                                .where((s) => s.isNotEmpty)
-                                .toList(),
-                          )),
-                      );
-                    }
-                  },
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      prefixIcon: Container(
+                        margin: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.search_rounded,
+                          color: Colors.black54,
+                          size: 20,
+                        ),
+                      ),
+                      hintText: 'Search for items, brands, or keywords...',
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                        borderSide: const BorderSide(color: Colors.black, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 18,
+                      ),
+                      suffixIcon: searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(
+                                Icons.clear_rounded,
+                                color: Colors.grey,
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  searchQuery = '';
+                                });
+                              },
+                            )
+                          : null,
+                    ),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
+                    onSubmitted: (value) {
+                      if (value.trim().isNotEmpty) {
+                        Navigator.of(context).push(
+                          SmoothTransitions.luxury(ItemResults(
+                              'search',
+                              '', // value is not used for search, only values is used
+                              values: value
+                                  .split(RegExp(r'\s+|,'))
+                                  .where((s) => s.isNotEmpty)
+                                  .toList(),
+                            )),
+                        );
+                      }
+                    },
+                  ),
                 ),
                 SizedBox(height: width * 0.05),
                 // Item type boxes
@@ -89,11 +167,12 @@ class _BrowseState extends State<Browse> {
                   ),
                 ),
               ],
-            ),
-          ),
-        ),
-      ),
-    );
+            ), // Column
+          ), // Padding
+        ), // SingleChildScrollView
+      ), // GestureDetector
+    ), // Container
+    ); // Scaffold
   }
 
   Widget _buildTypeBox(BuildContext context, double width, String label, String imagePath) {
