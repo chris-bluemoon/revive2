@@ -183,9 +183,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: ListView(
+      backgroundColor: Colors.grey[50],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.white,
+              Colors.grey[50]!,
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: ListView(
           children: [
             Center(
               child: GestureDetector(
@@ -372,8 +384,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
             ),
           ],
-        ),
-      ),
-    );
+          ), // Close ListView child
+        ), // Close Padding
+      ), // Close Container
+    ); // Close Scaffold
   }
 }
