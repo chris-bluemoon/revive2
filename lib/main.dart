@@ -2,7 +2,9 @@
 // import 'package:device_preview/device_preview.dart';
 import 'dart:developer';
 
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -39,19 +41,29 @@ Future main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  
+  // Initialize Firebase
   await Firebase.initializeApp(
-    // name: "revivals dev project",
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Initialize Firebase App Check
+  await FirebaseAppCheck.instance.activate(
+    // For Android, use Play Integrity in production, debug for development
+    androidProvider: kDebugMode 
+        ? AndroidProvider.debug 
+        : AndroidProvider.playIntegrity,
+    // For iOS, use DeviceCheck in production, debug for development  
+    appleProvider: kDebugMode 
+        ? AppleProvider.debug 
+        : AppleProvider.deviceCheck,
+    // For Web, use reCAPTCHA (replace with your actual site key for production)
+    webProvider: ReCaptchaV3Provider('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'), // Test key
   );
 
   await NotificationService.requestPermission();
   NotificationService.initializeNotifications();
   NotificationService.init();
-
-  // await FirebaseAppCheck.instance.activate(
-  //   androidProvider: AndroidProvider.debug,
-  //   appleProvider: AppleProvider.debug,
-  // );
 
   runApp(
     // DevicePreview(
