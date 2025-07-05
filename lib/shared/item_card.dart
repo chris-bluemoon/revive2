@@ -232,17 +232,22 @@ class _ItemCardState extends State<ItemCard> {
                                       height: double.infinity,
                                     ),
                         ),
+                  // Place BookmarkButton in the top right
                   Positioned(
                     top: 2,
                     right: 2,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        FavouriteButton(item: widget.item),
-                        SizedBox(height: 2), // Small vertical gap
-                        BookmarkButton(item: widget.item),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(0.0),
+                      child: BookmarkButton(item: widget.item),
+                    ),
+                  ),
+                  // Place FavouriteButton in the top left
+                  Positioned(
+                    top: 2,
+                    left: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(0.0),
+                      child: FavouriteButton(item: widget.item),
                     ),
                   ),
                 ],
