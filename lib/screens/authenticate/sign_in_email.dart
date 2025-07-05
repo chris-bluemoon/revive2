@@ -609,7 +609,7 @@ class _SignIn extends State<SignIn> {
             fontWeight: FontWeight.w600,
             color: Colors.black,
           ),
-          textAlign: TextAlign.center,
+          textAlign: TextAlign.center, // Center the title
         ),
         content: const Column(
           mainAxisSize: MainAxisSize.min,

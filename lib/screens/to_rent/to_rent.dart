@@ -309,14 +309,14 @@ class _ToRentState extends State<ToRent> {
                         ),
                   SizedBox(height: width * 0.03),
                   // DotsIndicator, Email, and BookmarkButton on the same line
-                  if (items.length > 1)
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: width * 0.05),
-                      child: SizedBox(
-                        height: width * 0.09,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: width * 0.05),
+                    child: SizedBox(
+                      height: width * 0.09,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          if (items.length > 1)
                             Center(
                               child: DotsIndicator(
                                 dotsCount: items.length,
@@ -327,49 +327,49 @@ class _ToRentState extends State<ToRent> {
                                 ),
                               ),
                             ),
-                            // Heart icon on the far left
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: FavouriteButton(item: widget.item),
+                          // Heart icon on the far left
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: FavouriteButton(item: widget.item),
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (!isOwner)
+                                  IconButton(
+                                    onPressed: () {
+                                      final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+                                      if (!itemStore.loggedIn) {
+                                        showMessagingAlertDialog(context);
+                                        return;
+                                      }
+                                      final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
+                                      final ownerList = renters.where((r) => r.id == widget.item.owner).toList();
+                                      final owner = ownerList.isNotEmpty ? ownerList.first : null;
+                                      Navigator.of(context).push(
+                                        SmoothTransitions.luxury(MessageConversationPage(
+                                            currentUserId: Provider.of<ItemStoreProvider>(context, listen: false).renter.id,
+                                            otherUserId: widget.item.owner,
+                                            otherUser: {
+                                              'name': ownerName,
+                                              'profilePicUrl': owner?.imagePath ?? '',
+                                            },
+                                          )),
+                                      );
+                                    },
+                                    icon: Icon(Icons.email_outlined, size: width * 0.05),
+                                  ),
+                                if (!isOwner) const SizedBox(width: 2), // Less space between icons if both are shown
+                                BookmarkButton(item: widget.item),
+                              ],
                             ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (!isOwner)
-                                    IconButton(
-                                      onPressed: () {
-                                        final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
-                                        if (!itemStore.loggedIn) {
-                                          showMessagingAlertDialog(context);
-                                          return;
-                                        }
-                                        final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
-                                        final ownerList = renters.where((r) => r.id == widget.item.owner).toList();
-                                        final owner = ownerList.isNotEmpty ? ownerList.first : null;
-                                        Navigator.of(context).push(
-                                          SmoothTransitions.luxury(MessageConversationPage(
-                                              currentUserId: Provider.of<ItemStoreProvider>(context, listen: false).renter.id,
-                                              otherUserId: widget.item.owner,
-                                              otherUser: {
-                                                'name': ownerName,
-                                                'profilePicUrl': owner?.imagePath ?? '',
-                                              },
-                                            )),
-                                        );
-                                      },
-                                      icon: Icon(Icons.email_outlined, size: width * 0.05),
-                                    ),
-                                  if (!isOwner) const SizedBox(width: 2), // Less space between icons if both are shown
-                                  BookmarkButton(item: widget.item),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
+                  ),
                   SizedBox(height: width * 0.03),
                   Padding(
                     padding: EdgeInsets.fromLTRB(width * 0.05, 0, 0, 0),
@@ -826,7 +826,7 @@ class _ToRentState extends State<ToRent> {
                         child: Text(
                           'BUY',
                           style: TextStyle(
-                            fontSize: width * 0.05,
+                            fontSize: width * 0.04, // Reduced font size
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                             letterSpacing: 1.2,
@@ -972,7 +972,7 @@ class _ToRentState extends State<ToRent> {
                                       style: TextStyle(
                                         color: Colors.red,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: width * 0.05, // Larger font
+                                        fontSize: width * 0.04, // Reduced font size
                                         letterSpacing: 1.2,
                                       ),
                                       maxLines: 2, // Allow up to 2 lines
@@ -1006,7 +1006,7 @@ class _ToRentState extends State<ToRent> {
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: width * 0.05, // Larger font
+                                        fontSize: width * 0.04, // Reduced font size
                                         letterSpacing: 1.2,
                                       ),
                                       maxLines: 2, // Allow up to 2 lines
@@ -1039,7 +1039,7 @@ class _ToRentState extends State<ToRent> {
                               child: Text(
                                 'RENT',
                                 style: TextStyle(
-                                  fontSize: width * 0.05,// Changed from 18 to 16
+                                  fontSize: width * 0.04, // Reduced font size
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                   letterSpacing: 1.2,
