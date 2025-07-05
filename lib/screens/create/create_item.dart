@@ -69,16 +69,23 @@ class _CreateItemState extends State<CreateItem> {
       cip.shortDescController.text = widget.item!.description.toString();
       cip.longDescController.text = widget.item!.longDescription.toString();
       cip.titleController.text = widget.item!.name.toString();
-      cip.images.clear();
+      cip.images.clear(); // Ensure images are cleared before repopulating
+      _imageFiles.clear(); // Ensure local image files are cleared before repopulating
       for (ItemImage i in Provider.of<ItemStoreProvider>(context, listen: false).images) {
-        log('imageId: ${i.imageId}');
+        log('imageId: [38;5;2m${i.imageId}[0m');
         for (String itemImageString in widget.item!.imageId) {
           if (i.id == itemImageString) {
-            cip.images.add(i.imageId);
+            if (!cip.images.contains(i.imageId)) {
+              cip.images.add(i.imageId);
+              // Only add to _imageFiles if it's a local file (not a network URL)
+              if (!i.imageId.startsWith('http') && !_imageFiles.any((x) => x.path == i.imageId)) {
+                _imageFiles.add(XFile(i.imageId));
+              }
+            }
           }
         }
       }
-      _initialized = true;
+      _initialized = true; // Set initialized to true so this block only runs once
       // Schedule checkFormComplete after build
       WidgetsBinding.instance.addPostFrameCallback((_) {
         cip.checkFormComplete();
