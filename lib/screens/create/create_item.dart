@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -308,11 +309,14 @@ class _CreateItemState extends State<CreateItem> {
                     SizedBox(height: width * 0.02),
                     // Show warning if less than 2 images
                     if (cip.images.length < 2)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8.0),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           "You must upload at least 2 images to your listing",
-                          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: cip.images.length == 1 ? Colors.red : Colors.grey,
+                            fontWeight: FontWeight.bold,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -582,8 +586,9 @@ class _CreateItemState extends State<CreateItem> {
                     ),
                     const Divider(),
                     SizedBox(
-                      height: width * 0.1,
+                      height: width * 0.13, // Increased height for better vertical alignment
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const StyledBody('Retail Price'),
                           const Expanded(child: SizedBox()),
@@ -593,26 +598,18 @@ class _CreateItemState extends State<CreateItem> {
                               keyboardType: TextInputType.number,
                               controller: cip.retailPriceController,
                               maxLength: 6, // <-- Limit to 6 digits
-                              onChanged: (text) {
-                                cip.retailPriceController.text = text.trimRight();
-                                cip.retailPriceController.selection = TextSelection.fromPosition(
-                                  TextPosition(offset: cip.retailPriceController.text.length),
-                                );
-                                cip.retailPriceValue = cip.retailPriceController.text;
-                                cip.checkFormComplete();
-                              },
-                              onSubmitted: (text) {
-                                cip.retailPriceController.text = text.trimRight();
-                                cip.retailPriceController.selection = TextSelection.fromPosition(
-                                  TextPosition(offset: cip.retailPriceController.text.length),
-                                );
-                                cip.retailPriceValue = cip.retailPriceController.text;
-                                cip.checkFormComplete();
-                              },
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              style: TextStyle(
+                                fontSize: width * 0.045, // Match StyledBody font size
+                                height: 1.2, // Adjust line height for better centering
+                              ),
+                              textAlignVertical: TextAlignVertical.center, // Center text vertically
                               decoration: InputDecoration(
                                 counterText: "",
                                 isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12), // Match title field
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(color: Colors.black),
                                   borderRadius: BorderRadius.circular(10.0),
@@ -632,6 +629,22 @@ class _CreateItemState extends State<CreateItem> {
                                 ),
                                 fillColor: Colors.white70,
                               ),
+                              onChanged: (text) {
+                                cip.retailPriceController.text = text.trimRight();
+                                cip.retailPriceController.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: cip.retailPriceController.text.length),
+                                );
+                                cip.retailPriceValue = cip.retailPriceController.text;
+                                cip.checkFormComplete();
+                              },
+                              onSubmitted: (text) {
+                                cip.retailPriceController.text = text.trimRight();
+                                cip.retailPriceController.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: cip.retailPriceController.text.length),
+                                );
+                                cip.retailPriceValue = cip.retailPriceController.text;
+                                cip.checkFormComplete();
+                              },
                             ),
                           ),
                         ],
@@ -652,17 +665,9 @@ class _CreateItemState extends State<CreateItem> {
                       maxLength: 30,
                       controller: cip.titleController,
                       onChanged: (text) {
-                        cip.titleController.text = text.trimRight();
-                        cip.titleController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: cip.titleController.text.length),
-                        );
                         cip.checkFormComplete();
                       },
                       onSubmitted: (text) {
-                        cip.titleController.text = text.trimRight();
-                        cip.titleController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: cip.titleController.text.length),
-                        );
                         cip.checkFormComplete();
                       },
                       decoration: InputDecoration(
@@ -693,17 +698,9 @@ class _CreateItemState extends State<CreateItem> {
                       maxLength: 200,
                       controller: cip.shortDescController,
                       onChanged: (text) {
-                        cip.shortDescController.text = text.trimRight();
-                        cip.shortDescController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: cip.shortDescController.text.length),
-                        );
                         cip.checkFormComplete();
                       },
                       onSubmitted: (text) {
-                        cip.shortDescController.text = text.trimRight();
-                        cip.shortDescController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: cip.shortDescController.text.length),
-                        );
                         cip.checkFormComplete();
                       },
                       decoration: InputDecoration(
@@ -733,17 +730,9 @@ class _CreateItemState extends State<CreateItem> {
                       maxLength: 1000,
                       controller: cip.longDescController,
                       onChanged: (text) {
-                        cip.longDescController.text = text.trimRight();
-                        cip.longDescController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: cip.longDescController.text.length),
-                        );
                         cip.checkFormComplete();
                       },
                       onSubmitted: (text) {
-                        cip.longDescController.text = text.trimRight();
-                        cip.longDescController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: cip.longDescController.text.length),
-                        );
                         cip.checkFormComplete();
                       },
                       decoration: InputDecoration(
