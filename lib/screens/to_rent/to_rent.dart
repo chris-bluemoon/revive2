@@ -15,6 +15,7 @@ import 'package:revivals/screens/messages/message_conversation_page.dart';
 import 'package:revivals/screens/profile/profile.dart';
 import 'package:revivals/screens/summary/summary_purchase.dart';
 import 'package:revivals/screens/to_rent/_bookmark_button.dart';
+import 'package:revivals/screens/to_rent/_favourite_button.dart';
 import 'package:revivals/screens/to_rent/item_widget.dart';
 import 'package:revivals/screens/to_rent/rent_this_with_date_selecter.dart';
 import 'package:revivals/screens/to_rent/user_card.dart';
@@ -325,6 +326,11 @@ class _ToRentState extends State<ToRent> {
                                   activeColor: Colors.black,
                                 ),
                               ),
+                            ),
+                            // Heart icon on the far left
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: FavouriteButton(item: widget.item),
                             ),
                             Align(
                               alignment: Alignment.centerRight,
