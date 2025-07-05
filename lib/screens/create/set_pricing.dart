@@ -758,7 +758,7 @@ class _SetPricingState extends State<SetPricing> {
               style: OutlinedButton.styleFrom(
                 backgroundColor: Colors.black, // Black background
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(0),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 textStyle: const TextStyle(
