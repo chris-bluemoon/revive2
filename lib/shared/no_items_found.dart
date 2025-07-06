@@ -30,7 +30,7 @@ class NoItemsFound extends StatelessWidget {
             child: Text(
               isMyItems 
                 ? "You don't have any items yet, use the + icon on the home page to create your first listing."
-                : 'Sorry, no items matched your criteria. Please try adjusting your search or filters.',
+                : 'Sorry, there are no items like this available right now.',
               style: const TextStyle(
                 fontWeight: FontWeight.normal,
                 fontSize: 18, // or match StyledHeading's size

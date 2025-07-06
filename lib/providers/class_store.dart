@@ -510,8 +510,34 @@ class ItemStoreProvider extends ChangeNotifier {
     final snapshot = await FirestoreService.getRentersOnce();
     _renters.clear();
     for (var doc in snapshot.docs) {
-      _renters.add(doc.data());
-      log('Fetched renter: ${doc.data()}');
+      // Create a copy of the renter with the email obfuscated
+      final renter = doc.data().copyWith(
+        email: 'hidden',
+        // Add all other required fields as null so they default to the current value
+        id: null,
+        name: null,
+        type: null,
+        size: null,
+        address: null,
+        countryCode: null,
+        phoneNum: null,
+        favourites: null,
+        verified: null,
+        imagePath: null,
+        creationDate: null,
+        location: null,
+        bio: null,
+        followers: null,
+        following: null,
+        avgReview: null,
+        lastLogin: null,
+        vacations: null,
+        status: null,
+        saved: null,
+        badgeTitles: null,
+      );
+      _renters.add(renter);
+      log('Added renter: [email hidden] (status: ${renter.status})');
     }
     notifyListeners();
   }
@@ -907,31 +933,7 @@ class ItemStoreProvider extends ChangeNotifier {
   // Debug method to dump all renters data
   void debugDumpAllRenters() {
     log('=== DEBUG: DUMPING ALL RENTERS DATA ===');
-    log('Total renters in memory: ${renters.length}');
-    
-    for (int i = 0; i < renters.length; i++) {
-      Renter r = renters[i];
-      log('Renter $i:');
-      log('  ID: ${r.id}');
-      log('  Email: "${r.email}"');
-      log('  Name: "${r.name}"');
-      log('  Status: "${r.status}" (length: ${r.status.length})');
-      log('  Status bytes: ${r.status.codeUnits}');
-      log('  Type: "${r.type}"');
-      log('  Verified: "${r.verified}"');
-      log('  LastLogin: ${r.lastLogin}');
-      log('  ---');
-    }
-    log('=== END DEBUG DUMP ===');
-  }
-
-  // Debug method to check specific user status
-  Future<void> debugCheckUserStatus(String email) async {
-    log('=== DEBUG: CHECKING STATUS FOR EMAIL: $email ===');
-    
-    // Ensure renters are loaded
-    await fetchRentersOnce();
-    
+    log('
     log('Searching among ${renters.length} renters...');
     bool found = false;
     

@@ -41,7 +41,7 @@ class _SignIn extends State<SignIn> {
     await Provider.of<ItemStoreProvider>(context, listen: false).fetchRentersOnce();
     
     // Debug check specific user status
-    await Provider.of<ItemStoreProvider>(context, listen: false).debugCheckUserStatus(email);
+    // await Provider.of<ItemStoreProvider>(context, listen: false).debugCheckUserStatus(email);
     
     List<Renter> renters =
         Provider.of<ItemStoreProvider>(context, listen: false).renters;
@@ -525,8 +525,8 @@ class _SignIn extends State<SignIn> {
                                         setState(() => loading = true);
                                         
                                         // Debug check before sign in
-                                        final itemProvider = Provider.of<ItemStoreProvider>(context, listen: false);
-                                        await itemProvider.debugCheckUserStatus(email);
+                                        // final itemProvider = Provider.of<ItemStoreProvider>(context, listen: false);
+                                        // await itemProvider.debugCheckUserStatus(email);
                                         
                                         dynamic result = await _auth.signInWithEmailAndPassword(email, password);
 

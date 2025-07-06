@@ -32,7 +32,7 @@ class Renter {
   });
 
   String id;
-  String email;
+  final String email;
   String name;
   String type;
   int size;
@@ -65,10 +65,11 @@ class Renter {
     Duration? avgResponseTime,
     int? compliments,
     bool? hasEcoInitiative,
+    String? email,
   }) {
     return Renter(
       id: id,
-      email: email,
+      email: email ?? this.email,
       name: name,
       type: type,
       size: size,
