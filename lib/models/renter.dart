@@ -26,6 +26,9 @@ class Renter {
     required this.status,
     required this.saved,
     required this.badgeTitles,
+    this.avgResponseTime,
+    this.compliments = 0,
+    this.hasEcoInitiative = false,
   });
 
   String id;
@@ -39,7 +42,7 @@ class Renter {
   List favourites;
   String verified;
   String imagePath;
-  String creationDate;
+  DateTime creationDate;
   String location;
   String bio;
   List<String> followers;
@@ -51,12 +54,17 @@ class Renter {
   String status; // <-- Added status field
   List<String> saved;
   List<String> badgeTitles; // Store badge titles earned by the user
+  final Duration? avgResponseTime;
+  final int compliments;
+  final bool hasEcoInitiative;
 
   Renter copyWith({
     List<Map<String, DateTime>>? vacations,
     String? verified,
     required String status, // <-- Added status field
-    // add other fields here if needed
+    Duration? avgResponseTime,
+    int? compliments,
+    bool? hasEcoInitiative,
   }) {
     return Renter(
       id: id,
@@ -82,6 +90,9 @@ class Renter {
       status: status,
       saved: saved,
       badgeTitles: badgeTitles, // Pass badgeTitles to copyWith
+      avgResponseTime: avgResponseTime ?? this.avgResponseTime,
+      compliments: compliments ?? this.compliments,
+      hasEcoInitiative: hasEcoInitiative ?? this.hasEcoInitiative,
     );
   }
 
@@ -99,7 +110,7 @@ class Renter {
       'favourites': favourites,
       'verified': verified,
       'imagePath': imagePath,
-      'creationDate': creationDate,
+      'creationDate': creationDate.toIso8601String(),
       'location': location,
       'bio': bio,
       'followers': followers,
@@ -116,6 +127,9 @@ class Renter {
       'fcmToken' : fcmToken,
       'saved': saved,
       'badgeTitles': badgeTitles,
+      'avgResponseTime': avgResponseTime?.inMilliseconds,
+      'compliments': compliments,
+      'hasEcoInitiative': hasEcoInitiative,
     };
   }
 
@@ -145,7 +159,9 @@ class Renter {
       favourites: data['favourites'] ?? [],
       verified: data['verified']?.toString() ?? '',
       imagePath: data['imagePath'] ?? '',
-      creationDate: data['creationDate'] ?? '',
+      creationDate: (data['creationDate'] is Timestamp)
+          ? (data['creationDate'] as Timestamp).toDate()
+          : DateTime.tryParse(data['creationDate'] ?? '') ?? DateTime.now(),
       location: data['location'] ?? '',
       bio: data['bio'] ?? '',
       followers: List<String>.from(data['followers'] ?? []),
@@ -161,6 +177,11 @@ class Renter {
       status: data['status']?.toString() ?? '', // <-- especially here!
       saved: data['saved'] != null ? List<String>.from(data['saved']) : <String>[],
       badgeTitles: data['badgeTitles'] != null ? List<String>.from(data['badgeTitles']) : <String>[],
+      avgResponseTime: data['avgResponseTime'] != null
+          ? Duration(milliseconds: data['avgResponseTime'])
+          : null,
+      compliments: data['compliments'] ?? 0,
+      hasEcoInitiative: data['hasEcoInitiative'] ?? false,
     );
 
     return renter;

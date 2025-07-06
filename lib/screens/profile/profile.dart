@@ -93,6 +93,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       _cachedProfileOwner = currentUser;
       _cachedIsOwnProfile = itemStore.loggedIn;
       userName = currentUser.name;
+      checkAndAwardBadges(currentUser, itemStore);
     } else {
       // For other users' profiles, use caching
       if (_lastComputedForUserId == currentUserId && 
@@ -1010,7 +1011,7 @@ class ReviewCard extends StatelessWidget {
         countryCode: '',
         phoneNum: '',
         verified: 'not started',
-        creationDate: DateTime.now().toIso8601String(),
+        creationDate: DateTime.now(),
         avgReview: 0.0,
         vacations: const [],
         status: '',
@@ -1197,6 +1198,152 @@ Future<void> chatWithUsLine(BuildContext context) async {
                   ),
                 ],
               ));
+    }
+  }
+}
+
+void checkAndAwardBadges(Renter renter, ItemStoreProvider itemStore) {
+  // Trust and Responsibility
+  if (!renter.badgeTitles.contains('Verified Identity') && renter.verified == 'verified') {
+    renter.badgeTitles.add('Verified Identity');
+  }
+  if (!renter.badgeTitles.contains('Highly Rated User - Test')) {
+    final myAvgReviews = itemStore.renter.avgReview;
+    if (myAvgReviews > 4) { // Assuming this is a test co
+      log('Awarding Highly Rated User badge to ${renter.name}');
+      renter.badgeTitles.add('Top Rated Lender');
+    }
+  }
+  if (!renter.badgeTitles.contains('Top Rated Lender')) {
+    final myLenderReviews = itemStore.reviews.where((r) => r.reviewedUserId == renter.id && r.type == 'lender').toList();
+    if (myLenderReviews.length >= 5 && myLenderReviews.every((r) => r.rating == 5)) {
+      renter.badgeTitles.add('Top Rated Lender');
+    }
+  }
+  if (!renter.badgeTitles.contains('Top Rated Renter')) {
+    final myRenterReviews = itemStore.reviews.where((r) => r.reviewedUserId == renter.id && r.type == 'renter').toList();
+    if (myRenterReviews.length >= 5 && myRenterReviews.every((r) => r.rating == 5)) {
+      renter.badgeTitles.add('Top Rated Renter');
+    }
+  }
+  if (!renter.badgeTitles.contains('Damage-Free Streak')) {
+    final rentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').toList();
+    if (rentals.length >= 10 && rentals.every((ir) => ir.damageReported == false)) {
+      renter.badgeTitles.add('Damage-Free Streak');
+    }
+  }
+  if (!renter.badgeTitles.contains('Always On Time')) {
+    final rentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').toList();
+    if (rentals.length >= 10 && rentals.every((ir) => ir.returnedOnTime == true)) {
+      renter.badgeTitles.add('Always On Time');
+    }
+  }
+
+  // Experience & Activity
+  if (!renter.badgeTitles.contains('Super Lender')) {
+    final myItems = itemStore.items.where((item) => item.owner == renter.id).length;
+    if (myItems >= 10) {
+      renter.badgeTitles.add('Super Lender');
+    }
+  }
+  if (!renter.badgeTitles.contains('Super Renter')) {
+    final myRentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').length;
+    if (myRentals >= 10) {
+      renter.badgeTitles.add('Super Renter');
+    }
+  }
+  if (!renter.badgeTitles.contains('Seasoned User')) {
+    final creation = renter.creationDate;
+    // if (DateTime.now().difference(creation).inDays >= 365) {
+    if (DateTime.now().difference(creation).inDays >= 0) {
+      renter.badgeTitles.add('Seasoned User');
+    }
+  }
+  if (!renter.badgeTitles.contains('First Rental Complete')) {
+    final myRentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').length;
+    if (myRentals >= 1) {
+      renter.badgeTitles.add('First Rental Complete');
+    }
+  }
+  if (!renter.badgeTitles.contains('10 Rentals')) {
+    final myRentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').length;
+    if (myRentals >= 10) {
+      renter.badgeTitles.add('10 Rentals');
+    }
+  }
+  if (!renter.badgeTitles.contains('50 Rentals')) {
+    final myRentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').length;
+    if (myRentals >= 50) {
+      renter.badgeTitles.add('50 Rentals');
+    }
+  }
+  if (!renter.badgeTitles.contains('100 Rentals')) {
+    final myRentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').length;
+    if (myRentals >= 100) {
+      renter.badgeTitles.add('100 Rentals');
+    }
+  }
+
+  // Community & Engagement
+  if (!renter.badgeTitles.contains('Fast Responder')) {
+    if (renter.avgResponseTime != null && renter.avgResponseTime! < Duration(hours: 1)) {
+      renter.badgeTitles.add('Fast Responder');
+    }
+  }
+  if (!renter.badgeTitles.contains('Helpful Rater')) {
+    final myReviews = itemStore.reviews.where((r) => r.reviewerId == renter.id).length;
+    if (myReviews >= 10) {
+      renter.badgeTitles.add('Helpful Rater');
+    }
+  }
+  if (!renter.badgeTitles.contains('Photogenic Closet')) {
+    final myItems = itemStore.items.where((item) => item.owner == renter.id && item.hasHighQualityImages == true).length;
+    if (myItems >= 5) {
+      renter.badgeTitles.add('Photogenic Closet');
+    }
+  }
+  if (!renter.badgeTitles.contains('Profile Complete')) {
+    if (renter.bio.isNotEmpty && renter.imagePath.isNotEmpty && renter.size > 0) {
+      renter.badgeTitles.add('Profile Complete');
+    }
+  }
+
+  // Style & Category
+  if (!renter.badgeTitles.contains('Luxury Collector')) {
+    final myLuxuryItems = itemStore.items.where((item) => item.owner == renter.id && item.isLuxury == true).length;
+    if (myLuxuryItems >= 1) {
+      renter.badgeTitles.add('Luxury Collector');
+    }
+  }
+  // if (!renter.badgeTitles.contains('Event Pro')) {
+  //   final eventRentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.isEventRental == true).length;
+  //   if (eventRentals >= 5) {
+  //     renter.badgeTitles.add('Event Pro');
+  //   }
+  // }
+  if (!renter.badgeTitles.contains('Style Icon')) {
+    final compliments = renter.compliments ?? 0;
+    if (compliments >= 10) {
+      renter.badgeTitles.add('Style Icon');
+    }
+  }
+
+  // Exclusive/Seasonal
+  if (!renter.badgeTitles.contains('Early Adopter')) {
+    final creation = renter.creationDate;
+    if (creation.isBefore(DateTime(2026, 1, 1))) {
+      renter.badgeTitles.add('Early Adopter');
+    }
+  }
+  // if (!renter.badgeTitles.contains('Holiday Hero')) {
+  //   final holidayRentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.isHolidayRental == true).length;
+  //   if (holidayRentals >= 1) {
+  //     renter.badgeTitles.add('Holiday Hero');
+  //   }
+  // }
+  if (!renter.badgeTitles.contains('Sustainability Star')) {
+    if (renter.hasEcoInitiative == true) {
+      renter.badgeTitles.add('Sustainability Star');
     }
   }
 }

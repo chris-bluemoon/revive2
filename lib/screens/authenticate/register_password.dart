@@ -116,7 +116,7 @@ class _RegisterPassword extends State<RegisterPassword> {
           saved: [],
           verified: 'not started',
           imagePath: '',
-          creationDate: DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now()),
+          creationDate: DateTime.now(),
           location: widget.location,
           bio: '',
           followers: [],

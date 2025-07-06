@@ -92,7 +92,7 @@ class ItemStoreProvider extends ChangeNotifier {
     favourites: [],
     verified: 'not started',
     imagePath: '',
-    creationDate: '',
+    creationDate: DateTime.now(),
     location: '', // <-- Add this line
     bio: '',
     followers: [],
@@ -820,7 +820,7 @@ class ItemStoreProvider extends ChangeNotifier {
       favourites: [],
       verified: 'not started',
       imagePath: '',
-      creationDate: '',
+      creationDate: DateTime.now(),
       location: '',
       bio: '',
       following: [],

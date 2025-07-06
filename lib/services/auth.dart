@@ -20,8 +20,7 @@ class AuthService {
             favourites: [''],
             verified: 'no',
             imagePath: '',
-            creationDate:
-                DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now()),
+            creationDate: DateTime.now(), // Use DateTime.now() for creationDate
             location: '',
             bio: '',
             followers: [],

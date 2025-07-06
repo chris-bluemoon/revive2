@@ -121,6 +121,9 @@ class FirestoreService {
       'status': renter.status,
       'saved': renter.saved, // Ensure saved items are included
       'badgeTitles': renter.badgeTitles, // Ensure badges are updated in Firestore
+      'avgResponseTime': renter.avgResponseTime?.inMilliseconds,
+      'compliments': renter.compliments,
+      'hasEcoInitiative': renter.hasEcoInitiative,
     });
   }
 

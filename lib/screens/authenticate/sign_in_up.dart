@@ -139,7 +139,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         favourites: [], 
         verified: '', 
         imagePath: '', 
-        creationDate: DateTime.now().toString(), 
+        creationDate: DateTime.now(),
         location: '', 
         bio: '', 
         followers: [], 
