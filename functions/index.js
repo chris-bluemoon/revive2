@@ -22,6 +22,7 @@ exports.createPaymentIntent = onCall(
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount * 100,
         currency: "THB",
+        payment_method_types: ["promptpay","card"],
       });
 
       return { clientSecret: paymentIntent.client_secret };
