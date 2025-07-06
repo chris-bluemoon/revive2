@@ -103,7 +103,25 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
     final now = DateTime.now();
 
     if (_autoTranslate) {
-      text = await _translateToThai(text);
+      final translator = GoogleTranslator();
+      try {
+        // Detect the language
+        final detected = await translator.translate(text);
+        final detectedLang = detected.sourceLanguage.code;
+
+        if (detectedLang == 'th') {
+          // If input is Thai, translate to English
+          final translation = await translator.translate(text, to: 'en');
+          text = translation.text;
+        } else {
+          // If input is not Thai, translate to Thai
+          final translation = await translator.translate(text, to: 'th');
+          text = translation.text;
+        }
+      } catch (e) {
+        log('Translation error: $e');
+        // fallback to original text
+      }
     }
 
     final participants = [widget.currentUserId, widget.otherUserId];
