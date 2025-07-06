@@ -1214,30 +1214,30 @@ void checkAndAwardBadges(Renter renter, ItemStoreProvider itemStore) {
       renter.badgeTitles.add('Top Rated Lender');
     }
   }
-  if (!renter.badgeTitles.contains('Top Rated Lender')) {
-    final myLenderReviews = itemStore.reviews.where((r) => r.reviewedUserId == renter.id && r.type == 'lender').toList();
-    if (myLenderReviews.length >= 5 && myLenderReviews.every((r) => r.rating == 5)) {
-      renter.badgeTitles.add('Top Rated Lender');
-    }
-  }
-  if (!renter.badgeTitles.contains('Top Rated Renter')) {
-    final myRenterReviews = itemStore.reviews.where((r) => r.reviewedUserId == renter.id && r.type == 'renter').toList();
-    if (myRenterReviews.length >= 5 && myRenterReviews.every((r) => r.rating == 5)) {
-      renter.badgeTitles.add('Top Rated Renter');
-    }
-  }
-  if (!renter.badgeTitles.contains('Damage-Free Streak')) {
-    final rentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').toList();
-    if (rentals.length >= 10 && rentals.every((ir) => ir.damageReported == false)) {
-      renter.badgeTitles.add('Damage-Free Streak');
-    }
-  }
-  if (!renter.badgeTitles.contains('Always On Time')) {
-    final rentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').toList();
-    if (rentals.length >= 10 && rentals.every((ir) => ir.returnedOnTime == true)) {
-      renter.badgeTitles.add('Always On Time');
-    }
-  }
+  // if (!renter.badgeTitles.contains('Top Rated Lender')) {
+  //   final myLenderReviews = itemStore.reviews.where((r) => r.reviewedUserId == renter.id && r.type == 'lender').toList();
+  //   if (myLenderReviews.length >= 5 && myLenderReviews.every((r) => r.rating == 5)) {
+  //     renter.badgeTitles.add('Top Rated Lender');
+  //   }
+  // }
+  // if (!renter.badgeTitles.contains('Top Rated Renter')) {
+  //   final myRenterReviews = itemStore.reviews.where((r) => r.reviewedUserId == renter.id && r.type == 'renter').toList();
+  //   if (myRenterReviews.length >= 5 && myRenterReviews.every((r) => r.rating == 5)) {
+  //     renter.badgeTitles.add('Top Rated Renter');
+  //   }
+  // }
+  // if (!renter.badgeTitles.contains('Damage-Free Streak')) {
+  //   final rentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').toList();
+  //   if (rentals.length >= 10 && rentals.every((ir) => ir.damageReported == false)) {
+  //     renter.badgeTitles.add('Damage-Free Streak');
+  //   }
+  // }
+  // if (!renter.badgeTitles.contains('Always On Time')) {
+  //   final rentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').toList();
+  //   if (rentals.length >= 10 && rentals.every((ir) => ir.returnedOnTime == true)) {
+  //     renter.badgeTitles.add('Always On Time');
+  //   }
+  // }
 
   // Experience & Activity
   if (!renter.badgeTitles.contains('Super Lender')) {
