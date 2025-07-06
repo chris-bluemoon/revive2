@@ -214,7 +214,6 @@ class _ToRentSubmissionState extends State<ToRentSubmission> {
                               builder: (BuildContext context) {
                                 return ItemWidget(
                                     item: widget.item, itemNumber: i);
-                                // return const SizedBox(child: Text("BOX"), height: 20, width: 20);
                               },
                             );
                           }).toList(),
@@ -228,7 +227,6 @@ class _ToRentSubmissionState extends State<ToRentSubmission> {
                         decorator: DotsDecorator(
                           colors: dotColours,
                           activeColor: Colors.black,
-                          // colors: [Colors.grey[300], Colors.grey[600], Colors.grey[900]], // Inactive dot colors
                         ),
                       ),
                     ),

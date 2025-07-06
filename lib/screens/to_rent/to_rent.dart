@@ -327,41 +327,16 @@ class _ToRentState extends State<ToRent> {
                                 ),
                               ),
                             ),
-                          // Heart icon on the far left
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: FavouriteButton(item: widget.item),
-                          ),
+                          // Remove the heart icon from the left
+                          // Place the heart icon next to the bookmark on the right
                           Align(
                             alignment: Alignment.centerRight,
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 if (!isOwner)
-                                  IconButton(
-                                    onPressed: () {
-                                      final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
-                                      if (!itemStore.loggedIn) {
-                                        showMessagingAlertDialog(context);
-                                        return;
-                                      }
-                                      final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
-                                      final ownerList = renters.where((r) => r.id == widget.item.owner).toList();
-                                      final owner = ownerList.isNotEmpty ? ownerList.first : null;
-                                      Navigator.of(context).push(
-                                        SmoothTransitions.luxury(MessageConversationPage(
-                                            currentUserId: Provider.of<ItemStoreProvider>(context, listen: false).renter.id,
-                                            otherUserId: widget.item.owner,
-                                            otherUser: {
-                                              'name': ownerName,
-                                              'profilePicUrl': owner?.imagePath ?? '',
-                                            },
-                                          )),
-                                      );
-                                    },
-                                    icon: Icon(Icons.email_outlined, size: width * 0.05),
-                                  ),
-                                if (!isOwner) const SizedBox(width: 2), // Less space between icons if both are shown
+                                  FavouriteButton(item: widget.item), // Heart icon now here
+                                if (!isOwner) const SizedBox(width: 2),
                                 BookmarkButton(item: widget.item),
                               ],
                             ),
@@ -375,6 +350,7 @@ class _ToRentState extends State<ToRent> {
                     padding: EdgeInsets.fromLTRB(width * 0.05, 0, 0, 0),
                     child: Row(
                       children: [
+                        // Avatar and owner/location info
                         GestureDetector(
                           onTap: () {
                             final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
@@ -393,7 +369,32 @@ class _ToRentState extends State<ToRent> {
                           },
                           child: UserCard(ownerName, location),
                         ),
-                        // Email icon removed as requested
+                        // Spacer to push the icon to the far right
+                        Spacer(),
+                        if (!isOwner)
+                          IconButton(
+                            icon: Icon(Icons.chat_bubble_outline, color: Colors.black, size: width * 0.06), // Reduced size
+                            onPressed: () {
+                              final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+                              if (!itemStore.loggedIn) {
+                                showMessagingAlertDialog(context);
+                                return;
+                              }
+                              final renters = itemStore.renters;
+                              final ownerList = renters.where((r) => r.id == widget.item.owner).toList();
+                              final owner = ownerList.isNotEmpty ? ownerList.first : null;
+                              Navigator.of(context).push(
+                                SmoothTransitions.luxury(MessageConversationPage(
+                                  currentUserId: itemStore.renter.id,
+                                  otherUserId: widget.item.owner,
+                                  otherUser: {
+                                    'name': ownerName,
+                                    'profilePicUrl': owner?.imagePath ?? '',
+                                  },
+                                )),
+                              );
+                            },
+                          ),
                       ],
                     ),
                   ),
@@ -459,25 +460,7 @@ class _ToRentState extends State<ToRent> {
                                   ),
                                   StyledBody(
                                     widget.item.type,
-                                    weight: FontWeight.bold, // <-- Make value bold
-                                    color: Colors.black,
-                                    fontSize: width * 0.042,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  StyledBody(
-                                    "Colour",
                                     weight: FontWeight.bold,
-                                    color: Colors.grey,
-                                    fontSize: width * 0.042,
-                                  ),
-                                  StyledBody(
-                                    widget.item.colour.isNotEmpty ? widget.item.colour : '',
-                                    weight: FontWeight.bold, // <-- Make value bold
                                     color: Colors.black,
                                     fontSize: width * 0.042,
                                   ),
@@ -495,7 +478,7 @@ class _ToRentState extends State<ToRent> {
                                   ),
                                   StyledBody(
                                     "${NumberFormat('#,###').format(widget.item.rentPriceDaily)}$symbol",
-                                    weight: FontWeight.bold, // <-- Make value bold
+                                    weight: FontWeight.bold,
                                     color: Colors.black,
                                     fontSize: width * 0.042,
                                   ),
