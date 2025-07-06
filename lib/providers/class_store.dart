@@ -567,6 +567,7 @@ class ItemStoreProvider extends ChangeNotifier {
     
     log('=== FETCH RENTERS ONCE END ===');
     notifyListeners();
+    refreshRenters();
     return true;
   }
 
