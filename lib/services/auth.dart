@@ -30,7 +30,8 @@ class AuthService {
             avgReview: 0, 
             lastLogin: DateTime.now(), 
             vacations: [],
-            saved: [], // <-- Added status field
+            saved: [],
+            badgeTitles: [], // <-- Added status field
           )
         : null;
   }

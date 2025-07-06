@@ -120,6 +120,7 @@ class FirestoreService {
       'fcmToken' : fcmToken,
       'status': renter.status,
       'saved': renter.saved, // Ensure saved items are included
+      'badgeTitles': renter.badgeTitles, // Ensure badges are updated in Firestore
     });
   }
 

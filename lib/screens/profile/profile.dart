@@ -402,10 +402,58 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    ProfileAvatar(
-                      imageUrl: profileOwner.profilePicUrl,
-                      userName: profileOwner.name,
-                      radius: width * 0.09,
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        ProfileAvatar(
+                          imageUrl: profileOwner.profilePicUrl,
+                          userName: profileOwner.name,
+                          radius: width * 0.09,
+                        ),
+                        if (profileOwner.badges.any((b) => b.title == 'Verified Identity'))
+                          Positioned(
+                            top: -width * 0.025,
+                            right: -width * 0.025,
+                            child: TooltipTheme(
+                              data: TooltipThemeData(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.92),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                textStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                waitDuration: Duration(milliseconds: 300),
+                                showDuration: Duration(seconds: 3),
+                              ),
+                              child: Tooltip(
+                                message: 'Verified Identity: User has verified ID or phone/email.',
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.12),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  padding: EdgeInsets.all(width * 0.012),
+                                  child: Icon(
+                                    Icons.verified, // Use the new green certificate icon
+                                    color: Colors.green[600], // Green color for certificate
+                                    size: width * 0.055,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                     SizedBox(width: width * 0.03),
                     Expanded(
@@ -490,6 +538,45 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 const SizedBox(height: 18),
                 // Name, Location, and bio section  
                 const SizedBox(height: 2),
+                // Badges row (no user name)
+                if (profileOwner.badges.where((b) => b.title != 'Verified Identity').isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.012),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ...profileOwner.badges
+                            .where((badge) => badge.title != 'Verified Identity')
+                            .map((badge) => Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: TooltipTheme(
+                                    data: TooltipThemeData(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.92),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      textStyle: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                      waitDuration: Duration(milliseconds: 300),
+                                      showDuration: Duration(seconds: 3),
+                                    ),
+                                    child: Tooltip(
+                                      message: badge.title + ': ' + badge.description,
+                                      child: Icon(
+                                        badge.icon,
+                                        color: Colors.amber[700],
+                                        size: width * 0.07,
+                                      ),
+                                    ),
+                                  ),
+                                )),
+                      ],
+                    ),
+                  ),
             if (profileOwner.location.isNotEmpty)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -928,6 +1015,8 @@ class ReviewCard extends StatelessWidget {
         vacations: const [],
         status: '',
         saved: [],
+        fcmToken: '',
+        badgeTitles: [],  
       ),
     );
     final dateStr = DateFormat('d MMM yyyy').format(review.date);

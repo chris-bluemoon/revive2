@@ -125,6 +125,7 @@ class _RegisterPassword extends State<RegisterPassword> {
           lastLogin: DateTime.now(),
           status: 'active',
           vacations: [],
+          badgeTitles: [],
         );
         
         log('Created new renter object: ${newRenter.name} (${newRenter.id})');

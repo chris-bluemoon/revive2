@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'badges.dart';
 
 class Renter {
   Renter({
@@ -24,6 +25,7 @@ class Renter {
     required this.vacations,
     required this.status,
     required this.saved,
+    required this.badgeTitles,
   });
 
   String id;
@@ -48,6 +50,7 @@ class Renter {
   List<Map<String, DateTime>> vacations;
   String status; // <-- Added status field
   List<String> saved;
+  List<String> badgeTitles; // Store badge titles earned by the user
 
   Renter copyWith({
     List<Map<String, DateTime>>? vacations,
@@ -78,8 +81,11 @@ class Renter {
       fcmToken: fcmToken,
       status: status,
       saved: saved,
+      badgeTitles: badgeTitles, // Pass badgeTitles to copyWith
     );
   }
+
+  List<Badge> get badges => allBadges.where((b) => badgeTitles.contains(b.title)).toList();
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -109,6 +115,7 @@ class Renter {
       'status': status, // <-- Added status field
       'fcmToken' : fcmToken,
       'saved': saved,
+      'badgeTitles': badgeTitles,
     };
   }
 
@@ -153,6 +160,7 @@ class Renter {
       fcmToken: data['fcmToken'],
       status: data['status']?.toString() ?? '', // <-- especially here!
       saved: data['saved'] != null ? List<String>.from(data['saved']) : <String>[],
+      badgeTitles: data['badgeTitles'] != null ? List<String>.from(data['badgeTitles']) : <String>[],
     );
 
     return renter;

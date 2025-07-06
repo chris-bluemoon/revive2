@@ -149,6 +149,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
         vacations: [], 
         status: 'active',
         saved: [],
+        badgeTitles: [],
       );
       
       // Add to database and local list

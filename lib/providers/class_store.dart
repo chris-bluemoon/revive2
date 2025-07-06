@@ -101,7 +101,8 @@ class ItemStoreProvider extends ChangeNotifier {
     lastLogin: DateTime.now(),
     vacations: [],
     status: 'not active',
-    saved: [], // <-- Added status field
+    saved: [],
+    badgeTitles: [], // <-- Added status field
   );
   bool _loggedIn = false;
   // String _region = 'BANGKOK';
@@ -256,6 +257,21 @@ class ItemStoreProvider extends ChangeNotifier {
   Future<void> addItemRenter(ItemRenter itemRenter) async {
     _itemRenters.add(itemRenter);
     await FirestoreService.addItemRenter(itemRenter);
+    // Award "First Rental Complete" badge if this is the user's first rental
+    if (itemRenter.transactionType == 'rental') {
+      final userRentals = _itemRenters.where((ir) => ir.renterId == itemRenter.renterId && ir.transactionType == 'rental').toList();
+      if (userRentals.length == 1) {
+        // First rental for this user
+        final renterIndex = _renters.indexWhere((r) => r.id == itemRenter.renterId);
+        if (renterIndex != -1) {
+          final renter = _renters[renterIndex];
+          if (!renter.badgeTitles.contains('First Rental Complete')) {
+            renter.badgeTitles.add('First Rental Complete');
+            await saveRenter(renter);
+          }
+        }
+      }
+    }
     notifyListeners();
   }
 
@@ -814,6 +830,7 @@ class ItemStoreProvider extends ChangeNotifier {
       lastLogin: DateTime.now(),
       status: 'not active',
       saved: [],
+      badgeTitles: [],
     );
     
     // Reset logged in status

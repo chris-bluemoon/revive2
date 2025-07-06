@@ -28,7 +28,7 @@ const List<Badge> allBadges = [
   Badge(
     title: 'Verified Identity',
     description: 'User has verified ID or phone/email.',
-    icon: Icons.verified_user,
+    icon: Icons.verified, // Use a certificate-like icon
     type: BadgeType.trust,
   ),
   Badge(
