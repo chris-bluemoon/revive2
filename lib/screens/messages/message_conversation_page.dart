@@ -9,6 +9,7 @@ import 'package:revivals/models/message.dart';
 // For example, if it's defined in item_store_provider.dart:
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/shared/profile_avatar.dart';
+import 'package:translator/translator.dart';
 
 class MessageConversationPage extends StatefulWidget {
   final String currentUserId;
@@ -27,6 +28,7 @@ class MessageConversationPage extends StatefulWidget {
 
 class _MessageConversationPageState extends State<MessageConversationPage> {
   final TextEditingController _controller = TextEditingController();
+  bool _autoTranslate = false; // 1. Add this state variable
 
   @override
   void initState() {
@@ -84,10 +86,25 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
     super.dispose();
   }
 
+  Future<String> _translateToThai(String text) async {
+    final translator = GoogleTranslator();
+    try {
+      final translation = await translator.translate(text, to: 'th');
+      return translation.text;
+    } catch (e) {
+      log('Translation error: $e');
+      return text; // fallback to original if error
+    }
+  }
+
   void _sendMessage() async {
-    final text = _controller.text.trim();
+    String text = _controller.text.trim();
     if (text.isEmpty) return;
     final now = DateTime.now();
+
+    if (_autoTranslate) {
+      text = await _translateToThai(text);
+    }
 
     final participants = [widget.currentUserId, widget.otherUserId];
 
@@ -114,7 +131,6 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
       );
     } catch (_) {
       log('ItemStoreProvider not available in this context');
-      // Ignore if provider is not available in this context
     }
 
     _controller.clear();
@@ -262,6 +278,24 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                 },
               ),
             ),
+            // --- Add the radio button here ---
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+              child: Row(
+                children: [
+                  Checkbox(
+                    value: _autoTranslate,
+                    onChanged: (val) {
+                      setState(() {
+                        _autoTranslate = val ?? false;
+                      });
+                    },
+                  ),
+                  const Text('Auto-translate to Thai'),
+                ],
+              ),
+            ),
+            // --- End radio button ---
             Container(
               color: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -286,7 +320,6 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                         ),
                         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       ),
-                      // onSubmitted: (_) => _sendMessage(),
                     ),
                   ),
                 ],

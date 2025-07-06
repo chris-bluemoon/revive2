@@ -1296,12 +1296,12 @@ void checkAndAwardBadges(Renter renter, ItemStoreProvider itemStore) {
       renter.badgeTitles.add('Helpful Rater');
     }
   }
-  if (!renter.badgeTitles.contains('Photogenic Closet')) {
-    final myItems = itemStore.items.where((item) => item.owner == renter.id && item.hasHighQualityImages == true).length;
-    if (myItems >= 5) {
-      renter.badgeTitles.add('Photogenic Closet');
-    }
-  }
+  // if (!renter.badgeTitles.contains('Photogenic Closet')) {
+  //   final myItems = itemStore.items.where((item) => item.owner == renter.id && item.hasHighQualityImages == true).length;
+  //   if (myItems >= 5) {
+  //     renter.badgeTitles.add('Photogenic Closet');
+  //   }
+  // }
   if (!renter.badgeTitles.contains('Profile Complete')) {
     if (renter.bio.isNotEmpty && renter.imagePath.isNotEmpty && renter.size > 0) {
       renter.badgeTitles.add('Profile Complete');
@@ -1309,12 +1309,12 @@ void checkAndAwardBadges(Renter renter, ItemStoreProvider itemStore) {
   }
 
   // Style & Category
-  if (!renter.badgeTitles.contains('Luxury Collector')) {
-    final myLuxuryItems = itemStore.items.where((item) => item.owner == renter.id && item.isLuxury == true).length;
-    if (myLuxuryItems >= 1) {
-      renter.badgeTitles.add('Luxury Collector');
-    }
-  }
+  // if (!renter.badgeTitles.contains('Luxury Collector')) {
+  //   final myLuxuryItems = itemStore.items.where((item) => item.owner == renter.id && item.isLuxury == true).length;
+  //   if (myLuxuryItems >= 1) {
+  //     renter.badgeTitles.add('Luxury Collector');
+  //   }
+  // }
   // if (!renter.badgeTitles.contains('Event Pro')) {
   //   final eventRentals = itemStore.itemRenters.where((ir) => ir.renterId == renter.id && ir.isEventRental == true).length;
   //   if (eventRentals >= 5) {
