@@ -309,7 +309,7 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                       });
                     },
                   ),
-                  const Text('Auto-translate to Thai'),
+                  const Text('Auto-translate Thai/English'),
                 ],
               ),
             ),
