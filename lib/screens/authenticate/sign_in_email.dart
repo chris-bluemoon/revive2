@@ -121,17 +121,49 @@ class _SignIn extends State<SignIn> {
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
-              title: const Text('Account Deleted'),
-              content: const Text('This account has been deleted. If you believe this is an error, please contact us for assistance.'),
+              title: const Text(
+                'Account Deleted',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+              content: const Text(
+                'This account has been deleted. If you believe this is an error, please contact us for assistance.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black87,
+                ),
+              ),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    log('User dismissed deleted account dialog');
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: const Text('OK'),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: TextButton(
+                    onPressed: () {
+                      log('User dismissed deleted account dialog');
+                      Navigator.of(context).pop();
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.black,
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('OK'),
+                  ),
                 ),
               ],
+              actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
             );
           },
         );

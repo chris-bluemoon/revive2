@@ -61,7 +61,7 @@ class Renter {
   Renter copyWith({
     List<Map<String, DateTime>>? vacations,
     String? verified,
-    required String status, // <-- Added status field
+    String? status, // <-- Added status field
     Duration? avgResponseTime,
     int? compliments,
     bool? hasEcoInitiative,
@@ -88,7 +88,7 @@ class Renter {
       lastLogin: lastLogin,
       vacations: vacations ?? this.vacations,
       fcmToken: fcmToken,
-      status: status,
+      status: status ?? this.status,
       saved: saved,
       badgeTitles: badgeTitles, // Pass badgeTitles to copyWith
       avgResponseTime: avgResponseTime ?? this.avgResponseTime,

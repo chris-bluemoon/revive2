@@ -513,28 +513,7 @@ class ItemStoreProvider extends ChangeNotifier {
       // Create a copy of the renter with the email obfuscated
       final renter = doc.data().copyWith(
         email: 'hidden',
-        // Add all other required fields as null so they default to the current value
-        id: null,
-        name: null,
-        type: null,
-        size: null,
-        address: null,
-        countryCode: null,
-        phoneNum: null,
-        favourites: null,
-        verified: null,
-        imagePath: null,
-        creationDate: null,
-        location: null,
-        bio: null,
-        followers: null,
-        following: null,
-        avgReview: null,
-        lastLogin: null,
-        vacations: null,
-        status: null,
-        saved: null,
-        badgeTitles: null,
+        status: doc.data().status, // Keep the status as is
       );
       _renters.add(renter);
       log('Added renter: [email hidden] (status: ${renter.status})');
@@ -584,7 +563,7 @@ class ItemStoreProvider extends ChangeNotifier {
     log('Final state - renters count: ${renters.length}, user: ${_user.name} (${_user.id})');
     
     // Debug dump all renters data
-    debugDumpAllRenters();
+    // debugDumpAllRenters();
     
     log('=== FETCH RENTERS ONCE END ===');
     notifyListeners();
@@ -931,34 +910,34 @@ class ItemStoreProvider extends ChangeNotifier {
   }
 
   // Debug method to dump all renters data
-  void debugDumpAllRenters() {
-    log('=== DEBUG: DUMPING ALL RENTERS DATA ===');
-    log('
-    log('Searching among ${renters.length} renters...');
-    bool found = false;
+  // void debugDumpAllRenters() {
+  //   log('=== DEBUG: DUMPING ALL RENTERS DATA ===');
+  //   log('
+  //   log('Searching among ${renters.length} renters...');
+  //   bool found = false;
     
-    for (Renter r in renters) {
-      if (r.email == email) {
-        log('✅ FOUND USER: ${r.email}');
-        log('  ID: ${r.id}');
-        log('  Name: "${r.name}"');
-        log('  Status: "${r.status}" (length: ${r.status.length})');
-        log('  Status bytes: ${r.status.codeUnits}');
-        log('  Status == "deleted": ${r.status == "deleted"}');
-        log('  Status.toLowerCase().trim() == "deleted": ${r.status.toLowerCase().trim() == "deleted"}');
-        found = true;
-        break;
-      }
-    }
+  //   for (Renter r in renters) {
+  //     if (r.email == email) {
+  //       log('✅ FOUND USER: ${r.email}');
+  //       log('  ID: ${r.id}');
+  //       log('  Name: "${r.name}"');
+  //       log('  Status: "${r.status}" (length: ${r.status.length})');
+  //       log('  Status bytes: ${r.status.codeUnits}');
+  //       log('  Status == "deleted": ${r.status == "deleted"}');
+  //       log('  Status.toLowerCase().trim() == "deleted": ${r.status.toLowerCase().trim() == "deleted"}');
+  //       found = true;
+  //       break;
+  //     }
+  //   }
     
-    if (!found) {
-      log('❌ USER NOT FOUND: $email');
-      log('Available emails:');
-      for (Renter r in renters) {
-        log('  - "${r.email}"');
-      }
-    }
+  //   if (!found) {
+  //     log('❌ USER NOT FOUND: $email');
+  //     log('Available emails:');
+  //     for (Renter r in renters) {
+  //       log('  - "${r.email}"');
+  //     }
+  //   }
     
-    log('=== END DEBUG CHECK ===');
-  }
+  //   log('=== END DEBUG CHECK ===');
+  // }
 }
