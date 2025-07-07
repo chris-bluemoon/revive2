@@ -94,34 +94,40 @@ class _ItemCardState extends State<ItemCard> {
     }
   }
 
-  int getPricePerDay(noOfDays) {
+  int getPricePerDay(int noOfDays) {
     String country = 'BANGKOK';
 
-    int oneDayPrice = widget.item.rentPriceDaily;
+    // Get the highest period rent price and its period
+    // Assuming you have these fields in your item model:
+    // - rentPriceDaily (1 day)
+    // - rentPrice3Days (3 days)
+    // - rentPrice5Days (5 days)
+    // If not, use your actual field names or logic to get the highest period and price.
 
-    if (country == 'BANGKOK') {
-      oneDayPrice = widget.item.rentPriceDaily;
-    } else {
-      oneDayPrice = int.parse(convertFromTHB(widget.item.rentPriceDaily, country));
-    }
+    // Example: Find the highest period and its price
+    final periodPrices = <int, int>{
+      1: widget.item.rentPriceDaily,
+      if (widget.item.rentPrice3 != null) 3: widget.item.rentPrice3,
+      if (widget.item.rentPrice5 != null) 5: widget.item.rentPrice5,
+      if (widget.item.rentPrice5 != null) 7: widget.item.rentPrice7,
+      if (widget.item.rentPrice5 != null) 14: widget.item.rentPrice14,
+    };
 
-    if (noOfDays == 3) {
-      int threeDayPrice = (oneDayPrice * 0.8).toInt() - 1;
-      if (country == 'BANGKOK') {
-        return (threeDayPrice ~/ 100) * 100 + 100;
-      } else {
-        return (threeDayPrice ~/ 5) * 5 + 5;
+    // Find the period with the highest price
+    int highestPeriod = periodPrices.keys.first;
+    int highestPrice = periodPrices[highestPeriod]!;
+    periodPrices.forEach((period, price) {
+      if (price > highestPrice) {
+        highestPrice = price;
+        highestPeriod = period;
       }
-    }
-    if (noOfDays == 5) {
-      int fiveDayPrice = (oneDayPrice * 0.6).toInt() - 1;
-      if (country == 'BANGKOK') {
-        return (fiveDayPrice ~/ 100) * 100 + 100;
-      } else {
-        return (fiveDayPrice ~/ 5) * 5 + 5;
-      }
-    }
-    return oneDayPrice;
+    });
+
+    // Calculate per-day price, rounded up to nearest 10
+    double perDay = highestPrice / highestPeriod;
+    int perDayRounded = ((perDay / 10).ceil()) * 10;
+
+    return perDayRounded;
   }
 
   String getSize(sizeArray) {
