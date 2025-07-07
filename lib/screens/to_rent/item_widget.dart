@@ -49,6 +49,7 @@ class _ItemWidgetState extends State<ItemWidget> {
       for (String j in widget.item.imageId) {
         if (i.id == j) {
           images.add(i.imageId);
+          log('Adding image: ${i.imageId} for item ${widget.item.name}, number ${widget.itemNumber}');
         }
       }
     }
@@ -78,6 +79,7 @@ class _ItemWidgetState extends State<ItemWidget> {
     return GestureDetector(
       onTap: () {
         // Only navigate if we have images to show
+        log('Number of images: ${images.length}');
         if (images.isNotEmpty) {
           Navigator.of(context).push(SmoothTransitions.luxury(ViewImage(
                     images,

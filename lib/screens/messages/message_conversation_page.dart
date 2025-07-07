@@ -1,8 +1,13 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/message.dart';
 // Add the correct import for ItemStoreProvider below.
@@ -28,7 +33,9 @@ class MessageConversationPage extends StatefulWidget {
 
 class _MessageConversationPageState extends State<MessageConversationPage> {
   final TextEditingController _controller = TextEditingController();
-  bool _autoTranslate = false; // 1. Add this state variable
+  final TextEditingController _captionController = TextEditingController();
+  bool _autoTranslate = false;
+  File? _selectedImage; // For holding the picked image before sending
 
   @override
   void initState() {
@@ -78,12 +85,6 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
         }
       }
     }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   Future<String> _translateToThai(String text) async {
@@ -153,6 +154,52 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
 
     _controller.clear();
     FocusScope.of(context).unfocus();
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile == null) return;
+    setState(() {
+      _selectedImage = File(pickedFile.path);
+      _captionController.clear();
+    });
+  }
+
+  Future<void> _sendImageWithCaption() async {
+    if (_selectedImage == null) return;
+
+    final file = _selectedImage!;
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}_${widget.currentUserId}.jpg';
+    final ref = FirebaseStorage.instance.ref().child('chat_images').child(fileName);
+
+    final uploadTask = ref.putFile(file);
+    final snapshot = await uploadTask.whenComplete(() {});
+    final imageUrl = await snapshot.ref.getDownloadURL();
+
+    final now = DateTime.now();
+    final participants = [widget.currentUserId, widget.otherUserId];
+
+    await FirebaseFirestore.instance.collection('messages').add({
+      'imageUrl': imageUrl,
+      'text': _captionController.text.trim(),
+      'time': now,
+      'participants': participants,
+      'status': 'sent',
+      'deletedFor': [],
+    });
+
+    setState(() {
+      _selectedImage = null;
+      _captionController.clear();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _captionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -264,21 +311,47 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                             child: Column(
                               crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 4),
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: isMe ? Colors.black : Colors.grey[300],
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    data['text'] ?? '',
-                                    style: TextStyle(
-                                      color: isMe ? Colors.white : Colors.black,
-                                      fontSize: 16,
+                                if ((data['imageUrl'] ?? '').isNotEmpty)
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 4),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.network(
+                                        data['imageUrl'],
+                                        width: 180,
+                                        height: 180,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   ),
-                                ),
+                                if ((data['text'] ?? '').isNotEmpty)
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: isMe ? Colors.black : Colors.grey[300],
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      data['text'] ?? '',
+                                      style: TextStyle(
+                                        color: isMe ? Colors.white : Colors.black,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                if ((data['audioUrl'] ?? '').isNotEmpty)
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 4),
+                                    child: IconButton(
+                                      icon: const Icon(Icons.play_arrow),
+                                      onPressed: () async {
+                                        final player = FlutterSoundPlayer();
+                                        await player.openPlayer();
+                                        await player.startPlayer(fromURI: data['audioUrl']);
+                                      },
+                                    ),
+                                  ),
                                 const SizedBox(height: 4),
                                 Text(
                                   data['time'] != null
@@ -314,35 +387,103 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
               ),
             ),
             // --- End radio button ---
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_upward, color: Colors.green, size: 32),
-                    onPressed: _sendMessage,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        hintText: "Type your message...",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8)),
-                          borderSide: BorderSide(color: Colors.black),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            // --- Image preview and caption input ---
+            if (_selectedImage != null)
+              Container(
+                color: Colors.grey[100],
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        _selectedImage!,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: _captionController,
+                        decoration: const InputDecoration(
+                          hintText: "Add a caption...",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_upward, color: Colors.green, size: 32),
+                      onPressed: _sendImageWithCaption,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                      onPressed: () {
+                        setState(() {
+                          _selectedImage = null;
+                          _captionController.clear();
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
+            // --- End image preview and caption input ---
+            if (_selectedImage == null)
+              Container(
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.add, color: Colors.black, size: 28), // Changed to black + icon
+                      onPressed: _pickImage,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        onChanged: (_) => setState(() {}),
+                        decoration: const InputDecoration(
+                          hintText: "Type your message...",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                            borderSide: BorderSide(color: Colors.black),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    GestureDetector(
+                      onTap: _controller.text.trim().isNotEmpty ? _sendMessage : null,
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: _controller.text.trim().isNotEmpty ? Colors.green : Colors.grey[300],
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(12),
+                          child: Icon(
+                            Icons.arrow_upward,
+                            color: _controller.text.trim().isNotEmpty ? Colors.white : Colors.grey[500],
+                            size: 26,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),

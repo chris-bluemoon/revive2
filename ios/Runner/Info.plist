@@ -70,5 +70,7 @@
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>This app needs microphone access to send voice messages.</string>
 	</dict>
 </plist>
