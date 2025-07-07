@@ -277,7 +277,8 @@ class _ToRentSubmissionState extends State<ToRentSubmission> {
                 widget.item.status = 'denied';
                 Provider.of<ItemStoreProvider>(context, listen: false)
                     .saveItem(widget.item);
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.of(context).pop();
+                // Navigator.of(context).popUntil((route) => route.isFirst);
               },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.all(10),
@@ -295,7 +296,8 @@ class _ToRentSubmissionState extends State<ToRentSubmission> {
                   widget.item.status = 'accepted';
                   Provider.of<ItemStoreProvider>(context, listen: false)
                       .saveItem(widget.item);
-                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  // Navigator.of(context).popUntil((route) => route.isFirst);
+                  Navigator.of(context).pop();
                 },
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.all(10),

@@ -107,10 +107,10 @@ class _ItemCardState extends State<ItemCard> {
     // Example: Find the highest period and its price
     final periodPrices = <int, int>{
       1: widget.item.rentPriceDaily,
-      if (widget.item.rentPrice3 != null) 3: widget.item.rentPrice3,
-      if (widget.item.rentPrice5 != null) 5: widget.item.rentPrice5,
-      if (widget.item.rentPrice5 != null) 7: widget.item.rentPrice7,
-      if (widget.item.rentPrice5 != null) 14: widget.item.rentPrice14,
+      3: widget.item.rentPrice3,
+      5: widget.item.rentPrice5,
+      7: widget.item.rentPrice7,
+      14: widget.item.rentPrice14,
     };
 
     // Find the period with the highest price
