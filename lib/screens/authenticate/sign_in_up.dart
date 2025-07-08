@@ -259,7 +259,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                     
                     // Title
                     const Text(
-                      'Welcome to VELAA',
+                      'Welcome to Second Stories',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,

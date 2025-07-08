@@ -78,17 +78,27 @@ class _HomeState extends State<Home> {
           actions: Provider.of<ItemStoreProvider>(context, listen: false).loggedIn
               ? [
                   Padding(
-                    padding: const EdgeInsets.only(right: 20.0),
+                    padding: EdgeInsets.only(right: width * 0.03), // right padding relative to width
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
+                        // Reduced container padding and border radius for a tighter look
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(width * 0.02), // border radius relative to width
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.chat_bubble_outline, color: Colors.black, size: 28),
+                            icon: Icon(
+                              Icons.chat_bubble_outline,
+                              color: Colors.black,
+                              size: width * 0.055, // icon size relative to width
+                            ),
+                            padding: EdgeInsets.all(width * 0.015), // padding relative to width
+                            constraints: BoxConstraints(
+                              minWidth: width * 0.09,
+                              minHeight: width * 0.09,
+                            ),
                             onPressed: () {
                               Navigator.of(context).push(
                                 SmoothTransitions.luxury(InboxPage(currentUserId: userId)),
@@ -98,24 +108,24 @@ class _HomeState extends State<Home> {
                         ),
                         if (unreadSenders.isNotEmpty)
                           Positioned(
-                            right: 6,
-                            top: 6,
+                            right: width * 0.01,
+                            top: width * 0.01,
                             child: Container(
-                              padding: const EdgeInsets.all(4),
+                              padding: EdgeInsets.all(width * 0.01),
                               decoration: const BoxDecoration(
                                 color: Colors.red,
                                 shape: BoxShape.circle,
                               ),
-                              constraints: const BoxConstraints(
-                                minWidth: 18,
-                                minHeight: 18,
+                              constraints: BoxConstraints(
+                                minWidth: width * 0.04,
+                                minHeight: width * 0.04,
                               ),
                               child: Center(
                                 child: Text(
                                   unreadSenders.length.toString(),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 11,
+                                    fontSize: width * 0.028,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -129,12 +139,12 @@ class _HomeState extends State<Home> {
               : [],
           title: Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: const Text(
-              'VELAA',
+            child: Text(
+              'SECOND STORIES',
               style: TextStyle(
                 fontFamily: 'Lovelo',
                 fontWeight: FontWeight.normal,
-                fontSize: 36,
+                fontSize: width * 0.06, // font size now relative to screen width
                 color: Colors.black,
                 letterSpacing: 4.0,
               ),
