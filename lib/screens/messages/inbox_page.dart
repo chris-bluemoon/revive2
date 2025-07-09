@@ -161,15 +161,15 @@ class _InboxPageState extends State<InboxPage> {
                                   children: [
                                   InkWell(
                                     onTap: () => Navigator.of(context).pop('delete'),
-                                    child: const Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 18.0),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 18.0),
                                       child: Center(
                                         child: Text(
                                           'DELETE',
                                           style: TextStyle(
                                             color: Colors.red,
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 18,
+                                            fontSize: MediaQuery.of(context).size.width * 0.04,
                                           ),
                                         ),
                                       ),
@@ -178,15 +178,15 @@ class _InboxPageState extends State<InboxPage> {
                                   const Divider(height: 1),
                                   InkWell(
                                     onTap: () => Navigator.of(context).pop('delete_report'),
-                                    child: const Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 18.0),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 18.0),
                                       child: Center(
                                         child: Text(
                                           'DELETE AND REPORT',
                                           style: TextStyle(
                                             color: Colors.red,
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 18,
+                                            fontSize: MediaQuery.of(context).size.width * 0.04,
                                           ),
                                         ),
                                       ),
@@ -194,16 +194,16 @@ class _InboxPageState extends State<InboxPage> {
                                   ),
                                   const Divider(height: 1),
                                   InkWell(
-                                    onTap: () => Navigator.of(context).pop('delete'),
-                                    child: const Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 18.0),
+                                    onTap: () => Navigator.of(context).pop('cancel'),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 18.0),
                                       child: Center(
                                         child: Text(
                                           'CANCEL',
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 18,
+                                            fontSize: MediaQuery.of(context).size.width * 0.04,
                                           ),
                                         ),
                                       ),
