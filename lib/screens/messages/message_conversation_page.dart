@@ -205,7 +205,6 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final otherUser = widget.otherUser;
-
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: width * 0.2,
