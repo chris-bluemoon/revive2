@@ -44,6 +44,7 @@ class _HomeState extends State<Home> {
         itemStore.fetchLedgersOnce();
         itemStore.fetchMessagesOnce();
         itemStore.fetchReviewsOnce();
+        itemStore.refreshRenters();
         // itemStore.listenToMessages(itemStore.renter.id);
       });
     });
