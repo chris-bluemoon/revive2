@@ -6,6 +6,7 @@ import 'package:pluralize/pluralize.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/item.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/screens/create/create_item.dart';
 import 'package:revivals/screens/profile/admin/to_rent_submission.dart';
 import 'package:revivals/screens/to_rent/to_rent.dart';
 import 'package:revivals/shared/filters_page.dart';
@@ -286,35 +287,55 @@ class _ItemResultsState extends State<ItemResults> {
                                   width: width * 0.5,
                                   child: ItemCard(item),
                                 ),
-                                onTap: () {
-                                  Navigator.of(context).push(SmoothTransitions.luxury(ToRent(item)));
+                                onTap: () async {
+                                  final action = await showModalBottomSheet<String>(
+                                    context: context,
+                                    builder: (context) {
+                                      return SafeArea(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            ListTile(
+                                              leading: const Icon(Icons.visibility),
+                                              title: const Text('View'),
+                                              onTap: () => Navigator.of(context).pop('view'),
+                                            ),
+                                            ListTile(
+                                              leading: const Icon(Icons.edit),
+                                              title: const Text('Edit'),
+                                              onTap: () => Navigator.of(context).pop('edit'),
+                                            ),
+                                            ListTile(
+                                              leading: const Icon(Icons.delete, color: Colors.red),
+                                              title: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                              onTap: () => Navigator.of(context).pop('delete'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+
+                                  if (action == 'view') {
+                                    Navigator.of(context).push(SmoothTransitions.luxury(ToRent(item)));
+                                  } else if (action == 'edit') {
+                                    Navigator.of(context).push(
+                                      SmoothTransitions.luxury(
+                                        CreateItem(
+                                          item: item,
+                                        ),
+                                      ),
+                                    );
+                                  } else if (action == 'delete') {
+                                    setState(() {
+                                      item.status = 'deleted';
+                                      Provider.of<ItemStoreProvider>(context, listen: false).saveItem(item);
+                                      allItems.removeWhere((i) => i.id == item.id); // Remove from allItems so it won't show up in finalItems
+                                    });
+                                  }
                                 },
                               ),
                               const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.edit, color: Colors.blue, size: width * 0.05),
-                                    iconSize: width * 0.05,
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    onPressed: () {
-                                      // TODO: Implement edit action
-                                    },
-                                  ),
-                                  SizedBox(width: width * 0.01),
-                                  IconButton(
-                                    icon: Icon(Icons.delete, color: Colors.red, size: width * 0.05),
-                                    iconSize: width * 0.05,
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    onPressed: () {
-                                      // TODO: Implement delete action
-                                    },
-                                  ),
-                                ],
-                              ),
                             ],
                           );
                         } else {
