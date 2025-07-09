@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
 import 'package:revivals/models/renter.dart';
 
 class AuthService {
@@ -30,7 +29,7 @@ class AuthService {
             lastLogin: DateTime.now(), 
             vacations: [],
             saved: [],
-            badgeTitles: [], // <-- Added status field
+            badgeTitles: {}, // <-- Changed to empty map to match Map<String, int>
           )
         : null;
   }
