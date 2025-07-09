@@ -42,20 +42,17 @@ class _ItemResultsState extends State<ItemResults> {
   late bool filterOn = false;
   late int numOfFilters = 0;
 
+  String? selectedCity;
   void setValues(
       List<String> filterColours,
       List<String> filterSizes,
       RangeValues rangeValuesFilter,
-      List<String> filterLengths,
-      List<String> filterPrints,
-      List<String> filterSleeves) {
+      String? city) {
     sizes = filterSizes;
-    lengths = filterLengths;
     ranges = rangeValuesFilter;
-    prints = filterPrints;
-    sleeves = filterSleeves;
     coloursSet = {...filterColours};
     sizesSet = {...filterSizes};
+    selectedCity = city;
     setState(() {});
   }
 
@@ -92,74 +89,31 @@ class _ItemResultsState extends State<ItemResults> {
     List<Item> finalItems = [];
     filteredItems.clear();
     log('Attribute: ${widget.attribute}, Value: ${widget.value}');
+    log('Filter is on: $filterOn');
     if (filterOn == true) {
-      switch (widget.attribute) {
-        case 'search':
-          // widget.value is expected to be a List<String> of search terms
-          List<String> searchTerms = [];
-          searchTerms = widget.values!;
-          for (Item i in allItems) {
-            if (i.hashtags.any((tag) => searchTerms.contains(tag))) {
-              filteredItems.add(i);
-            }
+      // Filter by city/location using the owner's location
+      List<Item> cityFilteredItems = [];
+      final renters = Provider.of<ItemStoreProvider>(context, listen: false).renters;
+      if (selectedCity != null && selectedCity!.isNotEmpty) {
+        for (Item i in allItems) {
+          final matches = renters.where((r) => r.id == i.owner);
+          final owner = matches.isNotEmpty ? matches.first : null;
+          if (owner != null &&
+              owner.location.trim().toLowerCase() == selectedCity!.trim().toLowerCase()) {
+            cityFilteredItems.add(i);
           }
-          break;
-        case 'hashtag':
-          for (Item i in allItems) {
-            if (i.hashtags.contains(widget.value)) {
-              filteredItems.add(i);
-            }
-          }
-        case 'myItems':
-          for (Item i in allItems) {
-            if (i.owner == widget.value) {
-              filteredItems.add(i);
-            }
-          }
-        case 'status':
-          for (Item i in allItems) {
-            log('Item status: ${i.status}');
-            if (i.status == widget.value) {
-              filteredItems.add(i);
-            }
-          }
-        case 'brand':
-          for (Item i in allItems) {
-            if (i.brand == widget.value) {
-              filteredItems.add(i);
-            }
-          }
-        case 'type':
-          for (Item i in allItems) {
-            if (i.type == widget.value) {
-              filteredItems.add(i);
-            }
-          }
-        case 'bookingType':
-          for (Item i in allItems) {
-            if (i.bookingType == widget.value || i.bookingType == 'both') {
-              filteredItems.add(i);
-            }
-          }
-        case 'dateAdded':
-          for (Item i in allItems) {
-            DateFormat format = DateFormat("dd-MM-yyyy");
-            DateTime dateSupplied = format.parse(widget.value);
-            DateTime dateAdded = format.parse(i.dateAdded);
-            if (dateAdded.isAfter(dateSupplied)) {
-              filteredItems.add(i);
-            }
-          }
+        }
+      } else {
+        cityFilteredItems = List.from(allItems);
       }
-      for (Item i in filteredItems) {
+      // Now apply other filters to cityFilteredItems
+      for (Item i in cityFilteredItems) {
         Set colourSet = {i.colour};
-        // TODO: FIX THIS
         if (
             coloursSet.intersection(colourSet).isNotEmpty &&
             sizesSet.contains(i.size) &&
             i.rentPriceDaily > ranges.start &&
             i.rentPriceDaily < ranges.end) {
-        // if (coloursSet.intersection(colourSet).isNotEmpty) {
           finalItems.add(i);
         }
       }

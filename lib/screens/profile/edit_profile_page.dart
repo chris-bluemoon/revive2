@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/shared/styled_text.dart';
+import 'package:revivals/shared/thailand_cities.dart';
 import 'package:uuid/uuid.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -27,19 +28,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   bool _isSaving = false; // <-- Add this line for save loading state
   bool _hasChanges = false; // <-- Add this line to track changes
 
-  // Add this list at the top of your _EditProfilePageState class:
-  final List<String> thailandCities = [
-    'Bangkok',
-    'Chiang Mai',
-    'Phuket',
-    'Pattaya',
-    'Khon Kaen',
-    'Hat Yai',
-    'Nakhon Ratchasima',
-    'Udon Thani',
-    'Surat Thani',
-    'Rayong',
-  ];
+  // Use shared Thailand cities list
 
   // Add a variable to hold the selected city:
   String? selectedCity;

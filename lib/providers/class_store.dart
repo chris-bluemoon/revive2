@@ -52,28 +52,7 @@ class ItemStoreProvider extends ChangeNotifier {
     Colors.pink: false,
     Colors.cyan: false,
   };
-  Map<String, bool> _lengthsFilter = {
-    'mini': false,
-    'midi': false,
-    'long': false
-  };
-  Map<String, bool> _printsFilter = {
-    'enthic': false,
-    'boho': false,
-    'preppy': false,
-    'floral': false,
-    'abstract': false,
-    'stripes': false,
-    'dots': false,
-    'textured': false,
-    'none': false
-  };
-  Map<String, bool> _sleevesFilter = {
-    'sleeveless': false,
-    'short sleeve': false,
-    '3/4 sleeve': false,
-    'long sleeve': false
-  };
+  String? _cityFilter;
   RangeValues _rangeValuesFilter = const RangeValues(0, 10000);
 
   // final List<bool> _sizesFilter = [true, true, false, false];
@@ -120,9 +99,7 @@ class ItemStoreProvider extends ChangeNotifier {
   get loggedIn => _loggedIn;
   get sizesFilter => _sizesFilter;
   get coloursFilter => _coloursFilter;
-  get lengthsFilter => _lengthsFilter;
-  get printsFilter => _printsFilter;
-  get sleevesFilter => _sleevesFilter;
+  get cityFilter => _cityFilter;
   get rangeValuesFilter => _rangeValuesFilter;
   get reviews => _reviews;
 
@@ -136,16 +113,8 @@ class ItemStoreProvider extends ChangeNotifier {
     _coloursFilter = colourF;
   }
 
-  void lengthsFilterSetter(lengthsF) {
-    _lengthsFilter = lengthsF;
-  }
-
-  void printsFilterSetter(printsF) {
-    _printsFilter = printsF;
-  }
-
-  void sleevesFilterSetter(sleevesF) {
-    _sleevesFilter = sleevesF;
+  void cityFilterSetter(String? city) {
+    _cityFilter = city;
   }
 
   void rangeValuesFilterSetter(rangeValuesF) {
@@ -156,9 +125,7 @@ class ItemStoreProvider extends ChangeNotifier {
     sizesFilter.updateAll((name, value) => value = false);
     rangeValuesFilterSetter(const RangeValues(0, 10000));
     coloursFilter.updateAll((name, value) => value = false);
-    lengthsFilter.updateAll((name, value) => value = false);
-    printsFilter.updateAll((name, value) => value = false);
-    sleevesFilter.updateAll((name, value) => value = false);
+    _cityFilter = null;
   }
 
   // assign the user
@@ -862,28 +829,7 @@ class ItemStoreProvider extends ChangeNotifier {
       Colors.pink: false,
       Colors.cyan: false,
     };
-    _lengthsFilter = {
-      'mini': false,
-      'midi': false,
-      'long': false
-    };
-    _printsFilter = {
-      'enthic': false,
-      'boho': false,
-      'preppy': false,
-      'floral': false,
-      'abstract': false,
-      'stripes': false,
-      'dots': false,
-      'textured': false,
-      'none': false
-    };
-    _sleevesFilter = {
-      'sleeveless': false,
-      'short sleeve': false,
-      '3/4 sleeve': false,
-      'long sleeve': false
-    };
+    _cityFilter = null;
     _rangeValuesFilter = const RangeValues(0, 10000);
     
     log('✅ Provider state reset complete');

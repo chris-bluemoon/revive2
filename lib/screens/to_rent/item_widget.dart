@@ -25,66 +25,59 @@ class _ItemWidgetState extends State<ItemWidget> {
   late String itemName;
   late String brandName;
   late String imageName;
-  // late Image thisImage;
-  String thisImage = ''; // Initialize with empty string to prevent LateInitializationError
+  String thisImage = '';
 
-  // late List<Image> images = [];
-  late List<String> images = [];
+  late final List<String> images;
+
+  @override
+  void initState() {
+    super.initState();
+    images = _getImagesOnce();
+  }
+
+  List<String> _getImagesOnce() {
+    final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+    final List<String> result = [];
+    log('ItemStore images count: \\${itemStore.images.length}');
+    // Only add images in the order of widget.item.imageId, and only once per id
+    for (String imageId in widget.item.imageId) {
+      final match = itemStore.images.firstWhere(
+        (img) => img.id == imageId,
+        orElse: () => ItemImage(id: '', imageId: ''),
+      );
+      if (match.id.isNotEmpty) {
+        result.add(match.imageId);
+        log('Adding image: \\${match.imageId} for item \\${widget.item.name}, number \\${widget.itemNumber}');
+      }
+    }
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
-    images.clear();
-
-    // String itemImage = 'assets/img/items2/${widget.item.brand}_${widget.item.name}_Item_${widget.itemNumber}.jpg';
-    // return FittedBox(
-    //ynt moved folowing function from outer build to inner build
-    // String setItemImage() {
-    // itemType = toBeginningOfSentenceCase(widget.item.type.replaceAll(RegExp(' +'), '_'));
-    // itemName = widget.item.name.replaceAll(RegExp(' +'), '_');
-    // brandName = widget.item.brand.replaceAll(RegExp(' +'), '_');
-    // imageName = 'assets/img/items2/${brandName}_${itemName}_${itemType}_${widget.itemNumber}.jpg';
-    // return imageName;
-    for (ItemImage i
-        in Provider.of<ItemStoreProvider>(context, listen: false).images) {
-      for (String j in widget.item.imageId) {
-        if (i.id == j) {
-          images.add(i.imageId);
-          log('Adding image: ${i.imageId} for item ${widget.item.name}, number ${widget.itemNumber}');
-        }
-      }
-    }
-    
     // Find the specific image for this item number
-    thisImage = ''; // Reset to empty string
-    for (ItemImage i
-        in Provider.of<ItemStoreProvider>(context, listen: false).images) {
-      if (widget.item.imageId.isNotEmpty && 
+    thisImage = '';
+    final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+    for (ItemImage i in itemStore.images) {
+      if (widget.item.imageId.isNotEmpty &&
           widget.itemNumber <= widget.item.imageId.length &&
           i.id == widget.item.imageId[widget.itemNumber - 1]) {
         log(widget.item.imageId[widget.itemNumber - 1].toString());
         thisImage = i.imageId;
-        break; // Exit loop once found
+        break;
       }
     }
-    
-    // If no image was found, try to use a fallback or placeholder
     if (thisImage.isEmpty) {
-      log('No image found for item ${widget.item.name}, number ${widget.itemNumber}');
-      // Could set a default image URL here if needed
+      log('No image found for item \\${widget.item.name}, number \\${widget.itemNumber}');
     }
-    // images.add(thisImage);
-    //   return thisImage;
-    // }
-
     return GestureDetector(
       onTap: () {
-        // Only navigate if we have images to show
-        log('Number of images: ${images.length}');
+        log('Number of images: \\${images.length}');
         if (images.isNotEmpty) {
           Navigator.of(context).push(SmoothTransitions.luxury(ViewImage(
-                    images,
-                    0,
-                  )));
+            images,
+            0,
+          )));
         }
       },
       child: ClipRRect(
@@ -100,12 +93,8 @@ class _ItemWidgetState extends State<ItemWidget> {
             : Image.asset(
                 'assets/img/items/No_Image_Available.jpg',
                 fit: BoxFit.cover,
-              ), // Fallback when no image URL
+              ),
       ),
     );
-    // return Image.asset(setItemImage(), fit: BoxFit.contain);
-    // child: Image.asset(setItemImage(),),
-    // fit: BoxFit.fill,
-    // );
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/shared/styled_text.dart';
+import 'package:revivals/shared/thailand_cities.dart';
 
 class FiltersPage extends StatefulWidget {
   const FiltersPage(
@@ -17,9 +18,9 @@ class FiltersPage extends StatefulWidget {
 }
 
 class _FiltersPage extends State<FiltersPage> {
-  // Distance filter state
-  final List<int> distanceOptions = [1, 3, 5, 10];
-  int? selectedDistance;
+  // Location filter state (Thai cities)
+  final List<String> cityOptions = thailandCities;
+  String? selectedCity;
   int noOfFilters = 0;
   final double width =
       WidgetsBinding.instance.platformDispatcher.views.first.physicalSize.width;
@@ -75,91 +76,6 @@ class _FiltersPage extends State<FiltersPage> {
     );
   }
 
-  Widget myLength(String length, bool selected) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          lengthMap[length] = !selected;
-        });
-      },
-      child: Container(
-          margin: const EdgeInsets.all(10),
-          width: width * 0.06,
-          height: width * 0.03,
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: (selected) ? Colors.black : Colors.white,
-            border: Border.all(color: Colors.black),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: (selected)
-              ? Center(
-                  child: StyledBody(length.toUpperCase(),
-                      color: Colors.white, weight: FontWeight.normal))
-              : Center(
-                  child: StyledBody(length.toUpperCase(),
-                      weight: FontWeight.normal))),
-    );
-  }
-
-  Widget myPrint(String print, bool selected) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          printMap[print] = !selected;
-        });
-      },
-      child: Container(
-          margin: const EdgeInsets.all(10),
-          width: width * 0.09,
-          height: width * 0.03,
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: (selected) ? Colors.black : Colors.white,
-            border: Border.all(color: Colors.black),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: (selected)
-              ? Center(
-                  child: StyledBody(print.toUpperCase(),
-                      color: Colors.white, weight: FontWeight.normal))
-              : Center(
-                  child: StyledBody(print.toUpperCase(),
-                      weight: FontWeight.normal))),
-    );
-  }
-
-  Widget mySleeve(String sleeve, bool selected) {
-    return GestureDetector(
-        onTap: () {
-          setState(() {
-            sleeveMap[sleeve] = !selected;
-          });
-        },
-        child: Container(
-            margin: const EdgeInsets.all(10),
-            width: width * 0.12,
-            height: width * 0.03,
-            // height: 51.0,
-            decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: (selected) ? Colors.black : Colors.white,
-              border: Border.all(color: Colors.black),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: (selected)
-                ? Center(
-                    child: StyledBody(sleeve.toUpperCase(),
-                        color: Colors.white, weight: FontWeight.normal),
-                  )
-                : Center(
-                    child: StyledBody(
-                      sleeve.toUpperCase(),
-                      weight: FontWeight.normal,
-                    ),
-                  )));
-  }
-
   Map<Color, bool> colourMap = {
     Colors.black: false,
     Colors.white: false,
@@ -181,25 +97,26 @@ class _FiltersPage extends State<FiltersPage> {
     '10': false,
   };
 
+  // Filter state
   bool filterOn = false;
+  bool colourFilter = false;
+  bool sizeFilter = false;
+  bool priceFilter = false;
+
   bool getFilterOn() {
-    log('Colour filter is: ${colourFilter.toString()}');
-    if (colourFilter == false &&
-        sizeFilter == false &&
-        (rangeVals.start == 0 && rangeVals.end == 10000) &&
-        lengthFilter == false &&
-        printFilter == false &&
-        sleeveFilter == false) {
-      filterOn = false;
-      return filterOn;
-    }
-    filterOn = true;
+    log('Colour filter is: \x1B[33m${colourFilter.toString()}\x1B[0m');
+    noOfFilters = 0;
+    if (colourFilter) noOfFilters++;
+    if (sizeFilter) noOfFilters++;
+    if (rangeVals.start > 0 || rangeVals.end < 10000) noOfFilters++;
+    if (selectedCity != null && selectedCity!.isNotEmpty) noOfFilters++;
+    filterOn = noOfFilters > 0;
     return filterOn;
   }
 
-  bool colourFilter = false;
   List<String> getColours() {
     List<String> returnColours = [];
+    colourFilter = false;
     colourMap.forEach((key, value) {
       if (value == true) {
         colourFilter = true;
@@ -240,11 +157,7 @@ class _FiltersPage extends State<FiltersPage> {
         }
       }
     });
-    if (colourFilter == true) {
-      noOfFilters++;
-    }
-    if (returnColours.isEmpty) {
-      colourFilter = false;
+    if (!colourFilter) {
       colourMap.forEach((key, value) {
         switch (key) {
           case Colors.black:
@@ -286,20 +199,16 @@ class _FiltersPage extends State<FiltersPage> {
     return returnColours;
   }
 
-  bool sizeFilter = false;
   List<String> getSizes() {
     List<String> returnSizes = [];
+    sizeFilter = false;
     sizeMap.forEach((key, value) {
       if (value == true) {
         sizeFilter = true;
         returnSizes.add(key);
       }
     });
-    if (sizeFilter == true) {
-      noOfFilters++;
-    }
-    if (returnSizes.isEmpty) {
-      sizeFilter = false;
+    if (!sizeFilter) {
       sizeMap.forEach((key, value) {
         returnSizes.add(key);
       });
@@ -307,133 +216,12 @@ class _FiltersPage extends State<FiltersPage> {
     return returnSizes;
   }
 
-  bool priceFilter = false;
   RangeValues getPrices() {
-    // RangeValues rangeValues = const RangeValues(0, 10000);
+    priceFilter = false;
     if (rangeVals.start > 0 || rangeVals.end < 10000) {
-      noOfFilters++;
       priceFilter = true;
     }
-    if (rangeVals.start == 0 && rangeVals.end == 10000) {
-      priceFilter = false;
-    }
     return rangeVals;
-  }
-
-  bool lengthFilter = false;
-  List<String> getLengths() {
-    List<String> returnLengths = [];
-    lengthMap.forEach((key, value) {
-      if (value == true) {
-        lengthFilter = true;
-        returnLengths.add(key);
-      }
-    });
-    if (lengthFilter == true) {
-      noOfFilters++;
-    }
-    if (returnLengths.isEmpty) {
-      lengthFilter = false;
-      lengthMap.forEach((key, value) {
-        returnLengths.add(key);
-      });
-    }
-    return returnLengths;
-  }
-
-  bool printFilter = false;
-  List<String> getPrints() {
-    List<String> returnPrints = [];
-    printMap.forEach((key, value) {
-      if (value == true) {
-        printFilter = true;
-        returnPrints.add(key);
-      }
-    });
-    if (printFilter == true) {
-      noOfFilters++;
-    }
-    if (returnPrints.isEmpty) {
-      printFilter = false;
-      printMap.forEach((key, value) {
-        returnPrints.add(key);
-      });
-    }
-    return returnPrints;
-  }
-
-  bool sleeveFilter = false;
-  List<String> getSleeves() {
-    List<String> returnSleeves = [];
-    sleeveMap.forEach((key, value) {
-      if (value == true) {
-        sleeveFilter = true;
-        returnSleeves.add(key);
-      }
-    });
-    if (sleeveFilter == true) {
-      noOfFilters++;
-    }
-    if (returnSleeves.isEmpty) {
-      sleeveFilter = false;
-      sleeveMap.forEach((key, value) {
-        returnSleeves.add(key);
-      });
-    }
-    return returnSleeves;
-  }
-  // TODO: To add a filter, add a getPrints, add to setValues as parameter, add to Occassions page setValues and IF statement, add to getFilterOn, add to database
-  // Map<String, bool> sizeMap = {
-  //   'XXS': false,
-  //   'XS': false,
-  //   'S': false,
-  //   'M': false,
-  //   'L': false,
-  //   'XL': false
-  // };
-
-  Map<String, bool> lengthMap = {'mini': false, 'midi': false, 'long': false};
-
-  Map<String, bool> printMap = {
-    'enthic': false,
-    'boho': false,
-    'preppy': false,
-    'floral': false,
-    'abstract': false,
-    'stripes': false,
-    'dots': false,
-    'textured': false,
-    'none': false
-  };
-  Map<String, bool> sleeveMap = {
-    'sleeveless': false,
-    'short sleeve': false,
-    '3/4 sleeve': false,
-    'long sleeve': false
-  };
-
-  List<Widget> generateLengths() {
-    List<Widget> lengths = [];
-    lengthMap.forEach((key, value) {
-      lengths.add(myLength(key, value));
-    });
-    return lengths;
-  }
-
-  List<Widget> generatePrints() {
-    List<Widget> prints = [];
-    printMap.forEach((key, value) {
-      prints.add(myPrint(key, value));
-    });
-    return prints;
-  }
-
-  List<Widget> generateSleeves() {
-    List<Widget> sleeves = [];
-    sleeveMap.forEach((key, value) {
-      sleeves.add(mySleeve(key, value));
-    });
-    return sleeves;
   }
 
   List<Widget> generateSizes() {
@@ -463,15 +251,9 @@ class _FiltersPage extends State<FiltersPage> {
     colourMap.updateAll((name, value) => value = false);
     sizeMap.updateAll((name, value) => value = false);
     rangeVals = const RangeValues(0, 10000);
-    lengthMap.updateAll((name, value) => value = false);
-    printMap.updateAll((name, value) => value = false);
-    sleeveMap.updateAll((name, value) => value = false);
     List a = [];
     a.add(colourMap);
     a.add(sizeMap);
-    a.add(lengthMap);
-    a.add(printMap);
-    a.add(sleeveMap);
     return a;
   }
 
@@ -482,21 +264,30 @@ class _FiltersPage extends State<FiltersPage> {
         Provider.of<ItemStoreProvider>(context, listen: false).sizesFilter;
     Map<Color, bool> coloursFromStore =
         Provider.of<ItemStoreProvider>(context, listen: false).coloursFilter;
-    Map<String, bool> lengthsFromStore =
-        Provider.of<ItemStoreProvider>(context, listen: false).lengthsFilter;
-    Map<String, bool> printsFromStore =
-        Provider.of<ItemStoreProvider>(context, listen: false).printsFilter;
-    Map<String, bool> sleevesFromStore =
-        Provider.of<ItemStoreProvider>(context, listen: false).sleevesFilter;
     RangeValues rangeValuesFromStore =
         Provider.of<ItemStoreProvider>(context, listen: false)
             .rangeValuesFilter;
+    String? cityFromStore = Provider.of<ItemStoreProvider>(context, listen: false).cityFilter;
     sizeMap = Map<String, bool>.from(sizesFromStore);
     colourMap = Map<Color, bool>.from(coloursFromStore);
-    lengthMap = Map<String, bool>.from(lengthsFromStore);
-    // printMap = Map<String, bool>.from(printsFromStore);
-    // sleeveMap = Map<String, bool>.from(sleevesFromStore);
     rangeVals = rangeValuesFromStore;
+    // Debug: print cityFromStore and cityOptions
+    log('cityFromStore: "${cityFromStore ?? 'null'}"');
+    log('cityOptions: ${cityOptions.join(", ")}');
+    if (cityFromStore != null && cityFromStore.isNotEmpty) {
+      // Try to match ignoring case and whitespace
+      final match = cityOptions.firstWhere(
+        (c) => c.trim().toLowerCase() == cityFromStore.trim().toLowerCase(),
+        orElse: () => '',
+      );
+      if (match.isNotEmpty) {
+        selectedCity = match;
+      } else {
+        selectedCity = null;
+      }
+    } else {
+      selectedCity = null;
+    }
     super.initState();
   }
 
@@ -574,62 +365,45 @@ class _FiltersPage extends State<FiltersPage> {
             ),
             SizedBox(height: width * 0.05),
             const Divider(),
-            const StyledHeading('DISTANCE (miles)'),
+            const StyledHeading('LOCATION'),
             SizedBox(height: width * 0.02),
             Padding(
               padding: EdgeInsets.fromLTRB(width * 0.05, 0, width * 0.05, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: distanceOptions.map((option) {
-                  return Row(
-                    children: [
-                      Radio<int>(
-                        value: option,
-                        groupValue: selectedDistance,
-                        onChanged: (val) {
-                          setState(() {
-                            selectedDistance = val;
-                          });
-                        },
-                      ),
-                      Text('$option'),
-                    ],
+              child: DropdownButtonFormField<String>(
+                value: selectedCity,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.black, width: 1),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.black, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.black, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                dropdownColor: Colors.white,
+                hint: const Text('Select a city'),
+                items: cityOptions.map((city) {
+                  return DropdownMenuItem<String>(
+                    value: city,
+                    child: Text(city),
                   );
                 }).toList(),
+                onChanged: (val) {
+                  setState(() {
+                    selectedCity = val;
+                  });
+                },
               ),
             ),
             SizedBox(height: width * 0.05),
-            // const StyledHeading('LENGTH'),
-            // SizedBox(height: width * 0.02),
-            // Padding(
-            //   padding: EdgeInsets.fromLTRB(width * 0.05, 0, width * 0.05, 0),
-            //   child: Wrap(
-            //     direction: Axis.horizontal,
-            //     children: generateLengths(),
-            //   ),
-            // ),
-            // SizedBox(height: width * 0.05),
-            // const Divider(),
-            // const StyledHeading('PRINT'),
-            // SizedBox(height: width * 0.02),
-            // Padding(
-            //   padding: EdgeInsets.fromLTRB(width * 0.05, 0, width * 0.05, 0),
-            //   child: Wrap(
-            //     direction: Axis.horizontal,
-            //     children: generatePrints(),
-            //   ),
-            // ),
-            // SizedBox(height: width * 0.05),
-            // const Divider(),
-            // const StyledHeading('SLEEVE'),
-            // SizedBox(height: width * 0.02),
-            // Padding(
-            //   padding: EdgeInsets.fromLTRB(width * 0.05, 0, width * 0.05, 0),
-            //   child: Wrap(
-            //     direction: Axis.horizontal,
-            //     children: generateSleeves(),
-            //   ),
-            // ),
           ]),
         ),
       ),
@@ -653,15 +427,14 @@ class _FiltersPage extends State<FiltersPage> {
               onPressed: () {
                 setState(() {
                   resetValues();
-                  widget.setValues(getColours(), getSizes(), getPrices(),
-                      getLengths(), getPrints(), getSleeves(), selectedDistance);
+                  selectedCity = null;
+                  widget.setValues(getColours(), getSizes(), getPrices(), selectedCity);
                   widget.setFilter(getFilterOn(), noOfFilters);
+                  Provider.of<ItemStoreProvider>(context, listen: false)
+                      .cityFilterSetter(null);
                   // Provider.of<ItemStoreProvider>(context, listen: false).sizesFilterSetter(sizeMap);
                   // Provider.of<ItemStoreProvider>(context, listen: false).rangeValuesFilterSetter(rangeVals);
                   // Provider.of<ItemStoreProvider>(context, listen: false).coloursFilterSetter(colourMap);
-                  // Provider.of<ItemStoreProvider>(context, listen: false).lengthsFilterSetter(lengthMap);
-                  // Provider.of<ItemStoreProvider>(context, listen: false).printsFilterSetter(printMap);
-                  // Provider.of<ItemStoreProvider>(context, listen: false).sleevesFilterSetter(sleeveMap);
                   // noOfFilters = 0;
                 });
               },
@@ -680,7 +453,7 @@ class _FiltersPage extends State<FiltersPage> {
             child: OutlinedButton(
               onPressed: () {
                 widget.setValues(getColours(), getSizes(), getPrices(),
-                    getLengths(), getPrints(), getSleeves(), selectedDistance);
+                    selectedCity);
                 widget.setFilter(getFilterOn(), noOfFilters);
                 Provider.of<ItemStoreProvider>(context, listen: false)
                     .sizesFilterSetter(sizeMap);
@@ -689,13 +462,9 @@ class _FiltersPage extends State<FiltersPage> {
                 Provider.of<ItemStoreProvider>(context, listen: false)
                     .coloursFilterSetter(colourMap);
                 Provider.of<ItemStoreProvider>(context, listen: false)
-                    .lengthsFilterSetter(lengthMap);
-                Provider.of<ItemStoreProvider>(context, listen: false)
-                    .printsFilterSetter(printMap);
-                Provider.of<ItemStoreProvider>(context, listen: false)
-                    .sleevesFilterSetter(sleeveMap);
-                Provider.of<ItemStoreProvider>(context, listen: false)
                     .rangeValuesFilterSetter(rangeVals);
+                Provider.of<ItemStoreProvider>(context, listen: false)
+                    .cityFilterSetter(selectedCity);
                 Navigator.pop(context);
               },
               style: OutlinedButton.styleFrom(
@@ -712,5 +481,19 @@ class _FiltersPage extends State<FiltersPage> {
         ]),
       ),
     );
+  }
+
+  void setValues(
+    List<String> filterColours,
+    List<String> filterSizes,
+    RangeValues rangeValuesFilter,
+    String? city,
+  ) {
+    filterSizes = filterSizes;
+    rangeValuesFilter = rangeValuesFilter;
+    filterColours = {...filterColours}.toList();
+    filterSizes = {...filterSizes}.toList();
+    selectedCity = city;
+    setState(() {});
   }
 }
