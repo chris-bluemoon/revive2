@@ -61,15 +61,26 @@ class _HomePageState extends State<HomePage> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('No Internet Connection'),
-        content: const Text('Please check your internet connection and try again.'),
+        backgroundColor: Colors.white,
+        title: const Center(child: Text('No Internet Connection', textAlign: TextAlign.center)),
+        content: const Text(
+          'Please check your internet connection and try again.',
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
             onPressed: () async {
               Navigator.of(context).pop();
               await _checkConnection();
             },
-            child: const Text('Try Again'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -81,15 +92,26 @@ class _HomePageState extends State<HomePage> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Connection Timeout'),
-        content: const Text('The connection timed out. Please try again.'),
+        backgroundColor: Colors.white,
+        title: const Center(child: Text('Connection Timeout', textAlign: TextAlign.center)),
+        content: const Text(
+          'The connection timed out. Please try again.',
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
             onPressed: () async {
               Navigator.of(context).pop();
               await _checkConnection();
             },
-            child: const Text('Try Again'),
+            child: const Text('OK'),
           ),
         ],
       ),
