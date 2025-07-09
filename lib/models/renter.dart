@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'badges.dart';
 
 class Renter {
@@ -53,7 +54,7 @@ class Renter {
   List<Map<String, DateTime>> vacations;
   String status; // <-- Added status field
   List<String> saved;
-  List<String> badgeTitles; // Store badge titles earned by the user
+  Map<String, int> badgeTitles; // Store badge titles and their scores
   final Duration? avgResponseTime;
   final int compliments;
   final bool hasEcoInitiative;
@@ -97,7 +98,7 @@ class Renter {
     );
   }
 
-  List<Badge> get badges => allBadges.where((b) => badgeTitles.contains(b.title)).toList();
+  List<Badge> get badges => allBadges.where((b) => badgeTitles.keys.contains(b.title)).toList();
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -177,7 +178,9 @@ class Renter {
       fcmToken: data['fcmToken'],
       status: data['status']?.toString() ?? '', // <-- especially here!
       saved: data['saved'] != null ? List<String>.from(data['saved']) : <String>[],
-      badgeTitles: data['badgeTitles'] != null ? List<String>.from(data['badgeTitles']) : <String>[],
+      badgeTitles: data['badgeTitles'] != null
+          ? Map<String, int>.from(data['badgeTitles'])
+          : <String, int>{},
       avgResponseTime: data['avgResponseTime'] != null
           ? Duration(milliseconds: data['avgResponseTime'])
           : null,

@@ -81,7 +81,7 @@ class ItemStoreProvider extends ChangeNotifier {
     vacations: [],
     status: 'not active',
     saved: [],
-    badgeTitles: [], // <-- Added status field
+    badgeTitles: {}, // <-- Added status field, changed to Map<String, int>
   );
   bool _loggedIn = false;
   // String _region = 'BANGKOK';
@@ -232,8 +232,8 @@ class ItemStoreProvider extends ChangeNotifier {
         final renterIndex = _renters.indexWhere((r) => r.id == itemRenter.renterId);
         if (renterIndex != -1) {
           final renter = _renters[renterIndex];
-          if (!renter.badgeTitles.contains('First Rental Complete')) {
-            renter.badgeTitles.add('First Rental Complete');
+          if (!renter.badgeTitles.containsKey('First Rental Complete')) {
+            renter.badgeTitles['First Rental Complete'] = 1;
             await saveRenter(renter);
           }
         }
@@ -803,7 +803,7 @@ class ItemStoreProvider extends ChangeNotifier {
       lastLogin: DateTime.now(),
       status: 'not active',
       saved: [],
-      badgeTitles: [],
+      badgeTitles: <String, int>{},
     );
     
     // Reset logged in status

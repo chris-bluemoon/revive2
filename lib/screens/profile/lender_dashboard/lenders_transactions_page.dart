@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:revivals/models/badges.dart';
 import 'package:revivals/models/item.dart';
 import 'package:revivals/models/item_renter.dart';
 import 'package:revivals/models/renter.dart';
@@ -577,51 +578,94 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                         builder: (context) {
                           int selectedStars = 0;
                           final reviewController = TextEditingController();
+                          // Only show badges relevant to reviews (e.g., trust badges)
+                          final reviewBadges = allBadges.where((b) =>
+                            b.title == 'Top Rated Renter' ||
+                            b.title == 'Damage-Free Streak' ||
+                            b.title == 'Always On Time' ||
+                            b.title == 'Super Renter' ||
+                            b.title == 'First Rental Complete' ||
+                            b.title == '10 Rentals' ||
+                            b.title == '50 Rentals' ||
+                            b.title == '100 Rentals' ||
+                            b.title == 'Sustainability Star' ||
+                            b.title == 'Fast Responder' ||
+                            b.title == 'Helpful Rater'
+                          ).toList();
+                          final Map<String, bool> badgeSelections = {
+                            for (var badge in reviewBadges) badge.title: false
+                          };
                           return StatefulBuilder(
                             builder: (context, setState) => AlertDialog(
                               backgroundColor: Colors.white,
                               shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.all(Radius.circular(12)),
                               ),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: List.generate(5, (index) {
-                                      return IconButton(
-                                        icon: Icon(
-                                          index < selectedStars
-                                              ? Icons.star
-                                              : Icons.star_border,
-                                          color: Colors.amber,
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: List.generate(5, (index) {
+                                        return IconButton(
+                                          icon: Icon(
+                                            index < selectedStars
+                                                ? Icons.star
+                                                : Icons.star_border,
+                                            color: Colors.amber,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedStars = index + 1;
+                                            });
+                                          },
+                                        );
+                                      }),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    TextField(
+                                      controller: reviewController,
+                                      maxLines: 4,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Write your review here...',
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.black),
                                         ),
-                                        onPressed: () {
-                                          setState(() {
-                                            selectedStars = index + 1;
-                                          });
-                                        },
-                                      );
-                                    }),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  TextField(
-                                    controller: reviewController,
-                                    maxLines: 4,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Write your review here...',
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.black),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.black),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.black, width: 2),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.black),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.black, width: 2),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 16),
+                                    // Badge checkboxes
+                                    const Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text('Award Badges:', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    ),
+                                    ...reviewBadges.map((badge) => CheckboxListTile(
+                                          value: badgeSelections[badge.title],
+                                          onChanged: (val) {
+                                            setState(() {
+                                              badgeSelections[badge.title] = val ?? false;
+                                            });
+                                          },
+                                          title: Row(
+                                            children: [
+                                              Icon(badge.icon, size: 20),
+                                              const SizedBox(width: 8),
+                                              Text(badge.title),
+                                            ],
+                                          ),
+                                          subtitle: Text(badge.description, style: const TextStyle(fontSize: 12)),
+                                          controlAffinity: ListTileControlAffinity.leading,
+                                          dense: true,
+                                        )),
+                                  ],
+                                ),
                               ),
                               actions: [
                                 TextButton(
@@ -642,6 +686,11 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                                       );
                                       return;
                                     }
+                                    // Collect selected badges
+                                    final selectedBadges = reviewBadges
+                                        .where((b) => badgeSelections[b.title] == true)
+                                        .map((b) => b.title)
+                                        .toList();
                                     Provider.of<ItemStoreProvider>(context, listen: false)
                                         .addReview(Review(
                                       id: uuid.v4(),
@@ -654,6 +703,7 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                                       rating: selectedStars,
                                       text: reviewController.text,
                                       date: DateTime.now(),
+                                      badges: selectedBadges,
                                     ));
                                     Navigator.of(context).pop();
                                     setState(() {});
@@ -867,65 +917,101 @@ class _PurchaseCardLenderState extends State<PurchaseCardLender> {
                       } else {
                         newStatus = "reviewedByLender";
                       }
-                      
-                      setState(() {
-                        widget.itemRenter.status = newStatus;
-                      });
-                      // Update in itemStore
-                      Provider.of<ItemStoreProvider>(context, listen: false)
-                          .saveItemRenter(widget.itemRenter);
-
+                      bool submitted = false;
                       await showDialog(
                         barrierDismissible: false,
                         context: context,
                         builder: (context) {
                           int selectedStars = 0;
                           final reviewController = TextEditingController();
+                          // Only show badges relevant to reviews (e.g., trust badges)
+                          final reviewBadges = allBadges.where((b) =>
+                            b.title == 'Top Rated Renter' ||
+                            b.title == 'Damage-Free Streak' ||
+                            b.title == 'Always On Time' ||
+                            b.title == 'Super Renter' ||
+                            b.title == 'First Rental Complete' ||
+                            b.title == '10 Rentals' ||
+                            b.title == '50 Rentals' ||
+                            b.title == '100 Rentals' ||
+                            b.title == 'Sustainability Star' ||
+                            b.title == 'Fast Responder' ||
+                            b.title == 'Helpful Rater'
+                          ).toList();
+                          final Map<String, bool> badgeSelections = {
+                            for (var badge in reviewBadges) badge.title: false
+                          };
                           return StatefulBuilder(
                             builder: (context, setState) => AlertDialog(
                               backgroundColor: Colors.white,
                               shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.all(Radius.circular(12)),
                               ),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: List.generate(5, (index) {
-                                      return IconButton(
-                                        icon: Icon(
-                                          index < selectedStars
-                                              ? Icons.star
-                                              : Icons.star_border,
-                                          color: Colors.amber,
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: List.generate(5, (index) {
+                                        return IconButton(
+                                          icon: Icon(
+                                            index < selectedStars
+                                                ? Icons.star
+                                                : Icons.star_border,
+                                            color: Colors.amber,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedStars = index + 1;
+                                            });
+                                          },
+                                        );
+                                      }),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    TextField(
+                                      controller: reviewController,
+                                      maxLines: 4,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Write your review here...',
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.black),
                                         ),
-                                        onPressed: () {
-                                          setState(() {
-                                            selectedStars = index + 1;
-                                          });
-                                        },
-                                      );
-                                    }),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  TextField(
-                                    controller: reviewController,
-                                    maxLines: 4,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Write your review here...',
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.black),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.black),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.black, width: 2),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.black),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.black, width: 2),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 16),
+                                    // Badge checkboxes
+                                    const Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text('Award Badges:', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    ),
+                                    ...reviewBadges.map((badge) => CheckboxListTile(
+                                          value: badgeSelections[badge.title],
+                                          onChanged: (val) {
+                                            setState(() {
+                                              badgeSelections[badge.title] = val ?? false;
+                                            });
+                                          },
+                                          title: Row(
+                                            children: [
+                                              Icon(badge.icon, size: 20),
+                                              const SizedBox(width: 8),
+                                              Text(badge.title),
+                                            ],
+                                          ),
+                                          subtitle: Text(badge.description, style: const TextStyle(fontSize: 12)),
+                                          controlAffinity: ListTileControlAffinity.leading,
+                                          dense: true,
+                                        )),
+                                  ],
+                                ),
                               ),
                               actions: [
                                 TextButton(
@@ -946,6 +1032,11 @@ class _PurchaseCardLenderState extends State<PurchaseCardLender> {
                                       );
                                       return;
                                     }
+                                    final selectedBadges = reviewBadges
+                                        .where((b) => badgeSelections[b.title] == true)
+                                        .map((b) => b.title)
+                                        .toList();
+                                    submitted = true;
                                     Provider.of<ItemStoreProvider>(context, listen: false)
                                         .addReview(Review(
                                       id: uuid.v4(),
@@ -958,6 +1049,7 @@ class _PurchaseCardLenderState extends State<PurchaseCardLender> {
                                       rating: selectedStars,
                                       text: reviewController.text,
                                       date: DateTime.now(),
+                                      badges: selectedBadges,
                                     ));
                                     Navigator.of(context).pop();
                                     setState(() {});
@@ -972,6 +1064,14 @@ class _PurchaseCardLenderState extends State<PurchaseCardLender> {
                           );
                         },
                       );
+                      if (submitted) {
+                        setState(() {
+                          widget.itemRenter.status = newStatus;
+                        });
+                        // Update in itemStore
+                        Provider.of<ItemStoreProvider>(context, listen: false)
+                            .saveItemRenter(widget.itemRenter);
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,

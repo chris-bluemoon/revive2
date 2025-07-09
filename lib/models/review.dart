@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+
 class Review {
   final String id; // Unique review id
   final String reviewerId; // The user who wrote the review
@@ -10,6 +11,7 @@ class Review {
   final int rating; // 1 to 5 stars
   final String text; // Review text
   final DateTime date; // Date of review
+  final List<String> badges; // List of badge titles awarded with the review
 
   Review({
     required this.id,
@@ -20,6 +22,7 @@ class Review {
     required this.rating,
     required this.text,
     required this.date,
+    this.badges = const [],
   });
 
   factory Review.fromFirestore(
@@ -40,6 +43,7 @@ class Review {
           : (data['date'] != null
               ? DateTime.tryParse(data['date'].toString()) ?? DateTime.now()
               : DateTime.now()),
+      badges: (data['badges'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
     );
   }
 
@@ -52,6 +56,7 @@ class Review {
       'rating': rating,
       'text': text,
       'date': date,
+      'badges': badges,
     };
   }
 }

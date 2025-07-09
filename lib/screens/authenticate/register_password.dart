@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/renter.dart';
@@ -125,7 +124,7 @@ class _RegisterPassword extends State<RegisterPassword> {
           lastLogin: DateTime.now(),
           status: 'active',
           vacations: [],
-          badgeTitles: [],
+          badgeTitles: {},
         );
         
         log('Created new renter object: ${newRenter.name} (${newRenter.id})');
