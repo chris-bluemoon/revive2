@@ -399,16 +399,49 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                                             shape: const RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(Radius.circular(12)),
                                             ),
-                                            title: const Text('Sign-In Failed'),
-                                            content: const Text('Google Sign-In failed. Please check your internet connection and try again.'),
+                                            title: const Text(
+                                              'Sign-In Failed',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            content: const Text(
+                                              'Google Sign-In failed. Please check your account and try again.',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                            actionsAlignment: MainAxisAlignment.center,
                                             actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text('OK'),
+                                              SizedBox(
+                                                width: double.infinity,
+                                                height: 48,
+                                                child: TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  style: TextButton.styleFrom(
+                                                    foregroundColor: Colors.white,
+                                                    backgroundColor: Colors.black,
+                                                    textStyle: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.w600,
+                                                      letterSpacing: 0.5,
+                                                    ),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(12),
+                                                    ),
+                                                  ),
+                                                  child: const Text('OK'),
+                                                ),
                                               ),
                                             ],
+                                            actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
                                           );
                                         },
                                       );

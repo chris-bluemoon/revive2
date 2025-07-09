@@ -147,27 +147,33 @@ class _ItemResultsState extends State<ItemResults> {
             if (i.hashtags.contains(widget.value)) {
               finalItems.add(i);
             }
+            break;
           case 'myItems':
             if (i.owner == widget.value) {
               finalItems.add(i);
             }
+            break;
           case 'status':
             if (i.status == widget.value) {
               log('Item status: ${i.status}');
               finalItems.add(i);
             }
+            break;
           case 'brand':
             if (i.brand == widget.value) {
               finalItems.add(i);
             }
+            break;
           case 'type':
             if (i.type == widget.value) {
               finalItems.add(i);
             }
+            break;
           case 'bookingType':
             if (i.bookingType == widget.value || i.bookingType == 'both') {
               finalItems.add(i);
             }
+            break;
           case 'dateAdded':
             for (Item i in allItems) {
               DateFormat format = DateFormat("dd-MM-yyyy");
@@ -177,6 +183,7 @@ class _ItemResultsState extends State<ItemResults> {
                 finalItems.add(i);
               }
             }
+            break;
         }
       }
     }
