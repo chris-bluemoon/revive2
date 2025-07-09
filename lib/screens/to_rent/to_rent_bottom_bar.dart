@@ -66,8 +66,41 @@ class ToRentBottomBar extends StatelessWidget {
       return Padding(
         padding: EdgeInsets.all(width * 0.04),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            // Left half: empty or BUY button
+            Expanded(
+              child: (item.bookingType == 'buy' || item.bookingType == 'both')
+                  ? ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: width * 0.04),
+                      ),
+                      onPressed: () {
+                        if (!store.loggedIn) {
+                          // You may want to show a dialog here
+                          return;
+                        }
+                        Navigator.of(context).push(SmoothTransitions.luxury(
+                          SummaryPurchase(
+                            item,
+                            DateTime.now(),
+                            DateTime.now().add(const Duration(days: 1)),
+                            1,
+                            item.buyPrice,
+                            'pending',
+                            '\u0e3f', // THB symbol as placeholder
+                          ),
+                        ));
+                      },
+                      child: const Text('BUY', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            SizedBox(width: width * 0.04),
+            // Right half: RENT button always
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -82,44 +115,18 @@ class ToRentBottomBar extends StatelessWidget {
                     // You may want to show a dialog here
                     return;
                   }
-                    Navigator.of(context).push(SmoothTransitions.luxury(RentThisWithDateSelecter(item)));
+                  Navigator.of(context).push(SmoothTransitions.luxury(RentThisWithDateSelecter(item)));
                 },
-                child: const Text('RENT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              ),
-            ),
-            if (item.bookingType == 'buy' || item.bookingType == 'both') ...[
-              SizedBox(width: width * 0.04),
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: width * 0.04),
+                child: Text(
+                  'RENT',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: width * 0.05, // Slightly bigger and relative to screen width
                   ),
-                  onPressed: () {
-                    if (!store.loggedIn) {
-                      // You may want to show a dialog here
-                      return;
-                    }
-                    // TODO: Replace with real values for startDate, endDate, noOfDays, price, status, symbol
-                    Navigator.of(context).push(SmoothTransitions.luxury(
-                      SummaryPurchase(
-                        item,
-                        DateTime.now(),
-                        DateTime.now().add(const Duration(days: 1)),
-                        1,
-                        item.buyPrice,
-                        'pending',
-                        '\u0e3f', // THB symbol as placeholder
-                      ),
-                    ));
-                  },
-                  child: const Text('BUY', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
-            ],
+            ),
           ],
         ),
       );

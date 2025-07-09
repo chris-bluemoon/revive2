@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:revivals/models/item.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/to_rent/to_rent.dart';
-import 'package:revivals/shared/smooth_page_route.dart';
 import 'package:revivals/shared/item_card.dart';
+import 'package:revivals/shared/smooth_page_route.dart';
 
 class YouMayAlsoLike extends StatelessWidget {
   final Item item;
