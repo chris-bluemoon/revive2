@@ -208,44 +208,45 @@ class _ToRentState extends State<ToRent> {
                           title: const Text('Share'),
                           onTap: () async {
                             Navigator.pop(context);
-                            final shareText = 'Check out this item on Revive: ${widget.item.name}';
+                            final shareText = 'Check out this item on Revive: \\${widget.item.name}';
                             try {
                               await Share.share(shareText);
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Failed to share: $e')),
+                                SnackBar(content: Text('Failed to share: \\$e')),
                               );
                             }
                           },
                         ),
-                        ListTile(
-                          leading: const Icon(Icons.report),
-                          title: const Text('Report as inappropriate'),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            // Add report to Firebase (Firestore)
-                            try {
-                              final report = {
-                                'itemId': widget.item.id,
-                                'itemName': widget.item.name,
-                                'reportedUserId': widget.item.owner,
-                                'reportedUserName': ownerName,
-                                'reason': 'Item Report',
-                                'timestamp': DateTime.now().toIso8601String(),
-                              };
-                              // Use Firebase Firestore
-                              // ignore: avoid_dynamic_calls
-                              await FirebaseFirestore.instance.collection('reports').add(report);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Reported. Thank you!')),
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Failed to report: $e')),
-                              );
-                            }
-                          },
-                        ),
+                        if (!isOwner)
+                          ListTile(
+                            leading: const Icon(Icons.report),
+                            title: const Text('Report as inappropriate'),
+                            onTap: () async {
+                              Navigator.pop(context);
+                              // Add report to Firebase (Firestore)
+                              try {
+                                final report = {
+                                  'itemId': widget.item.id,
+                                  'itemName': widget.item.name,
+                                  'reportedUserId': widget.item.owner,
+                                  'reportedUserName': ownerName,
+                                  'reason': 'Item Report',
+                                  'timestamp': DateTime.now().toIso8601String(),
+                                };
+                                // Use Firebase Firestore
+                                // ignore: avoid_dynamic_calls
+                                await FirebaseFirestore.instance.collection('reports').add(report);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Reported. Thank you!')),
+                                );
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Failed to report: \\$e')),
+                                );
+                              }
+                            },
+                          ),
                         ListTile(
                           leading: const Icon(Icons.close),
                           title: const Text('Cancel'),
@@ -370,7 +371,7 @@ class _ToRentState extends State<ToRent> {
                           child: UserCard(ownerName, location),
                         ),
                         // Spacer to push the icon to the far right
-                        Spacer(),
+                        const Spacer(),
                         if (!isOwner)
                           IconButton(
                             icon: Icon(Icons.chat_bubble_outline, color: Colors.black, size: width * 0.06), // Reduced size

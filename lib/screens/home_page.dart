@@ -10,6 +10,7 @@ import 'package:revivals/screens/browse/browse.dart';
 import 'package:revivals/screens/create/create_item_temp.dart';
 import 'package:revivals/screens/home/home.dart';
 import 'package:revivals/screens/profile/profile.dart';
+import 'package:revivals/shared/network_utils.dart';
 
 double? screenWidth;
 double? screenHeight;
@@ -22,19 +23,77 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _checkingConnection = true;
+  bool _hasConnection = true;
+  bool _timeoutError = false;
   @override
   void initState() {
     super.initState();
-    // itemStore.fetchReviewsOnce(); // <-- Add this line
-    // Provider.of<ItemStoreProvider>(context, listen: false)
-    // .fetchRentersOnce();
-    // Provider.of<ItemStoreProvider>(context, listen: false)
-    // .fetchImagesOnce();
-    // Provider.of<ItemStoreProvider>(context, listen: false).populateFavourites();
-    // Provider.of<ItemStoreProvider>(context, listen: false).populateFittings();
-    // Provider.of<ItemStoreProvider>(context, listen: false).addAllFavourites();
-    // getCurrentUser();
-    log('initState Logged in status at home_page.dart: ${Provider.of<ItemStoreProvider>(context, listen: false).loggedIn}');
+    _checkConnection();
+    log('initState Logged in status at home_page.dart: \\${Provider.of<ItemStoreProvider>(context, listen: false).loggedIn}');
+  }
+
+  Future<void> _checkConnection() async {
+    setState(() {
+      _checkingConnection = true;
+      _timeoutError = false;
+    });
+    try {
+      final hasConnection = await NetworkUtils.hasInternetConnection(timeout: const Duration(seconds: 5));
+      setState(() {
+        _hasConnection = hasConnection;
+        _checkingConnection = false;
+      });
+      if (!hasConnection) {
+        _showNoConnectionDialog();
+      }
+    } catch (e) {
+      setState(() {
+        _timeoutError = true;
+        _checkingConnection = false;
+      });
+      _showTimeoutDialog();
+    }
+  }
+
+  void _showNoConnectionDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('No Internet Connection'),
+        content: const Text('Please check your internet connection and try again.'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await _checkConnection();
+            },
+            child: const Text('Try Again'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showTimeoutDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Connection Timeout'),
+        content: const Text('The connection timed out. Please try again.'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await _checkConnection();
+            },
+            child: const Text('Try Again'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -94,10 +153,15 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
+    if (_checkingConnection) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: Container(
-        margin: EdgeInsets.only(bottom: screenHeight * 0.03), // 3% of screen height
+        margin: EdgeInsets.only(bottom: screenHeight * 0.03),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,

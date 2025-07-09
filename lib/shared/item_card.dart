@@ -8,7 +8,6 @@ import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/screens/to_rent/_bookmark_button.dart';
 import 'package:revivals/screens/to_rent/_favourite_button.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
-import 'package:revivals/shared/get_country_price.dart';
 import 'package:revivals/shared/styled_text.dart';
 
 // ignore: must_be_immutable
@@ -94,9 +93,7 @@ class _ItemCardState extends State<ItemCard> {
     }
   }
 
-  int getPricePerDay(int noOfDays) {
-    String country = 'BANGKOK';
-
+  int getPricePerDay() {
     // Get the highest period rent price and its period
     // Assuming you have these fields in your item model:
     // - rentPriceDaily (1 day)
@@ -283,7 +280,7 @@ class _ItemCardState extends State<ItemCard> {
             // Show rental price for "rental" or "both" booking types
             if (widget.item.bookingType == 'rental' || widget.item.bookingType == 'both')
               StyledBody(
-                'Rent from ${getPricePerDay(5)}$symbol',
+                'Rent from ${getPricePerDay()}$symbol / day',
                 weight: FontWeight.bold,
                 color: Colors.black,
                 fontSize: widget.item.bookingType == 'both' ? width * 0.03 : null, // Smaller text for 'both'

@@ -17,6 +17,9 @@ class FiltersPage extends StatefulWidget {
 }
 
 class _FiltersPage extends State<FiltersPage> {
+  // Distance filter state
+  final List<int> distanceOptions = [1, 3, 5, 10];
+  int? selectedDistance;
   int noOfFilters = 0;
   final double width =
       WidgetsBinding.instance.platformDispatcher.views.first.physicalSize.width;
@@ -570,7 +573,32 @@ class _FiltersPage extends State<FiltersPage> {
                   }),
             ),
             SizedBox(height: width * 0.05),
-            // const Divider(),
+            const Divider(),
+            const StyledHeading('DISTANCE (miles)'),
+            SizedBox(height: width * 0.02),
+            Padding(
+              padding: EdgeInsets.fromLTRB(width * 0.05, 0, width * 0.05, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: distanceOptions.map((option) {
+                  return Row(
+                    children: [
+                      Radio<int>(
+                        value: option,
+                        groupValue: selectedDistance,
+                        onChanged: (val) {
+                          setState(() {
+                            selectedDistance = val;
+                          });
+                        },
+                      ),
+                      Text('$option'),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+            SizedBox(height: width * 0.05),
             // const StyledHeading('LENGTH'),
             // SizedBox(height: width * 0.02),
             // Padding(
@@ -626,7 +654,7 @@ class _FiltersPage extends State<FiltersPage> {
                 setState(() {
                   resetValues();
                   widget.setValues(getColours(), getSizes(), getPrices(),
-                      getLengths(), getPrints(), getSleeves());
+                      getLengths(), getPrints(), getSleeves(), selectedDistance);
                   widget.setFilter(getFilterOn(), noOfFilters);
                   // Provider.of<ItemStoreProvider>(context, listen: false).sizesFilterSetter(sizeMap);
                   // Provider.of<ItemStoreProvider>(context, listen: false).rangeValuesFilterSetter(rangeVals);
@@ -652,7 +680,7 @@ class _FiltersPage extends State<FiltersPage> {
             child: OutlinedButton(
               onPressed: () {
                 widget.setValues(getColours(), getSizes(), getPrices(),
-                    getLengths(), getPrints(), getSleeves());
+                    getLengths(), getPrints(), getSleeves(), selectedDistance);
                 widget.setFilter(getFilterOn(), noOfFilters);
                 Provider.of<ItemStoreProvider>(context, listen: false)
                     .sizesFilterSetter(sizeMap);

@@ -91,7 +91,7 @@ class _RentersRentalsPageState extends State<RentersRentalsPage> {
                 children: [
                   // Rentals Tab
                   rentals.isEmpty
-                      ? const Center(child: Text('No rentals found.'))
+                      ? const Center(child: Text('No rentals yet'))
                       : ListView.separated(
                     itemCount: rentals.length,
                     separatorBuilder: (context, index) => const Divider(),
@@ -138,7 +138,7 @@ class _RentersRentalsPageState extends State<RentersRentalsPage> {
                   ),
                   // Purchases Tab
                   purchases.isEmpty
-                      ? const Center(child: Text('No purchases found.'))
+                      ? const Center(child: Text('No purchases yet'))
                       : ListView.separated(
                           itemCount: purchases.length,
                           separatorBuilder: (context, index) => const Divider(),

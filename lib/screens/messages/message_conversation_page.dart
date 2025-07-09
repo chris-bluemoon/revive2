@@ -4,10 +4,9 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flutter_sound.dart';
-import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
+// import 'package:flutter_sound/flutter_sound.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/models/message.dart';
 // Add the correct import for ItemStoreProvider below.
@@ -340,18 +339,8 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                                       ),
                                     ),
                                   ),
-                                if ((data['audioUrl'] ?? '').isNotEmpty)
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(vertical: 4),
-                                    child: IconButton(
-                                      icon: const Icon(Icons.play_arrow),
-                                      onPressed: () async {
-                                        final player = FlutterSoundPlayer();
-                                        await player.openPlayer();
-                                        await player.startPlayer(fromURI: data['audioUrl']);
-                                      },
-                                    ),
-                                  ),
+                                // Audio playback removed: FlutterSoundPlayer usage deleted
+                                // If you want to show an audio indicator, you can add a placeholder here.
                                 const SizedBox(height: 4),
                                 Text(
                                   data['time'] != null
