@@ -356,22 +356,22 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                                   setState(() {
                                     _isProcessingLogin = true;
                                   });
-                                  
+
                                   showDialogue(context);
                                   userCredential.value = await signInWithGoogle();
                                   hideProgressDialogue(context);
-                                  
+
                                   print('=== DEBUG: Google Sign-In Result ===');
                                   print('userCredential.value: ${userCredential.value}');
-                                  
+
                                   if (userCredential.value != null && context.mounted) {
                                     final email = userCredential.value.user!.email;
                                     final displayName = userCredential.value.user!.displayName;
                                     print('Email from Google: $email');
                                     print('Display Name from Google: $displayName');
-                                    
+
                                     await handleNewLogIn(email, displayName);
-                                    
+
                                     // Only navigate to home page if login was successful and user wasn't deleted
                                     if (context.mounted && found == true && !_isProcessingLogin) {
                                       Navigator.of(context).pushNamedAndRemoveUntil(
@@ -390,62 +390,66 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
                                     setState(() {
                                       _isProcessingLogin = false;
                                     });
-                                    if (context.mounted) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            backgroundColor: Colors.white,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(Radius.circular(12)),
-                                            ),
-                                            title: const Text(
-                                              'Sign-In Failed',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20,
-                                                color: Colors.black,
+                                    // Only show error dialog if sign-in failed, not if cancelled
+                                    if (userCredential.value != null) {
+                                      if (context.mounted) {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              backgroundColor: Colors.white,
+                                              shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(12)),
                                               ),
-                                            ),
-                                            content: const Text(
-                                              'Google Sign-In failed. Please check your account and try again.',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black87,
-                                              ),
-                                            ),
-                                            actionsAlignment: MainAxisAlignment.center,
-                                            actions: [
-                                              SizedBox(
-                                                width: double.infinity,
-                                                height: 48,
-                                                child: TextButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    foregroundColor: Colors.white,
-                                                    backgroundColor: Colors.black,
-                                                    textStyle: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.w600,
-                                                      letterSpacing: 0.5,
-                                                    ),
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(12),
-                                                    ),
-                                                  ),
-                                                  child: const Text('OK'),
+                                              title: const Text(
+                                                'Sign-In Failed',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20,
+                                                  color: Colors.black,
                                                 ),
                                               ),
-                                            ],
-                                            actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                                          );
-                                        },
-                                      );
+                                              content: const Text(
+                                                'Google Sign-In failed. Please check your account and try again.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                              actionsAlignment: MainAxisAlignment.center,
+                                              actions: [
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  height: 48,
+                                                  child: TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    style: TextButton.styleFrom(
+                                                      foregroundColor: Colors.white,
+                                                      backgroundColor: Colors.black,
+                                                      textStyle: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.w600,
+                                                        letterSpacing: 0.5,
+                                                      ),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(12),
+                                                      ),
+                                                    ),
+                                                    child: const Text('OK'),
+                                                  ),
+                                                ),
+                                              ],
+                                              actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                                            );
+                                          },
+                                        );
+                                      }
                                     }
+                                    // If userCredential.value == null, do nothing (user cancelled)
                                   }
                                 },
                               ),
