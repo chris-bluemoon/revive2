@@ -275,20 +275,64 @@ class _ItemResultsState extends State<ItemResults> {
                           const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2, childAspectRatio: 0.5),
                       itemCount: finalItems.length,
-                      itemBuilder: (_, index) => GestureDetector(
-                          child: SizedBox(
-                                  width: width * 0.5, // Constrain width
-                                  // Removed fixed height to let IntrinsicHeight work
-                                  child: ItemCard(finalItems[index])),
-                          onTap: () {
-                            final item = finalItems[index];
-                            // final currentUserId = Provider.of<ItemStoreProvider>(context, listen: false).renter.id;
-                            if (widget.attribute != 'status') {
-                              Navigator.of(context).push(SmoothTransitions.luxury(ToRent(item)));
-                            } else if (widget.attribute == 'status') {
-                              Navigator.of(context).push(SmoothTransitions.luxury(ToRentSubmission(item)));
-                            } 
-                          }),
+                      itemBuilder: (_, index) {
+                        final item = finalItems[index];
+                        if (widget.attribute == 'myItems') {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GestureDetector(
+                                child: SizedBox(
+                                  width: width * 0.5,
+                                  child: ItemCard(item),
+                                ),
+                                onTap: () {
+                                  Navigator.of(context).push(SmoothTransitions.luxury(ToRent(item)));
+                                },
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit, color: Colors.blue, size: width * 0.05),
+                                    iconSize: width * 0.05,
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () {
+                                      // TODO: Implement edit action
+                                    },
+                                  ),
+                                  SizedBox(width: width * 0.01),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red, size: width * 0.05),
+                                    iconSize: width * 0.05,
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () {
+                                      // TODO: Implement delete action
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        } else {
+                          return GestureDetector(
+                            child: SizedBox(
+                              width: width * 0.5,
+                              child: ItemCard(item),
+                            ),
+                            onTap: () {
+                              if (widget.attribute != 'status') {
+                                Navigator.of(context).push(SmoothTransitions.luxury(ToRent(item)));
+                              } else if (widget.attribute == 'status') {
+                                Navigator.of(context).push(SmoothTransitions.luxury(ToRentSubmission(item)));
+                              }
+                            },
+                          );
+                        }
+                      },
                     );
                   }),
                 )
