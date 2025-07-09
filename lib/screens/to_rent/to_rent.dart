@@ -175,8 +175,9 @@ class _ToRentState extends State<ToRent> {
               fontWeight: FontWeight.bold,
               fontSize: 22,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+            softWrap: true,            // <-- Ensure wrapping
+            maxLines: 3,               // <-- Allow up to 3 lines (adjust as needed)
+            overflow: TextOverflow.visible, // <-- Show all lines, no ellipsis
             textAlign: TextAlign.center,
           ),
         ),
@@ -412,7 +413,18 @@ class _ToRentState extends State<ToRent> {
                           weight: FontWeight.bold,
                         ),
                         SizedBox(height: width * 0.01),
-                        StyledHeading(widget.item.description),
+                        // --- Make description wrap ---
+                        Text(
+                          widget.item.description,
+                          style: TextStyle(
+                            fontSize: width * 0.042,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.black,
+                          ),
+                          softWrap: true,
+                          maxLines: 5, // or remove for unlimited lines
+                          overflow: TextOverflow.visible,
+                        ),
                         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                         Row(
                           children: [

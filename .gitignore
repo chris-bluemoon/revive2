@@ -44,3 +44,11 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 serviceAccountKey.json
+
+# Python virtual environment
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
