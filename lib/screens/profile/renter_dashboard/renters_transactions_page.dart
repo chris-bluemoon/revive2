@@ -921,7 +921,188 @@ class PurchaseCard extends StatelessWidget {
                 ),
               ],
             ),
-            // No action buttons for purchases - only status display
+            // Add LEAVE REVIEW button condition for purchases (same as lender dashboard)
+            if (DateTime.parse(itemRenter.endDate).isBefore(DateTime.now()) &&
+                itemRenter.status != "booked" &&
+                itemRenter.status != "reviewedByRenter" &&
+                itemRenter.status != "reviewedByBoth")
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Determine new status based on current status
+                      String newStatus;
+                      if (itemRenter.status == "reviewedByLender") {
+                        newStatus = "reviewedByBoth";
+                      } else {
+                        newStatus = "reviewedByRenter";
+                      }
+                      bool submitted = false;
+                      await showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) {
+                          int selectedStars = 0;
+                          final reviewController = TextEditingController();
+                          // Only show badges relevant to reviews (e.g., trust badges)
+                          final reviewBadges = allBadges.where((b) =>
+                            b.title == 'Top Rated Lender' ||
+                            b.title == 'Great Communication' ||
+                            b.title == 'Flexible Pickup/Return' ||
+                            b.title == 'Super Lender' ||
+                            b.title == 'First Rental Complete' ||
+                            b.title == '10 Rentals' ||
+                            b.title == '50 Rentals' ||
+                            b.title == '100 Rentals' ||
+                            b.title == 'Sustainability Star' ||
+                            b.title == 'Fast Responder' ||
+                            b.title == 'Helpful Rater'
+                          ).toList();
+                          final Map<String, bool> badgeSelections = {
+                            for (var badge in reviewBadges) badge.title: false
+                          };
+                          return StatefulBuilder(
+                            builder: (context, setState) => AlertDialog(
+                              backgroundColor: Colors.white,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(12)),
+                              ),
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: List.generate(5, (index) {
+                                        return IconButton(
+                                          icon: Icon(
+                                            index < selectedStars
+                                                ? Icons.star
+                                                : Icons.star_border,
+                                            color: Colors.amber,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedStars = index + 1;
+                                            });
+                                          },
+                                        );
+                                      }),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    TextField(
+                                      controller: reviewController,
+                                      maxLines: 4,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Write your review here...',
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.black),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.black),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(color: Colors.black, width: 2),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    // Badge checkboxes
+                                    const Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text('Award Badges:', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    ),
+                                    ...reviewBadges.map((badge) => CheckboxListTile(
+                                          value: badgeSelections[badge.title],
+                                          onChanged: (val) {
+                                            setState(() {
+                                              badgeSelections[badge.title] = val ?? false;
+                                            });
+                                          },
+                                          title: Row(
+                                            children: [
+                                              Icon(badge.icon, size: 20),
+                                              const SizedBox(width: 8),
+                                              Text(badge.title),
+                                            ],
+                                          ),
+                                          subtitle: Text(badge.description, style: const TextStyle(fontSize: 12)),
+                                          controlAffinity: ListTileControlAffinity.leading,
+                                          dense: true,
+                                        )),
+                                  ],
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    'Cancel',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    if (selectedStars == 0) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Please select a star rating.')),
+                                      );
+                                      return;
+                                    }
+                                    final selectedBadges = reviewBadges
+                                        .where((b) => badgeSelections[b.title] == true)
+                                        .map((b) => b.title)
+                                        .toList();
+                                    submitted = true;
+                                    Provider.of<ItemStoreProvider>(context, listen: false)
+                                        .addReview(Review(
+                                      id: uuid.v4(),
+                                      reviewerId: Provider.of<ItemStoreProvider>(context, listen: false)
+                                          .renter
+                                          .id,
+                                      reviewedUserId: itemRenter.ownerId, // Reviewing the owner (lender)
+                                      itemRenterId: itemRenter.id,
+                                      itemId: itemRenter.itemId,
+                                      rating: selectedStars,
+                                      text: reviewController.text,
+                                      date: DateTime.now(),
+                                      badges: selectedBadges,
+                                    ));
+                                    Navigator.of(context).pop();
+                                    // setState will be called below if submitted
+                                  },
+                                  child: const Text(
+                                    'Submit',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                      if (submitted) {
+                        // Update status and save
+                        (context as Element).markNeedsBuild(); // force rebuild
+                        itemRenter.status = newStatus;
+                        Provider.of<ItemStoreProvider>(context, listen: false)
+                            .saveItemRenter(itemRenter);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                    ),
+                    child: const Text('LEAVE REVIEW'),
+                  ),
+                ],
+              ),
           ],
         ),
       ),

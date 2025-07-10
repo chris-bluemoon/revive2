@@ -904,7 +904,8 @@ class _PurchaseCardLenderState extends State<PurchaseCardLender> {
             ),
             // Add LEAVE REVIEW button condition for purchases
             if (DateTime.parse(widget.itemRenter.endDate).isBefore(DateTime.now()) &&
-                widget.itemRenter.status != "reviewedByLender" && 
+                widget.itemRenter.status != "booked" &&
+                widget.itemRenter.status != "reviewedByLender" &&
                 widget.itemRenter.status != "reviewedByBoth")
               Row(
                 children: [
