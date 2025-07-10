@@ -745,6 +745,15 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                     // Update in itemStore (if using Provider or similar)
                     Provider.of<ItemStoreProvider>(context, listen: false)
                         .saveItemRenter(widget.itemRenter);
+                    // After submitting a review, update badges for the lender (owner)
+                    final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
+                    final owner = itemStore.renters.firstWhere(
+                      (r) => r.id == widget.itemRenter.ownerId,
+                      orElse: () => null,
+                    );
+                    if (owner != null) {
+                      itemStore.checkAndAwardBadges(owner);
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(

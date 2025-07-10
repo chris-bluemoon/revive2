@@ -132,7 +132,7 @@ class _VacationPageState extends State<VacationPage> {
                         'endDate': result['end'],
                       });
                     final updatedRenter = provider.renter.copyWith(vacations: updatedVacations);
-                    provider.saveRenter(updatedRenter);
+                    provider.saveRenterNoEmail(updatedRenter);
                   }
                 },
                 child: const Text('ADD VACTION PERIOD')

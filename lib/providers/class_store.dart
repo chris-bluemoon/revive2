@@ -19,6 +19,112 @@ import 'package:revivals/services/firestore_service.dart';
 import 'package:revivals/shared/secure_repo.dart';
 
 class ItemStoreProvider extends ChangeNotifier {
+
+  /// Award badges based on profile, items, and reviews (not review dialog badges)
+  void checkAndAwardBadges(Renter renter) {
+    // Trust and Responsibility
+    if (!(renter.badgeTitles.containsKey('Verified Identity')) && renter.verified == 'verified') {
+      renter.badgeTitles['Verified Identity'] = 1;
+    }
+    if (!(renter.badgeTitles.containsKey('Highly Rated User - Test'))) {
+      final myAvgReviews = renter.avgReview;
+      if (myAvgReviews > 4) {
+        log('Awarding Highly Rated User badge to ${renter.name}');
+        renter.badgeTitles['Top Rated Lender'] = 1;
+      }
+    }
+
+    // Experience & Activity
+    if (!(renter.badgeTitles.containsKey('Super Lender'))) {
+      final myItems = _items.where((item) => item.owner == renter.id).length;
+      if (myItems >= 10) {
+        renter.badgeTitles['Super Lender'] = 1;
+      }
+    }
+    if (!(renter.badgeTitles.containsKey('Super Renter'))) {
+      final myRentals = _itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').length;
+      if (myRentals >= 10) {
+        renter.badgeTitles['Super Renter'] = 1;
+      }
+    }
+    if (!(renter.badgeTitles.containsKey('Seasoned User'))) {
+      final creation = renter.creationDate;
+      if (DateTime.now().difference(creation).inDays >= 0) {
+        renter.badgeTitles['Seasoned User'] = 1;
+      }
+    }
+    if (!(renter.badgeTitles.containsKey('First Rental Complete'))) {
+      final myRentals = _itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').length;
+      if (myRentals >= 1) {
+        renter.badgeTitles['First Rental Complete'] = 1;
+      }
+    }
+    if (!(renter.badgeTitles.containsKey('10 Rentals'))) {
+      final myRentals = _itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').length;
+      if (myRentals >= 10) {
+        renter.badgeTitles['10 Rentals'] = 1;
+      }
+    }
+    if (!(renter.badgeTitles.containsKey('50 Rentals'))) {
+      final myRentals = _itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').length;
+      if (myRentals >= 50) {
+        renter.badgeTitles['50 Rentals'] = 1;
+      }
+    }
+    if (!(renter.badgeTitles.containsKey('100 Rentals'))) {
+      final myRentals = _itemRenters.where((ir) => ir.renterId == renter.id && ir.transactionType == 'rental').length;
+      if (myRentals >= 100) {
+        renter.badgeTitles['100 Rentals'] = 1;
+      }
+    }
+
+    // Community & Engagement
+    if (!(renter.badgeTitles.containsKey('Fast Responder'))) {
+      if (renter.avgResponseTime != null && renter.avgResponseTime! < const Duration(hours: 1)) {
+        renter.badgeTitles['Fast Responder'] = 1;
+      }
+    }
+    if (!(renter.badgeTitles.containsKey('Helpful Rater'))) {
+      final myReviews = _reviews.where((r) => r.reviewerId == renter.id).length;
+      if (myReviews >= 10) {
+        renter.badgeTitles['Helpful Rater'] = 1;
+      }
+    }
+    if (!(renter.badgeTitles.containsKey('Profile Complete'))) {
+      if (renter.bio.isNotEmpty && renter.imagePath.isNotEmpty && renter.size > 0) {
+        renter.badgeTitles['Profile Complete'] = 1;
+      }
+    }
+
+    // Style & Category
+    if (!(renter.badgeTitles.containsKey('Style Icon'))) {
+      final compliments = renter.compliments;
+      if (compliments >= 10) {
+        renter.badgeTitles['Style Icon'] = 1;
+      }
+    }
+
+    // Exclusive/Seasonal
+    if (!(renter.badgeTitles.containsKey('Early Adopter'))) {
+      final creation = renter.creationDate;
+      if (creation.isBefore(DateTime(2026, 1, 1))) {
+        renter.badgeTitles['Early Adopter'] = 1;
+      }
+    }
+    if (!(renter.badgeTitles.containsKey('Sustainability Star'))) {
+      if (renter.hasEcoInitiative == true) {
+        renter.badgeTitles['Sustainability Star'] = 1;
+      }
+    }
+
+    // --- Award badges when score is over 50 ---
+    renter.badgeTitles.forEach((title, score) {
+      if (score > 50 && !renter.badgeTitles.containsKey(title)) {
+        renter.badgeTitles[title] = score;
+      }
+    });
+    saveRenterNoEmail(renter);
+  }
   final double width =
       WidgetsBinding.instance.platformDispatcher.views.first.physicalSize.width;
 
@@ -206,6 +312,7 @@ class ItemStoreProvider extends ChangeNotifier {
     notifyListeners();
     // No Firebase or remote update, just local state
   }
+
   Future<void> saveRenter(Renter renter) async {
     log('Updating renter: ${renter.name} with email: ${renter.type}');
     await FirestoreService.updateRenter(renter, refreshFcmToken: false); // Default to no FCM refresh for performance
@@ -234,7 +341,7 @@ class ItemStoreProvider extends ChangeNotifier {
           final renter = _renters[renterIndex];
           if (!renter.badgeTitles.containsKey('First Rental Complete')) {
             renter.badgeTitles['First Rental Complete'] = 1;
-            await saveRenter(renter);
+            await saveRenterNoEmail(renter);
           }
         }
       }

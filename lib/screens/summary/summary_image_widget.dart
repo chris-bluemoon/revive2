@@ -62,12 +62,15 @@ class _SummaryImageWidgetState extends State<SummaryImageWidget> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    for (ItemImage i
-        in Provider.of<ItemStoreProvider>(context, listen: false).images) {
-      if (i.id == widget.item.imageId[0]) {
-        setState(() {
-          thisImage = i.imageId;
-        });
+    // Defensive: Only try to access imageId[0] if not empty
+    String? foundImage;
+    if (widget.item.imageId.isNotEmpty) {
+      for (ItemImage i
+          in Provider.of<ItemStoreProvider>(context, listen: false).images) {
+        if (i.id == widget.item.imageId[0]) {
+          foundImage = i.imageId;
+          break;
+        }
       }
     }
     return Card(
@@ -79,12 +82,14 @@ class _SummaryImageWidgetState extends State<SummaryImageWidget> {
               child: SizedBox(
                 height: width * 0.25,
                 width: width * 0.2,
-                child: CachedNetworkImage(
-                  imageUrl: thisImage,
-                  placeholder: (context, url) => const Loading(),
-                  errorWidget: (context, url, error) =>
-                      Image.asset('assets/img/items/No_Image_Available.jpg'),
-                ),
+                child: widget.item.imageId.isEmpty || foundImage == null
+                    ? Image.asset('assets/img/items/No_Image_Available.jpg')
+                    : CachedNetworkImage(
+                        imageUrl: foundImage,
+                        placeholder: (context, url) => const Loading(),
+                        errorWidget: (context, url, error) =>
+                            Image.asset('assets/img/items/No_Image_Available.jpg'),
+                      ),
               ),
             ),
             // Image.asset('assets/img/items2/${setItemImage()}', fit: BoxFit.fitHeight, height: 0.25*width, width: 0.2*width)),

@@ -93,7 +93,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       _cachedProfileOwner = currentUser;
       _cachedIsOwnProfile = itemStore.loggedIn;
       userName = currentUser.name;
-      checkAndAwardBadges(currentUser, itemStore);
+      // checkAndAwardBadges(currentUser, itemStore);
     } else {
       // For other users' profiles, use caching
       if (_lastComputedForUserId == currentUserId && 
@@ -763,8 +763,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               }
 
                               // Optionally, persist changes to backend here
-                              itemStore.saveRenter(itemStore.renter);
-                              itemStore.saveRenter(profileOwner);
+                              itemStore.saveRenterNoEmail(itemStore.renter);
+                              itemStore.saveRenterNoEmail(profileOwner);
                             
                               setState(() {});
                             },
@@ -1298,6 +1298,7 @@ void checkAndAwardBadges(Renter renter, ItemStoreProvider itemStore) {
     }
   }
 
+  // itemStore.saveRenter(renter); // Save changes to the renter object
   // --- Award badges when score is over 50 ---
   // For each badge, if score > 50, ensure badge is present (score is already tracked)
   renter.badgeTitles.forEach((title, score) {
