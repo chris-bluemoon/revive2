@@ -338,9 +338,17 @@ class _ToRentState extends State<ToRent> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 if (!isOwner)
-                                  FavouriteButton(item: widget.item), // Heart icon now here
-                                if (!isOwner) const SizedBox(width: 2),
-                                BookmarkButton(item: widget.item),
+                                  SizedBox(
+                                    height: width * 0.09, // Increase icon size
+                                    width: width * 0.09,
+                                    child: FavouriteButton(item: widget.item),
+                                  ), // Heart icon now here
+                                if (!isOwner) const SizedBox(width: 6),
+                                SizedBox(
+                                  height: width * 0.09,
+                                  width: width * 0.09,
+                                  child: BookmarkButton(item: widget.item),
+                                ),
                               ],
                             ),
                           ),

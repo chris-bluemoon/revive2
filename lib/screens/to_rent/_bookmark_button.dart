@@ -36,7 +36,7 @@ class _BookmarkButtonState extends State<BookmarkButton> {
     return IconButton(
       icon: Icon(
         isSaved ? Icons.bookmark : Icons.bookmark_border,
-        size: width * 0.05, // Revert to original size
+        size: width * 0.07, // Revert to original size
         color: isSaved ? Colors.amber : Colors.grey[400],
       ),
       onPressed: _toggleSaved,
