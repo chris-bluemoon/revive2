@@ -713,21 +713,20 @@ class ItemStoreProvider extends ChangeNotifier {
     await FirestoreService.addReview(review); // Persist to Firestore
 
     // Calculate average review for the reviewed user
-    final reviewedUserId =
-        review.reviewedUserId; // Make sure your Review model has this field
-    final userReviews =
-        _reviews.where((r) => r.reviewedUserId == reviewedUserId).toList();
+    final reviewedUserId = review.reviewedUserId;
+    final userReviews = _reviews.where((r) => r.reviewedUserId == reviewedUserId).toList();
 
     if (userReviews.isNotEmpty) {
       log('Calculating average review for user: $reviewedUserId');
-      final avg = userReviews.map((r) => r.rating).reduce((a, b) => a + b) /
-          userReviews.length;
+      final avg = userReviews.map((r) => r.rating).reduce((a, b) => a + b) / userReviews.length;
 
       // Find the renter and update avgReview
       final renterIndex = _renters.indexWhere((r) => r.id == reviewedUserId);
       if (renterIndex != -1) {
         log('Updating reviewed user ${_renters[renterIndex].name} with new average: $avg');
         _renters[renterIndex].avgReview = avg;
+        // Call checkAndAwardBadges for the reviewed user
+        checkAndAwardBadges(_renters[renterIndex]);
         await FirestoreService.updateRenter(_renters[renterIndex], refreshFcmToken: false); // Just updating average - no need for FCM token refresh
       }
     }
