@@ -648,11 +648,12 @@ class _SetPricingState extends State<SetPricing> {
     );
   }
 
-  Future<void> uploadFile(XFile passedFile) async {
+  Future<void> uploadFile(XFile passedFile, String itemId) async {
     String id =
         Provider.of<ItemStoreProvider>(context, listen: false).renter.id;
     String rng = uuid.v4();
-    Reference ref = storage.ref().child('items').child(id).child('$rng.png');
+    // Add a directory after 'items' as the id of the user
+    Reference ref = storage.ref().child('items').child(id).child(itemId).child('$rng.png');
 
     File file = File(passedFile.path);
     UploadTask uploadTask = ref.putFile(file);
@@ -679,14 +680,16 @@ class _SetPricingState extends State<SetPricing> {
     SetPriceProvider spp =
         Provider.of<SetPriceProvider>(context, listen: false);
     // Only upload new images
+    String newItemId = uuid.v4(); // Generate a new ID for the item if not editing
     for (XFile passedFile in widget.imageFiles) {
-      await uploadFile(passedFile); // This adds to imagePaths
+      await uploadFile(passedFile, newItemId); // This adds to imagePaths
+      log('Image uploaded: ${passedFile.path}');
     }
 
     final item = Item(
       id: widget.dailyPrice != null && widget.rentPrice3 != null && widget.rentPrice5 != null && widget.minRentalPeriod != null && widget.title.isNotEmpty
-          ? (widget as dynamic).id ?? uuid.v4() // Use existing id if editing, else new
-          : uuid.v4(),
+          ? (widget as dynamic).id ?? newItemId // Use existing id if editing, else new
+          : newItemId,
       owner: ownerId,
       type: widget.productType,
       bookingType: 'rental',

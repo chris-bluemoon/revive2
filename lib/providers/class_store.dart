@@ -545,7 +545,6 @@ class ItemStoreProvider extends ChangeNotifier {
     log('Item count is: ${items.length}');
     for (Item i in items) {
       for (String j in i.imageId) {
-        log(j);
         final ref = FirebaseStorage.instance.ref().child(j);
         String url = '';
         try {
