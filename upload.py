@@ -92,16 +92,20 @@ def upload_images_and_update_firestore(owner_id, item_id, brand, name):
     brand_name_dir = os.path.join(HOME_ITEMS_DIR, f"{brand} {name}".strip())
     jpg_files = []
     webp_files = []
+    avif_files = []
+    png_files = []
     if os.path.isdir(brand_name_dir):
         jpg_files = [os.path.join(brand_name_dir, f) for f in os.listdir(brand_name_dir) if f.lower().endswith('.jpg')]
         webp_files = [os.path.join(brand_name_dir, f) for f in os.listdir(brand_name_dir) if f.lower().endswith('.webp')]
+        avif_files = [os.path.join(brand_name_dir, f) for f in os.listdir(brand_name_dir) if f.lower().endswith('.avif')]
+        png_files = [os.path.join(brand_name_dir, f) for f in os.listdir(brand_name_dir) if f.lower().endswith('.png')]
     else:
         print(f"WARNING: Directory not found for images: {brand_name_dir}")
     image_paths = []
     bucket = storage.bucket()
     ensure_owner_dir_in_bucket(bucket, owner_id)
-    # Upload up to 4 images directly from source (jpg first, then webp converted to jpg)
-    all_images = jpg_files + webp_files
+    # Upload up to 4 images directly from source (jpg first, then webp/avif/png converted to jpg)
+    all_images = jpg_files + webp_files + avif_files + png_files
     from PIL import Image
     import io
     def process_and_upload(src, firestore_path):
@@ -144,7 +148,7 @@ def upload_images_and_update_firestore(owner_id, item_id, brand, name):
             print(f"Processed and uploaded {src} as jpg to storage at {firestore_path} (size: {size_kb:.1f} KB, quality: {quality})")
     for idx, src in enumerate(all_images[:4], 1):
         firestore_path = f'items/{owner_id}/{item_id}/{idx}.jpg'
-        if src.lower().endswith('.jpg') or src.lower().endswith('.webp'):
+        if src.lower().endswith(('.jpg', '.webp', '.avif', '.png')):
             process_and_upload(src, firestore_path)
             image_paths.append(firestore_path)
     # Only update Firestore if images were found and uploaded
