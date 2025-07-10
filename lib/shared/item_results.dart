@@ -296,6 +296,7 @@ class _ItemResultsState extends State<ItemResults> {
                                 ),
                                 onTap: () async {
                                   final action = await showModalBottomSheet<String>(
+                                    backgroundColor: Colors.white,
                                     context: context,
                                     builder: (context) {
                                       return SafeArea(

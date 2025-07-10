@@ -194,6 +194,8 @@ class _ToRentState extends State<ToRent> {
             icon: Icon(Icons.more_vert, size: width * 0.08),
             onPressed: () {
               showModalBottomSheet(
+                backgroundColor: Colors.white,
+                // barrierColor: Colors.white, // Make the overlay background white
                 context: context,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
