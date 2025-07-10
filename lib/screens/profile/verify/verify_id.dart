@@ -80,7 +80,7 @@ class _VerifyIdState extends State<VerifyId> {
                             itemsStore.renter.imagePath = imagePath;
                             itemsStore.renter.verified = 'pending';
                             await itemsStore
-                                .saveRenterNoEmail(itemsStore.renter)
+                                .saveRenter(itemsStore.renter)
                                 .onError((e, _) {
                               if (context.mounted) {
                                 showToast(context, "FAIL SUBMISSION");

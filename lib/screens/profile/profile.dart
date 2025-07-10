@@ -763,8 +763,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               }
 
                               // Optionally, persist changes to backend here
-                              itemStore.saveRenterNoEmail(itemStore.renter);
-                              itemStore.saveRenterNoEmail(profileOwner);
+                              itemStore.saveRenter(itemStore.renter);
+                              itemStore.saveRenter(profileOwner);
                             
                               setState(() {});
                             },

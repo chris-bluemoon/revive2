@@ -248,7 +248,7 @@ class _VacationDatesPageState extends State<VacationDatesPage> {
 
                         // Save to Firestore (replace with your actual update logic)
                         Provider.of<ItemStoreProvider>(context, listen: false)
-                            .saveRenterNoEmail(renter);
+                            .saveRenter(renter);
                         Navigator.of(context).pop({'start': startDate, 'end': endDate});
                       }
                     : null,

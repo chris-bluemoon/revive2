@@ -123,7 +123,7 @@ class ItemStoreProvider extends ChangeNotifier {
         renter.badgeTitles[title] = score;
       }
     });
-    saveRenterNoEmail(renter);
+    saveRenter(renter);
   }
   final double width =
       WidgetsBinding.instance.platformDispatcher.views.first.physicalSize.width;
@@ -341,7 +341,7 @@ class ItemStoreProvider extends ChangeNotifier {
           final renter = _renters[renterIndex];
           if (!renter.badgeTitles.containsKey('First Rental Complete')) {
             renter.badgeTitles['First Rental Complete'] = 1;
-            await saveRenterNoEmail(renter);
+            await saveRenter(renter);
           }
         }
       }
