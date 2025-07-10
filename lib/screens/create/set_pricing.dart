@@ -94,17 +94,17 @@ class _SetPricingState extends State<SetPricing> {
         
         // If multi-day prices aren't provided, calculate them with discounts
         if (widget.rentPrice3 != null) {
-          spp.weeklyPriceController.text = widget.rentPrice3!;
+          spp.price3Controller.text = widget.rentPrice3!;
         } else if (dailyPrice > 0) {
           // Calculate 3-day price with 5% discount
-          spp.weeklyPriceController.text = ((dailyPrice * 3 * 0.95).floor()).toString();
+          spp.price3Controller.text = ((dailyPrice * 3 * 0.95).floor()).toString();
         }
         
         if (widget.rentPrice5 != null) {
-          spp.monthlyPriceController.text = widget.rentPrice5!;
+          spp.price5Controller.text = widget.rentPrice5!;
         } else if (dailyPrice > 0) {
           // Calculate 5-day price with 10% discount
-          spp.monthlyPriceController.text = ((dailyPrice * 5 * 0.90).floor()).toString();
+          spp.price5Controller.text = ((dailyPrice * 5 * 0.90).floor()).toString();
         }
         
         if (widget.rentPrice7 != null) {
@@ -123,10 +123,10 @@ class _SetPricingState extends State<SetPricing> {
       } else {
         // If no daily price, just populate existing values
         if (widget.rentPrice3 != null) {
-          spp.weeklyPriceController.text = widget.rentPrice3!;
+          spp.price3Controller.text = widget.rentPrice3!;
         }
         if (widget.rentPrice5 != null) {
-          spp.monthlyPriceController.text = widget.rentPrice5!;
+          spp.price5Controller.text = widget.rentPrice5!;
         }
         if (widget.rentPrice7 != null) {
           _price7Controller.text = widget.rentPrice7!;
@@ -222,24 +222,24 @@ class _SetPricingState extends State<SetPricing> {
                               
                               if (dailyPrice > 0) {
                                 // Only auto-calculate prices that haven't been manually set
-                                if (!spp.weeklyPriceManuallySet) {
-                                  spp.weeklyPriceController.text = ((dailyPrice * 3 * 0.95).floor()).toString();
+                                if (!spp.price3ManuallySet) {
+                                  spp.price3Controller.text = ((dailyPrice * 1.2).floor()).toString();
                                 }
-                                if (!spp.monthlyPriceManuallySet) {
-                                  spp.monthlyPriceController.text = ((dailyPrice * 5 * 0.90).floor()).toString();
+                                if (!spp.price5ManuallySet) {
+                                  spp.price5Controller.text = ((dailyPrice * 1.4).floor()).toString();
                                 }
                                 if (!spp.price7ManuallySet) {
-                                  _price7Controller.text = ((dailyPrice * 7 * 0.85).floor()).toString();
+                                  _price7Controller.text = ((dailyPrice * 1.6).floor()).toString();
                                 }
                                 if (!spp.price14ManuallySet) {
-                                  _price14Controller.text = ((dailyPrice * 14 * 0.80).floor()).toString();
+                                  _price14Controller.text = ((dailyPrice * 2).floor()).toString();
                                 }
                               }
                             } else {
                               // If daily price is cleared, clear all multi-day prices
                               // But reset the manual flags since we're clearing everything
-                              spp.weeklyPriceController.clear();
-                              spp.monthlyPriceController.clear();
+                              spp.price3Controller.clear();
+                              spp.price5Controller.clear();
                               _price7Controller.clear();
                               _price14Controller.clear();
                               // Reset manual flags when daily price is cleared
@@ -288,7 +288,7 @@ class _SetPricingState extends State<SetPricing> {
                           keyboardType: TextInputType.number,
                           maxLines: null,
                           maxLength: 6,
-                          controller: spp.weeklyPriceController,
+                          controller: spp.price3Controller,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: (text) {
                             // Mark as manually set when user edits this field
@@ -302,9 +302,9 @@ class _SetPricingState extends State<SetPricing> {
                               if (pricePerDay >= dailyPrice) {
                                 // Set to 95% of daily price * 3 to ensure discount
                                 int discountedPrice = ((dailyPrice * 3 * 0.95).floor());
-                                spp.weeklyPriceController.text = discountedPrice.toString();
-                                spp.weeklyPriceController.selection = TextSelection.fromPosition(
-                                  TextPosition(offset: spp.weeklyPriceController.text.length),
+                                spp.price3Controller.text = discountedPrice.toString();
+                                spp.price3Controller.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: spp.price3Controller.text.length),
                                 );
                               }
                             }
@@ -346,7 +346,7 @@ class _SetPricingState extends State<SetPricing> {
                           keyboardType: TextInputType.number,
                           maxLines: null,
                           maxLength: 6,
-                          controller: spp.monthlyPriceController,
+                          controller: spp.price5Controller,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           onChanged: (text) {
                             // Mark as manually set when user edits this field
@@ -360,9 +360,9 @@ class _SetPricingState extends State<SetPricing> {
                               if (pricePerDay >= dailyPrice) {
                                 // Set to 90% of daily price * 5 to ensure discount
                                 int discountedPrice = ((dailyPrice * 5 * 0.90).floor());
-                                spp.monthlyPriceController.text = discountedPrice.toString();
-                                spp.monthlyPriceController.selection = TextSelection.fromPosition(
-                                  TextPosition(offset: spp.monthlyPriceController.text.length),
+                                spp.price5Controller.text = discountedPrice.toString();
+                                spp.price5Controller.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: spp.price5Controller.text.length),
                                 );
                               }
                             }
@@ -699,8 +699,8 @@ class _SetPricingState extends State<SetPricing> {
       colour: widget.colour,
       size: widget.size,
       rentPriceDaily: int.parse(spp.dailyPriceController.text),
-      rentPrice3: int.parse(spp.weeklyPriceController.text),
-      rentPrice5: int.parse(spp.monthlyPriceController.text),
+      rentPrice3: int.parse(spp.price3Controller.text),
+      rentPrice5: int.parse(spp.price5Controller.text),
       rentPrice7: _price7Controller.text.isNotEmpty ? int.parse(_price7Controller.text) : 0,
       rentPrice14: _price14Controller.text.isNotEmpty ? int.parse(_price14Controller.text) : 0,
       buyPrice: 0,

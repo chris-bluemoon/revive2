@@ -2,31 +2,33 @@ import 'package:flutter/material.dart';
 
 class SetPriceProvider with ChangeNotifier {
   final dailyPriceController = TextEditingController();
-  final weeklyPriceController = TextEditingController();
-  final monthlyPriceController = TextEditingController();
+  final price3Controller = TextEditingController();
+  final price5Controller = TextEditingController();
+  final price7Controller = TextEditingController();
+  final price14Controller = TextEditingController();
   final minimalRentalPeriodController = TextEditingController();
 
   bool isCompleteForm = false;
   
   // Flags to track if prices have been manually set by user
-  bool _weeklyPriceManuallySet = false;
-  bool _monthlyPriceManuallySet = false;
+  bool _price3ManuallySet = false;
+  bool _price5ManuallySet = false;
   bool _price7ManuallySet = false;
   bool _price14ManuallySet = false;
   
   // Getters for the flags
-  bool get weeklyPriceManuallySet => _weeklyPriceManuallySet;
-  bool get monthlyPriceManuallySet => _monthlyPriceManuallySet;
+  bool get price3ManuallySet => _price3ManuallySet;
+  bool get price5ManuallySet => _price5ManuallySet;
   bool get price7ManuallySet => _price7ManuallySet;
   bool get price14ManuallySet => _price14ManuallySet;
   
   // Methods to mark prices as manually set
   void markWeeklyPriceAsManual() {
-    _weeklyPriceManuallySet = true;
+    _price3ManuallySet = true;
   }
   
   void markMonthlyPriceAsManual() {
-    _monthlyPriceManuallySet = true;
+    _price5ManuallySet = true;
   }
   
   void markPrice7AsManual() {
@@ -39,8 +41,8 @@ class SetPriceProvider with ChangeNotifier {
   
   // Methods to reset manual flags
   void resetManualFlags() {
-    _weeklyPriceManuallySet = false;
-    _monthlyPriceManuallySet = false;
+    _price3ManuallySet = false;
+    _price5ManuallySet = false;
     _price7ManuallySet = false;
     _price14ManuallySet = false;
   }
@@ -48,8 +50,10 @@ class SetPriceProvider with ChangeNotifier {
   /// Clear all form controllers and reset form state
   void clearAllFields() {
     dailyPriceController.clear();
-    weeklyPriceController.clear();
-    monthlyPriceController.clear();
+    price3Controller.clear();
+    price5Controller.clear();
+    price7Controller.clear();
+    price14Controller.clear();
     minimalRentalPeriodController.clear();
     isCompleteForm = false;
     
@@ -61,8 +65,8 @@ class SetPriceProvider with ChangeNotifier {
   
   void checkFormComplete() {
     if (dailyPriceController.text.isNotEmpty &&
-        weeklyPriceController.text.isNotEmpty &&
-        monthlyPriceController.text.isNotEmpty &&
+        price3Controller.text.isNotEmpty &&
+        price5Controller.text.isNotEmpty &&
         minimalRentalPeriodController.text.isNotEmpty) {
       isCompleteForm = true;
     } else {
