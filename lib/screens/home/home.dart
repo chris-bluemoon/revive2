@@ -142,12 +142,14 @@ class _HomeState extends State<Home> {
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(
               'SECOND STORIES',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'Lovelo',
                 fontWeight: FontWeight.normal,
-                fontSize: width * 0.06, // font size now relative to screen width
+                fontSize: width * 0.06 > 28 ? 28 : width * 0.06, // Clamp max font size
                 color: Colors.black,
                 letterSpacing: 4.0,
+                height: 1.1,
               ),
             ),
           ),
