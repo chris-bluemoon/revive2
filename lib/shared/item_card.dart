@@ -45,7 +45,6 @@ class _ItemCardState extends State<ItemCard> {
   void _loadImage() async {
     if (widget.item.imageId.isNotEmpty) {
       final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
-      
       // First attempt - immediate check
       for (ItemImage i in itemStore.images) {
         if (i.id == widget.item.imageId[0]) {
@@ -57,19 +56,11 @@ class _ItemCardState extends State<ItemCard> {
           return; // Found it, exit early
         }
       }
-      
-      // If not found immediately, try with delays
+      // If not found immediately, try with delays (no fetchImages)
       for (int attempt = 0; attempt < 3; attempt++) {
         await Future.delayed(Duration(milliseconds: 500 + (attempt * 300)));
-        
-        if (!mounted) return; // Check if widget is still mounted
-        
-        // Refetch images if needed
-        if (attempt > 0) {
-          await itemStore.fetchImages();
-        }
-        
-        // Try to find the image again
+        if (!mounted) return;
+        // Only retry finding image, do not refetch images
         for (ItemImage i in itemStore.images) {
           if (i.id == widget.item.imageId[0]) {
             if (mounted) {
@@ -81,7 +72,6 @@ class _ItemCardState extends State<ItemCard> {
           }
         }
       }
-      
       // If still not found after all attempts, log for debugging
       if (mounted && thisImage.isEmpty) {
         print('Failed to load image for item: ${widget.item.name}, imageId: ${widget.item.imageId[0]}');
@@ -103,11 +93,10 @@ class _ItemCardState extends State<ItemCard> {
 
     // Example: Find the highest period and its price
     final periodPrices = <int, int>{
-      1: widget.item.rentPriceDaily,
-      3: widget.item.rentPrice3,
-      5: widget.item.rentPrice5,
-      7: widget.item.rentPrice7,
-      14: widget.item.rentPrice14,
+      1: widget.item.rentPrice1,
+      3: widget.item.rentPrice2,
+      5: widget.item.rentPrice3,
+      7: widget.item.rentPrice4,
     };
 
     // Find the period with the highest price

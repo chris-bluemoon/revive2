@@ -48,7 +48,7 @@ class SetPriceProvider with ChangeNotifier {
   }
   
   /// Clear all form controllers and reset form state
-  void clearAllFields() {
+  void clearAllFields({bool deferNotifyListeners = false}) {
     dailyPriceController.clear();
     price3Controller.clear();
     price5Controller.clear();
@@ -59,19 +59,33 @@ class SetPriceProvider with ChangeNotifier {
     
     // Reset manual edit flags
     resetManualFlags();
-    
-    notifyListeners();
+    if (deferNotifyListeners) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => notifyListeners());
+    } else {
+      notifyListeners();
+    }
   }
-  
-  void checkFormComplete() {
-    if (dailyPriceController.text.isNotEmpty &&
-        price3Controller.text.isNotEmpty &&
-        price5Controller.text.isNotEmpty &&
-        minimalRentalPeriodController.text.isNotEmpty) {
+
+  void checkFormComplete({bool deferNotifyListeners = false}) {
+    // Only require min days, min day price, min+2, min+4, and 14 day price fields
+    bool minDaysFilled = minimalRentalPeriodController.text.isNotEmpty;
+    bool minPriceFilled = dailyPriceController.text.isNotEmpty;
+    bool plus2Filled = price3Controller.text.isNotEmpty;
+    bool plus4Filled = price5Controller.text.isNotEmpty;
+    bool plus14Filled = price14Controller.text.isNotEmpty;
+
+    debugPrint('checkFormComplete: minDaysFilled=$minDaysFilled, minPriceFilled=$minPriceFilled, plus2Filled=$plus2Filled, plus4Filled=$plus4Filled, plus14Filled=$plus14Filled');
+
+    // All must be filled for form to be complete
+    if (minDaysFilled && minPriceFilled && plus2Filled && plus4Filled && plus14Filled) {
       isCompleteForm = true;
     } else {
       isCompleteForm = false;
     }
-    notifyListeners();
+    if (deferNotifyListeners) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => notifyListeners());
+    } else {
+      notifyListeners();
+    }
   }
 }

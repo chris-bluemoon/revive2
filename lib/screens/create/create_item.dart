@@ -246,8 +246,12 @@ class _CreateItemState extends State<CreateItem> {
                       children: [
                         GestureDetector(
                           child: (cip.images.isNotEmpty)
-                              ? SizedBox(
+                              ? Container(
                                   width: 80,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black, width: 3), // Highlight cover image
+                                    borderRadius: BorderRadius.circular(0),
+                                  ),
                                   child: cip.images[0].startsWith('http')
                                       ? Image.network(cip.images[0])
                                       : Image.file(File(cip.images[0])))
@@ -838,11 +842,10 @@ class _CreateItemState extends State<CreateItem> {
                           size: cip.sizeValue,
                           existingImagePaths: (widget.item?.imageId ?? []).cast<String>(),
                           imageFiles: _imageFiles,
-                          dailyPrice: widget.item?.rentPriceDaily.toString(),
+                          rentPrice1: widget.item?.rentPrice1.toString(),
+                          rentPrice2: widget.item?.rentPrice2.toString(),
                           rentPrice3: widget.item?.rentPrice3.toString(),
-                          rentPrice5: widget.item?.rentPrice5.toString(),
-                          rentPrice7: widget.item?.rentPrice7.toString(),
-                          rentPrice14: widget.item?.rentPrice14.toString(),
+                          rentPrice4: widget.item?.rentPrice4.toString(),
                           minRentalPeriod: widget.item?.minDays.toString(),
                           hashtags: hashtags,
                           id: widget.item?.id,
@@ -878,10 +881,10 @@ class _CreateItemState extends State<CreateItem> {
     String id =
         Provider.of<ItemStoreProvider>(context, listen: false).renter.id;
     String rng = uuid.v4();
-    Reference ref = storage.ref().child('items').child(id).child('$rng.png');
+    Reference ref = storage.ref().child('items').child(id).child('$rng.jpg');
 
     File file = File(_image!.path);
-    UploadTask uploadTask = ref.putFile(file);
+    UploadTask uploadTask = ref.putFile(file, SettableMetadata(contentType: 'image/jpeg'));
 
     await uploadTask;
     //
@@ -930,10 +933,11 @@ class _CreateItemState extends State<CreateItem> {
                       imageQuality: 100,
                     );
                     if (image != null) {
-                      // Crop the image to 3:4 ratio before adding
+                      // Crop the image to 3:4 ratio before adding, enforce JPG
                       final croppedFile = await ImageCropper().cropImage(
                         sourcePath: image.path,
                         aspectRatio: const CropAspectRatio(ratioX: 3, ratioY: 4),
+                        compressFormat: ImageCompressFormat.jpg,
                         uiSettings: [
                           AndroidUiSettings(
                             toolbarTitle: 'Crop Image',
@@ -949,13 +953,15 @@ class _CreateItemState extends State<CreateItem> {
                         ],
                       );
                       if (croppedFile != null) {
-                        cip.images.add(croppedFile.path);
-                        _imageFiles.add(XFile(croppedFile.path));
-                        log('Added cropped imageFile: ${croppedFile.path}');
-                        cip.checkFormComplete(); // <-- Add this line to check form completeness after adding image
+                        // Ensure .jpg extension
+                        String jpgPath = croppedFile.path.replaceAll(RegExp(r'\.(png|jpeg|heic|webp) 0$'), '.jpg');
+                        File(croppedFile.path).copySync(jpgPath);
+                        cip.images.add(jpgPath);
+                        _imageFiles.add(XFile(jpgPath));
+                        log('Added cropped JPG imageFile: ' + jpgPath);
+                        cip.checkFormComplete();
                       }
                     }
-
                     setState(() {});
                     Navigator.pop(context);
                   },
@@ -971,10 +977,11 @@ class _CreateItemState extends State<CreateItem> {
                       imageQuality: 100,
                     );
                     if (image != null) {
-                      // Crop the image to 3:4 ratio before adding
+                      // Crop the image to 3:4 ratio before adding, enforce JPG
                       final croppedFile = await ImageCropper().cropImage(
                         sourcePath: image.path,
                         aspectRatio: const CropAspectRatio(ratioX: 3, ratioY: 4),
+                        compressFormat: ImageCompressFormat.jpg,
                         uiSettings: [
                           AndroidUiSettings(
                             toolbarTitle: 'Crop Image',
@@ -990,13 +997,15 @@ class _CreateItemState extends State<CreateItem> {
                         ],
                       );
                       if (croppedFile != null) {
-                        cip.images.add(croppedFile.path);
-                        _imageFiles.add(XFile(croppedFile.path));
-                        log('Added cropped imageFile: ${croppedFile.path}');
-                        cip.checkFormComplete(); // <-- Add this line to check form completeness after adding image
+                        // Ensure .jpg extension
+                        String jpgPath = croppedFile.path.replaceAll(RegExp(r'\.(png|jpeg|heic|webp) 0$'), '.jpg');
+                        File(croppedFile.path).copySync(jpgPath);
+                        cip.images.add(jpgPath);
+                        _imageFiles.add(XFile(jpgPath));
+                        log('Added cropped JPG imageFile: ' + jpgPath);
+                        cip.checkFormComplete();
                       }
                     }
-
                     setState(() {});
                     if (context.mounted) {
                       Navigator.pop(context);
@@ -1030,6 +1039,23 @@ class _CreateItemState extends State<CreateItem> {
                 },
                 child: const Center(child: StyledBody('VIEW IMAGE')),
               ),
+              if (n > 1) ...[
+                Divider(height: width * 0.04),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      // Move selected image to first position
+                      final img = cip.images.removeAt(n - 1);
+                      cip.images.insert(0, img);
+                      final file = _imageFiles.removeAt(n - 1);
+                      _imageFiles.insert(0, file);
+                    });
+                    Navigator.pop(context);
+                    cip.checkFormComplete();
+                  },
+                  child: const Center(child: StyledBody('MAKE COVER IMAGE')),
+                ),
+              ],
               Divider(height: width * 0.04),
               GestureDetector(
                 onTap: () {

@@ -11,11 +11,10 @@ class Item {
     required this.brand,
     required this.colour,
     required this.size,
-    required this.rentPriceDaily,
+    required this.rentPrice1,
+    required this.rentPrice2,
     required this.rentPrice3,
-    required this.rentPrice5,
-    required this.rentPrice7,
-    required this.rentPrice14,
+    required this.rentPrice4,
     required this.buyPrice,
     required this.rrp,
     required this.description,
@@ -35,11 +34,10 @@ class Item {
   String brand;
   String colour;
   String size;
-  int rentPriceDaily;
+  int rentPrice1;
+  int rentPrice2;
   int rentPrice3;
-  int rentPrice5;
-  int rentPrice7;
-  int rentPrice14;
+  int rentPrice4;
   int buyPrice;
   int rrp;
   String description;
@@ -59,11 +57,10 @@ class Item {
       'brand': brand,
       'colour': colour,
       'size': size,
-      'rentPriceDaily': rentPriceDaily,
+      'rentPrice1': rentPrice1,
+      'rentPrice2': rentPrice2,
       'rentPrice3': rentPrice3,
-      'rentPrice5': rentPrice5,
-      'rentPrice7': rentPrice7,
-      'rentPrice14': rentPrice14,
+      'rentPrice4': rentPrice4,
       'buyPrice': buyPrice,
       'rrp': rrp,
       'description': description,
@@ -90,11 +87,10 @@ class Item {
       brand: data['brand'],
       colour: data['colour'],
       size: data['size'],
-      rentPriceDaily: data['rentPriceDaily'],
+      rentPrice1: data['rentPrice1'] ?? 0,
+      rentPrice2: data['rentPrice2'] ?? 0,
       rentPrice3: data['rentPrice3'] ?? 0,
-      rentPrice5: data['rentPrice5'] ?? 0,
-      rentPrice7: data['rentPrice7'] ?? 0,
-      rentPrice14: data['rentPrice14'] ?? 0,
+      rentPrice4: data['rentPrice4'] ?? 0,
       buyPrice: data['buyPrice'],
       rrp: data['rrp'],
       description: data['description'],
