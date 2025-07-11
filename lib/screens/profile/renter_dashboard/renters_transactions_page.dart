@@ -386,50 +386,54 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    Provider.of<PaymentOptionProvider>(context, listen: false)
-                        .amount = widget.price;
+                    PaymentOptionProvider paymentProvider =
+                        Provider.of<PaymentOptionProvider>(context,
+                            listen: false);
+                    paymentProvider.amount = widget.price;
                     showPaymentOptionBottomSheet(context);
-                    // bool success =
-                    // if (false) {
-                    //   NotificationService.sendNotification(
-                    //     notiType: NotiType.payment,
-                    //     item: widget.itemName,
-                    //     notiReceiverId: widget.itemRenter.ownerId,
-                    //   );
-                    //   if (!context.mounted) return;
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     const SnackBar(
-                    //       content: Text('Payment successful!'),
-                    //     ),
-                    //   );
-                    //   setState(() {
-                    //     widget.itemRenter.status = "paid";
-                    //   });
-                    //   ItemStoreProvider itemStore =
-                    //       Provider.of<ItemStoreProvider>(context,
-                    //           listen: false);
-                    //   itemStore.saveItemRenter(widget.itemRenter);
-                    //   Ledger newLedgerEntry = Ledger(
-                    //     id: uuid.v4(), // Use uuid v4 for unique id
-                    //     itemRenterId: widget.itemRenter.id,
-                    //     owner: widget.itemRenter.ownerId,
-                    //     date: DateTime.now().toIso8601String(),
-                    //     type: "rental",
-                    //     desc: "Payment for rental of ${widget.itemName}",
-                    //     amount: widget.price,
-                    //     balance: itemStore.getBalance() +
-                    //         widget.price, // Update balance logic
-                    //   );
-                    //   itemStore.addLedger(newLedgerEntry);
-                    // } else {
-                    //   if (!context.mounted) return;
 
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     const SnackBar(
-                    //       content: Text('Payment failed.'),
-                    //     ),
-                    //   );
-                    // }
+                    bool paymentSuccess = paymentProvider.paymentSuccess;
+                    if (paymentSuccess) {
+                      Navigator.pop(context);
+                      NotificationService.sendNotification(
+                        notiType: NotiType.payment,
+                        item: widget.itemName,
+                        notiReceiverId: widget.itemRenter.ownerId,
+                      );
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Payment successful!'),
+                        ),
+                      );
+                      setState(() {
+                        widget.itemRenter.status = "paid";
+                      });
+                      ItemStoreProvider itemStore =
+                          Provider.of<ItemStoreProvider>(context,
+                              listen: false);
+                      itemStore.saveItemRenter(widget.itemRenter);
+                      Ledger newLedgerEntry = Ledger(
+                        id: uuid.v4(), // Use uuid v4 for unique id
+                        itemRenterId: widget.itemRenter.id,
+                        owner: widget.itemRenter.ownerId,
+                        date: DateTime.now().toIso8601String(),
+                        type: "rental",
+                        desc: "Payment for rental of ${widget.itemName}",
+                        amount: widget.price,
+                        balance: itemStore.getBalance() +
+                            widget.price, // Update balance logic
+                      );
+                      itemStore.addLedger(newLedgerEntry);
+                    } else {
+                      if (!context.mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Payment failed.'),
+                        ),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,

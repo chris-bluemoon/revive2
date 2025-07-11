@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:revivals/services/stripe_sevice.dart';
+import 'package:revivals/widgets/promptpay_qrcode_generate.dart';
 
 class PaymentOptionProvider extends ChangeNotifier {
   String _selectedPaymentMethod = "Card";
@@ -22,9 +23,16 @@ class PaymentOptionProvider extends ChangeNotifier {
     return paymentSuccess;
   }
 
-  Future<bool> promptPay() async {
-    print("PromptPay payment selected");
-
+  Future<bool> promptPay(BuildContext context) async {
+    try {
+      print("PromptPay payment selected");
+      showPromptPayQRCodeBottomSheet(context,
+          amount: amount, promptPayId: "0812062913");
+      paymentSuccess = true; // Set to true if QR code shown successfully
+    } catch (e) {
+      print("Error in PromptPay payment: $e");
+      paymentSuccess = false;
+    }
     notifyListeners();
     return paymentSuccess;
   }
@@ -43,7 +51,7 @@ class PaymentOptionProvider extends ChangeNotifier {
     return paymentSuccess;
   }
 
-  Future<bool> makePayment() async {
+  Future<bool> makePayment(BuildContext context) async {
     if (amount <= 0) {
       print("Amount is not set");
       return false;
@@ -52,7 +60,7 @@ class PaymentOptionProvider extends ChangeNotifier {
       case "Card":
         return await card();
       case "PromptPay":
-        return await promptPay();
+        return await promptPay(context);
       case "TrueMoney":
         return await trueMoney();
       case "Line Pay":

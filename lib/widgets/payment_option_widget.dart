@@ -12,8 +12,12 @@ void showPaymentOptionBottomSheet(BuildContext context) {
       final provider = Provider.of<PaymentOptionProvider>(context);
       return PaymentOptionBottomSheet(
         onContinue: () {
-          provider.makePayment();
-          Navigator.pop(context);
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   const SnackBar(
+          //     content: Text('Processing payment. Please wait...'),
+          //   ),
+          // );
+          provider.makePayment(context);
         },
       );
     },
