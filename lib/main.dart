@@ -13,6 +13,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import 'package:revivals/providers/class_store.dart';
 import 'package:revivals/providers/create_item_provider.dart';
+import 'package:revivals/providers/payment_option_provider.dart';
 import 'package:revivals/providers/set_price_provider.dart';
 import 'package:revivals/screens/authenticate/authenticate.dart';
 import 'package:revivals/screens/authenticate/sign_in_up.dart';
@@ -41,7 +42,7 @@ Future main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  
+
   // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -50,15 +51,13 @@ Future main() async {
   // Initialize Firebase App Check
   await FirebaseAppCheck.instance.activate(
     // For Android, use Play Integrity in production, debug for development
-    androidProvider: kDebugMode 
-        ? AndroidProvider.debug 
-        : AndroidProvider.playIntegrity,
-    // For iOS, use DeviceCheck in production, debug for development  
-    appleProvider: kDebugMode 
-        ? AppleProvider.debug 
-        : AppleProvider.deviceCheck,
+    androidProvider:
+        kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+    // For iOS, use DeviceCheck in production, debug for development
+    appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
     // For Web, use reCAPTCHA (replace with your actual site key for production)
-    webProvider: ReCaptchaV3Provider('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'), // Test key
+    webProvider: ReCaptchaV3Provider(
+        '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'), // Test key
   );
 
   await NotificationService.requestPermission();
@@ -81,6 +80,7 @@ Future main() async {
         ChangeNotifierProvider(create: (_) => ItemStoreProvider()),
         ChangeNotifierProvider(create: (_) => CreateItemProvider()),
         ChangeNotifierProvider(create: (_) => SetPriceProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentOptionProvider()),
       ],
       child: const MyApp(),
     ),
@@ -98,7 +98,7 @@ class MyApp extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       LogoImageCache.preloadLogo(context);
     });
-    
+
     return MaterialApp(
       useInheritedMediaQuery: true,
       // locale: DevicePreview.locale(context),

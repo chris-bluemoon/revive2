@@ -8,10 +8,12 @@ import 'package:revivals/models/ledger.dart';
 import 'package:revivals/models/renter.dart';
 import 'package:revivals/models/review.dart';
 import 'package:revivals/providers/class_store.dart';
+import 'package:revivals/providers/payment_option_provider.dart';
 import 'package:revivals/services/notification_service.dart';
 import 'package:revivals/services/stripe_sevice.dart';
 import 'package:revivals/shared/animated_logo_spinner.dart';
 import 'package:revivals/shared/styled_text.dart';
+import 'package:revivals/widgets/payment_option_widget.dart';
 import 'package:uuid/uuid.dart';
 
 var uuid = const Uuid();
@@ -378,67 +380,69 @@ class _ItemRenterCardState extends State<ItemRenterCard> {
                 ),
               ],
             ),
-            if (widget.itemRenter.status == "accepted" && !isExpired)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      bool success = await StripeService.instance
-                          .makePayment(widget.price);
-                      if (success) {
-                        NotificationService.sendNotification(
-                          notiType: NotiType.payment,
-                          item: widget.itemName,
-                          notiReceiverId: widget.itemRenter.ownerId,
-                        );
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Payment successful!'),
-                          ),
-                        );
-                        setState(() {
-                          widget.itemRenter.status = "paid";
-                        });
-                        ItemStoreProvider itemStore =
-                            Provider.of<ItemStoreProvider>(context,
-                                listen: false);
-                        itemStore.saveItemRenter(widget.itemRenter);
-                        Ledger newLedgerEntry = Ledger(
-                          id: uuid.v4(), // Use uuid v4 for unique id
-                          itemRenterId: widget.itemRenter.id,
-                          owner: widget.itemRenter.ownerId,
-                          date: DateTime.now().toIso8601String(),
-                          type: "rental",
-                          desc: "Payment for rental of ${widget.itemName}",
-                          amount: widget.price,
-                          balance: itemStore.getBalance() +
-                              widget.price, // Update balance logic
-                        );
-                        itemStore.addLedger(newLedgerEntry);
-                      } else {
-                        if (!context.mounted) return;
+            // if (widget.itemRenter.status == "accepted" && !isExpired)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    Provider.of<PaymentOptionProvider>(context, listen: false)
+                        .amount = widget.price;
+                    showPaymentOptionBottomSheet(context);
+                    // bool success =
+                    // if (false) {
+                    //   NotificationService.sendNotification(
+                    //     notiType: NotiType.payment,
+                    //     item: widget.itemName,
+                    //     notiReceiverId: widget.itemRenter.ownerId,
+                    //   );
+                    //   if (!context.mounted) return;
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     const SnackBar(
+                    //       content: Text('Payment successful!'),
+                    //     ),
+                    //   );
+                    //   setState(() {
+                    //     widget.itemRenter.status = "paid";
+                    //   });
+                    //   ItemStoreProvider itemStore =
+                    //       Provider.of<ItemStoreProvider>(context,
+                    //           listen: false);
+                    //   itemStore.saveItemRenter(widget.itemRenter);
+                    //   Ledger newLedgerEntry = Ledger(
+                    //     id: uuid.v4(), // Use uuid v4 for unique id
+                    //     itemRenterId: widget.itemRenter.id,
+                    //     owner: widget.itemRenter.ownerId,
+                    //     date: DateTime.now().toIso8601String(),
+                    //     type: "rental",
+                    //     desc: "Payment for rental of ${widget.itemName}",
+                    //     amount: widget.price,
+                    //     balance: itemStore.getBalance() +
+                    //         widget.price, // Update balance logic
+                    //   );
+                    //   itemStore.addLedger(newLedgerEntry);
+                    // } else {
+                    //   if (!context.mounted) return;
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Payment failed.'),
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     const SnackBar(
+                    //       content: Text('Payment failed.'),
+                    //     ),
+                    //   );
+                    // }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Text('MAKE PAYMENT'),
                   ),
-                  const SizedBox(width: 12),
-                ],
-              ),
+                  child: const Text('MAKE PAYMENT'),
+                ),
+                const SizedBox(width: 12),
+              ],
+            ),
             if (canCancel &&
                 (widget.itemRenter.status == "accepted" ||
                     widget.itemRenter.status == "requested"))

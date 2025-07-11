@@ -5,21 +5,14 @@ class StripeService {
   StripeService._();
   static final StripeService instance = StripeService._();
 
-  Future<bool> makePayment(int amount) async {
+  Future<bool> makeCardPayment(int amount) async {
     try {
-      print('StripeService: Starting payment for amount: $amount THB');
       String? paymentIntentClientSecret =
           await _createPaymentIntent(amount, "THB");
 
-      print(
-          'StripeService: Payment intent client secret received: ${paymentIntentClientSecret != null ? "Yes" : "No"}');
-
       if (paymentIntentClientSecret == null) {
-        print('StripeService: Payment intent creation failed');
         return false;
       }
-
-      print('StripeService: Initializing payment sheet');
       await Stripe.instance.initPaymentSheet(
           paymentSheetParameters: SetupPaymentSheetParameters(
               paymentIntentClientSecret: paymentIntentClientSecret,
@@ -27,7 +20,6 @@ class StripeService {
               customFlow: true,
               merchantDisplayName: "REVIVE"));
 
-      print('StripeService: Processing payment');
       return await _processPayment();
     } catch (e) {
       print('StripeService: Error in makePayment: $e');
