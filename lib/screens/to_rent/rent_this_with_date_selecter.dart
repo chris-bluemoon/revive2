@@ -41,29 +41,36 @@ class _RentThisWithDateSelecterState extends State<RentThisWithDateSelecter> {
   bool bothDatesSelected = false;
   bool showConfirm = false;
 
-  int getPricePerDay(noOfDays) {
-    // Use the new rental pricing structure
-    if (noOfDays <= 3) {
-      return widget.item.rentPriceDaily;
+  int getPricePerDay(int noOfDays) {
+    String country = 'BANGKOK';
+    int price = widget.item.rentPrice1;
+    if (country == 'BANGKOK') {
+      if (noOfDays == widget.item.minDays) {
+        price = widget.item.rentPrice1;
+      } else if (noOfDays == widget.item.minDays + 2) {
+        price = widget.item.rentPrice2;
+      } else if (noOfDays == widget.item.minDays + 4) {
+        price = widget.item.rentPrice3;
+      } else if (noOfDays == 14) {
+        price = widget.item.rentPrice4;
+      } else {
+        price = widget.item.rentPrice1;
+      }
+    } else {
+      // If not Bangkok, convert from THB
+      if (noOfDays == widget.item.minDays) {
+        price = int.parse(convertFromTHB(widget.item.rentPrice1, country));
+      } else if (noOfDays == widget.item.minDays + 2) {
+        price = int.parse(convertFromTHB(widget.item.rentPrice2, country));
+      } else if (noOfDays == widget.item.minDays + 4) {
+        price = int.parse(convertFromTHB(widget.item.rentPrice3, country));
+      } else if (noOfDays == 14) {
+        price = int.parse(convertFromTHB(widget.item.rentPrice4, country));
+      } else {
+        price = int.parse(convertFromTHB(widget.item.rentPrice1, country));
+      }
     }
-    
-    if (noOfDays <= 5) {
-      return widget.item.rentPrice3 ~/ 3;
-    }
-    
-    if (noOfDays <= 7) {
-      return widget.item.rentPrice5 ~/ 5;
-    }
-    
-    if (noOfDays <= 14) {
-      return widget.item.rentPrice7 ~/ 7;
-    }
-    
-    if (noOfDays >= 14) {
-      return widget.item.rentPrice14 ~/ 14;
-    }
-
-    return widget.item.rentPriceDaily;
+    return (price / noOfDays).round();
   }
 
   List<DateTime> getBlackoutDates(String itemId, int daysToRent) {

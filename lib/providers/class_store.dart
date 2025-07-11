@@ -546,6 +546,7 @@ class ItemStoreProvider extends ChangeNotifier {
   }
 
   Future<void> fetchImages() async {
+    // _images.clear();
     log('Item count is: ${items.length}');
     for (Item i in items) {
       for (String j in i.imageId) {
@@ -564,13 +565,11 @@ class ItemStoreProvider extends ChangeNotifier {
     for (Renter r in renters) {
       String verifyImagePath = r.imagePath;
       if (verifyImagePath != '') {
-        final refVerifyImage =
-            FirebaseStorage.instance.ref().child(verifyImagePath);
+        final refVerifyImage = FirebaseStorage.instance.ref().child(verifyImagePath);
         String verifyUrl = '';
         try {
           verifyUrl = await refVerifyImage.getDownloadURL();
-          ItemImage newImage =
-              ItemImage(id: refVerifyImage.fullPath, imageId: verifyUrl);
+          ItemImage newImage = ItemImage(id: refVerifyImage.fullPath, imageId: verifyUrl);
           _images.add(newImage);
           log('VerifyImage load success');
         } catch (e) {

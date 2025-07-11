@@ -64,10 +64,17 @@ class SetPriceProvider with ChangeNotifier {
   }
   
   void checkFormComplete() {
-    if (dailyPriceController.text.isNotEmpty &&
-        price3Controller.text.isNotEmpty &&
-        price5Controller.text.isNotEmpty &&
-        minimalRentalPeriodController.text.isNotEmpty) {
+    // Only require min days, min day price, min+2, min+4, and 14 day price fields
+    bool minDaysFilled = minimalRentalPeriodController.text.isNotEmpty;
+    bool minPriceFilled = dailyPriceController.text.isNotEmpty;
+    bool plus2Filled = price3Controller.text.isNotEmpty;
+    bool plus4Filled = price5Controller.text.isNotEmpty;
+    bool plus14Filled = price14Controller.text.isNotEmpty;
+
+    debugPrint('checkFormComplete: minDaysFilled=$minDaysFilled, minPriceFilled=$minPriceFilled, plus2Filled=$plus2Filled, plus4Filled=$plus4Filled, plus14Filled=$plus14Filled');
+
+    // All must be filled for form to be complete
+    if (minDaysFilled && minPriceFilled && plus2Filled && plus4Filled && plus14Filled) {
       isCompleteForm = true;
     } else {
       isCompleteForm = false;

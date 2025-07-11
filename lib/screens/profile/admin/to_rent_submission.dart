@@ -44,7 +44,7 @@ class _ToRentSubmissionState extends State<ToRentSubmission> {
   CarouselSliderController buttonCarouselSliderController =
       CarouselSliderController();
 
-  String convertedrentPriceDaily = '-1';
+  String convertedrentPrice1 = '-1';
   String convertedBuyPrice = '-1';
   String convertedRRPPrice = '-1';
   String symbol = '?';
@@ -52,12 +52,12 @@ class _ToRentSubmissionState extends State<ToRentSubmission> {
   int getPricePerDay(noOfDays) {
     String country = 'BANGKOK';
 
-    int oneDayPrice = widget.item.rentPriceDaily;
+    int oneDayPrice = widget.item.rentPrice1;
 
     if (country == 'BANGKOK') {
-      oneDayPrice = widget.item.rentPriceDaily;
+      oneDayPrice = widget.item.rentPrice1;
     } else {
-      oneDayPrice = int.parse(convertFromTHB(widget.item.rentPriceDaily, country));
+      oneDayPrice = int.parse(convertFromTHB(widget.item.rentPrice1, country));
     }
 
     if (noOfDays == 3) {
@@ -90,13 +90,13 @@ class _ToRentSubmissionState extends State<ToRentSubmission> {
       String country = 'BANGKOK';
       //
       if (country == 'BANGKOK') {
-      convertedrentPriceDaily = getPricePerDay(5).toString();
+      convertedrentPrice1 = getPricePerDay(5).toString();
       // convertedrentPriceDaily = convertFromTHB(getPricePerDay(1), country);
       convertedBuyPrice = convertFromTHB(widget.item.buyPrice, country);
       convertedRRPPrice = convertFromTHB(widget.item.rrp, country);
       symbol = getCurrencySymbol(country);
     } else {
-      convertedrentPriceDaily = getPricePerDay(5).toString();
+      convertedrentPrice1 = getPricePerDay(5).toString();
       convertedBuyPrice = widget.item.buyPrice.toString();
       convertedRRPPrice = widget.item.rrp.toString();
       symbol = globals.thb;
@@ -238,7 +238,7 @@ class _ToRentSubmissionState extends State<ToRentSubmission> {
                     padding: EdgeInsets.only(
                         left: width * 0.05, bottom: width * 0.05),
                     child: StyledBody(
-                        'Rental price: From $convertedrentPriceDaily$symbol'),
+                        'Rental price: From $convertedrentPrice1$symbol'),
                     // child: StyledBody('Rental price: ${widget.item.rentPriceDaily.toString()} ${getCurrency()}'),
                   ),
                   Padding(

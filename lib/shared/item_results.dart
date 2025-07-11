@@ -113,8 +113,8 @@ class _ItemResultsState extends State<ItemResults> {
         if (
             coloursSet.intersection(colourSet).isNotEmpty &&
             sizesSet.contains(i.size) &&
-            i.rentPriceDaily > ranges.start &&
-            i.rentPriceDaily < ranges.end) {
+            i.rentPrice1 > ranges.start &&
+            i.rentPrice1 < ranges.end) {
           finalItems.add(i);
         }
       }

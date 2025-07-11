@@ -125,17 +125,19 @@ class MyApp extends StatelessWidget {
 }
 
 Widget buildImage(String? imageUrl) {
-  Widget imageWidget;
   if (imageUrl != null && imageUrl.isNotEmpty) {
-    imageWidget = Image.network(
+    return Image.network(
       imageUrl,
-      // ...other params...
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => Image.asset(
+        'assets/img/items/No_Image_Available.jpg',
+        fit: BoxFit.cover,
+      ),
     );
   } else {
-    imageWidget = Image.asset(
+    return Image.asset(
       'assets/img/items/No_Image_Available.jpg',
-      // ...other params...
+      fit: BoxFit.cover,
     );
   }
-  return imageWidget;
 }

@@ -26,11 +26,10 @@ class SetPricing extends StatefulWidget {
   final String size;
   final List<String> existingImagePaths;
   final List<XFile> imageFiles;
-  final String? dailyPrice;
+  final String? rentPrice1;
+  final String? rentPrice2;
   final String? rentPrice3;
-  final String? rentPrice5;
-  final String? rentPrice7;
-  final String? rentPrice14;
+  final String? rentPrice4;
   final String? minRentalPeriod;
   final List<String> hashtags;
   final String? id;
@@ -47,11 +46,10 @@ class SetPricing extends StatefulWidget {
     required this.size,
     required this.existingImagePaths,
     required this.imageFiles,
-    this.dailyPrice,
+    this.rentPrice1,
+    this.rentPrice2,
     this.rentPrice3,
-    this.rentPrice5,
-    this.rentPrice7,
-    this.rentPrice14,
+    this.rentPrice4,
     this.minRentalPeriod,
     required this.hashtags,
     this.id,
@@ -63,10 +61,10 @@ class SetPricing extends StatefulWidget {
 
 class _SetPricingState extends State<SetPricing> {
   bool _isUploading = false;
-  
-  // Controllers for the new pricing fields
   final TextEditingController _price7Controller = TextEditingController();
   final TextEditingController _price14Controller = TextEditingController();
+
+  int? _selectedMinDays; // Track selected minimum days
 
   @override
   void initState() {
@@ -74,11 +72,10 @@ class _SetPricingState extends State<SetPricing> {
     final spp = Provider.of<SetPriceProvider>(context, listen: false);
     
     // Check if this is a new item creation (no existing data) - clear all fields
-    bool isNewItem = widget.dailyPrice == null && 
+    bool isNewItem = widget.rentPrice1 == null && 
+                     widget.rentPrice2 == null && 
                      widget.rentPrice3 == null && 
-                     widget.rentPrice5 == null && 
-                     widget.rentPrice7 == null && 
-                     widget.rentPrice14 == null && 
+                     widget.rentPrice4 == null && 
                      widget.minRentalPeriod == null;
     
     // Always clear controllers first to ensure clean state for any new item creation
@@ -88,54 +85,35 @@ class _SetPricingState extends State<SetPricing> {
     
     if (!isNewItem) {
       // Only populate if we have existing data (editing mode)
-      if (widget.dailyPrice != null) {
-        spp.dailyPriceController.text = widget.dailyPrice!;
-        int dailyPrice = int.tryParse(widget.dailyPrice!) ?? 0;
-        
-        // If multi-day prices aren't provided, calculate them with discounts
+      if (widget.rentPrice1 != null) {
+        spp.dailyPriceController.text = widget.rentPrice1!;
+        int dailyPrice = int.tryParse(widget.rentPrice1!) ?? 0;
+        if (widget.rentPrice2 != null) {
+          spp.price3Controller.text = widget.rentPrice2!;
+        } else if (dailyPrice > 0) {
+          spp.price3Controller.text = ((dailyPrice * 1.2).floor()).toString();
+        }
         if (widget.rentPrice3 != null) {
-          spp.price3Controller.text = widget.rentPrice3!;
+          spp.price5Controller.text = widget.rentPrice3!;
         } else if (dailyPrice > 0) {
-          // Calculate 3-day price with 5% discount
-          spp.price3Controller.text = ((dailyPrice * 3 * 0.95).floor()).toString();
+          spp.price5Controller.text = ((dailyPrice * 1.4).floor()).toString();
         }
-        
-        if (widget.rentPrice5 != null) {
-          spp.price5Controller.text = widget.rentPrice5!;
+        if (widget.rentPrice4 != null) {
+          _price7Controller.text = widget.rentPrice4!;
         } else if (dailyPrice > 0) {
-          // Calculate 5-day price with 10% discount
-          spp.price5Controller.text = ((dailyPrice * 5 * 0.90).floor()).toString();
-        }
-        
-        if (widget.rentPrice7 != null) {
-          _price7Controller.text = widget.rentPrice7!;
-        } else if (dailyPrice > 0) {
-          // Calculate 7-day price with 15% discount
-          _price7Controller.text = ((dailyPrice * 7 * 0.85).floor()).toString();
-        }
-        
-        if (widget.rentPrice14 != null) {
-          _price14Controller.text = widget.rentPrice14!;
-        } else if (dailyPrice > 0) {
-          // Calculate 14-day price with 20% discount
-          _price14Controller.text = ((dailyPrice * 14 * 0.80).floor()).toString();
+          _price7Controller.text = ((dailyPrice * 1.7).floor()).toString();
         }
       } else {
-        // If no daily price, just populate existing values
+        if (widget.rentPrice2 != null) {
+          spp.price3Controller.text = widget.rentPrice2!;
+        }
         if (widget.rentPrice3 != null) {
-          spp.price3Controller.text = widget.rentPrice3!;
+          spp.price5Controller.text = widget.rentPrice3!;
         }
-        if (widget.rentPrice5 != null) {
-          spp.price5Controller.text = widget.rentPrice5!;
-        }
-        if (widget.rentPrice7 != null) {
-          _price7Controller.text = widget.rentPrice7!;
-        }
-        if (widget.rentPrice14 != null) {
-          _price14Controller.text = widget.rentPrice14!;
+        if (widget.rentPrice4 != null) {
+          _price7Controller.text = widget.rentPrice4!;
         }
       }
-      
       if (widget.minRentalPeriod != null) {
         spp.minimalRentalPeriodController.text = widget.minRentalPeriod!;
       }
@@ -171,22 +149,15 @@ class _SetPricingState extends State<SetPricing> {
                 elevation: 0,
                 toolbarHeight: width * 0.2,
                 centerTitle: true,
-                title: const StyledTitle(
-                  'SET PRICING',
-                ),
+                title: const StyledTitle('SET PRICING'),
                 leading: IconButton(
                   icon: Icon(Icons.chevron_left, color: Colors.black, size: width * 0.08),
                   onPressed: () {
-                    // Clear all fields before navigating back
                     spp.clearAllFields();
-                    // Clear local controllers too
                     _price7Controller.clear();
                     _price14Controller.clear();
-                    
-                    // Also clear CreateItemProvider to ensure CreateItem form is reset
                     final cip = Provider.of<CreateItemProvider>(context, listen: false);
                     cip.reset();
-                    
                     Navigator.pop(context);
                   },
                 ),
@@ -199,370 +170,233 @@ class _SetPricingState extends State<SetPricing> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: width * 0.02),
-                        const StyledBody(
-                            'Based on our price analytics we have provided you with optimal pricing to maximise rentals',
-                            weight: FontWeight.normal),
                         SizedBox(height: width * 0.05),
-                        const StyledBody('Daily Price'),
-                        const StyledBody('Please provide a price per day for the item',
-                            weight: FontWeight.normal),
+                        const StyledBody('First, select the minimum of days you are willing to rent'),
                         SizedBox(height: width * 0.03),
-                        TextField(
-                          keyboardType: TextInputType.number,
-                          maxLines: null,
-                          maxLength: 5,
-                          controller: spp.dailyPriceController,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          onChanged: (text) {
-                            // When daily price changes, update multi-day prices with discounts
-                            // BUT only if they haven't been manually set by the user
-                            if (text.isNotEmpty) {
-                              int dailyPrice = int.tryParse(text) ?? 0;
-                              
-                              if (dailyPrice > 0) {
-                                // Only auto-calculate prices that haven't been manually set
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(5, (i) {
+                            int day = i + 1;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: ChoiceChip(
+                                label: Text(day.toString()),
+                                selected: _selectedMinDays == day,
+                                onSelected: (selected) {
+                                  setState(() {
+                                    _selectedMinDays = day;
+                                    spp.minimalRentalPeriodController.text = day.toString();
+                                  });
+                                },
+                                selectedColor: Colors.black,
+                                labelStyle: TextStyle(
+                                  color: _selectedMinDays == day ? Colors.white : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                        SizedBox(height: width * 0.05),
+                        if (_selectedMinDays != null) ...[
+                          const StyledBody('Based on our price analytics we have provided you with optimal pricing to maximise rentals', weight: FontWeight.normal),
+                          SizedBox(height: width * 0.05),
+                          // Show X Day Price for selected min days
+                          StyledBody('${_selectedMinDays} Day Price'),
+                          StyledBody('Please provide a price for ${_selectedMinDays} days', weight: FontWeight.normal),
+                          SizedBox(height: width * 0.03),
+                          TextField(
+                            keyboardType: TextInputType.number,
+                            maxLines: null,
+                            maxLength: 5,
+                            controller: spp.dailyPriceController,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                            onChanged: (text) {
+                              // When min day price changes, update multi-day prices
+                              if (text.isEmpty) {
+                                spp.price3Controller.clear();
+                                spp.price5Controller.clear();
+                                _price7Controller.clear();
+                                spp.price14Controller.clear();
+                                spp.resetManualFlags();
+                                spp.checkFormComplete();
+                                return;
+                              }
+                              int minDayPrice = int.tryParse(text) ?? 0;
+                              // No enforcement here; allow user to delete freely
+                              if (minDayPrice > 0) {
+                                // 3 Day Price: minDayPrice * 1.2
                                 if (!spp.price3ManuallySet) {
-                                  spp.price3Controller.text = ((dailyPrice * 1.2).floor()).toString();
+                                  spp.price3Controller.text = (minDayPrice * 1.2).floor().toString();
                                 }
+                                // 5 Day Price: minDayPrice * 1.4
                                 if (!spp.price5ManuallySet) {
-                                  spp.price5Controller.text = ((dailyPrice * 1.4).floor()).toString();
+                                  spp.price5Controller.text = (minDayPrice * 1.4).floor().toString();
                                 }
-                                if (!spp.price7ManuallySet) {
-                                  _price7Controller.text = ((dailyPrice * 1.6).floor()).toString();
-                                }
+                                // 14 Day Price: double the previous day price (5-day or 3-day)
                                 if (!spp.price14ManuallySet) {
-                                  _price14Controller.text = ((dailyPrice * 2).floor()).toString();
+                                  int prevDayPrice = 0;
+                                  if (spp.price5Controller.text.isNotEmpty) {
+                                    prevDayPrice = int.tryParse(spp.price5Controller.text) ?? 0;
+                                  } else if (spp.price3Controller.text.isNotEmpty) {
+                                    prevDayPrice = int.tryParse(spp.price3Controller.text) ?? 0;
+                                  }
+                                  spp.price14Controller.text = (prevDayPrice * 2).toString();
+                                  spp.price14Controller.selection = TextSelection.fromPosition(
+                                    TextPosition(offset: spp.price14Controller.text.length),
+                                  );
                                 }
                               }
+                              spp.checkFormComplete();
+                            },
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(color: Colors.grey[400]),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: Colors.grey[300]!),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Colors.black, width: 2),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: Colors.grey[300]!),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              hintText: (() {
+                                // Remove any currency symbol and commas, then parse
+                                String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^ -\u007F]+'), '');
+                                int retail = int.tryParse(priceStr) ?? 0;
+                                if (retail == 0) return "1 Day Price"; // Changed hint from 'Daily Price' to '1 Day Price'
+                                // Calculate suggested price: retail/25, rounded up to nearest 10
+                                int suggested = ((retail / 25).ceil());
+                                // Round up to nearest 10
+                                if (suggested % 10 != 0) {
+                                  suggested = ((suggested / 10).ceil()) * 10;
+                                }
+                                return "e.g. $suggested";
+                              })(),
+                              filled: true,
+                              fillColor: Colors.white,
+                            ),
+                          ),
+                          // Show subsequent price fields for min+2 and min+4 days
+                          ...[2, 4].map((addDays) {
+                            int labelDay = (_selectedMinDays ?? 1) + addDays;
+                            TextEditingController controller;
+                            String label;
+                            VoidCallback markManual;
+                            if (addDays == 2) {
+                              controller = spp.price3Controller;
+                              label = '${labelDay} Day Price';
+                              markManual = spp.markWeeklyPriceAsManual;
                             } else {
-                              // If daily price is cleared, clear all multi-day prices
-                              // But reset the manual flags since we're clearing everything
-                              spp.price3Controller.clear();
-                              spp.price5Controller.clear();
-                              _price7Controller.clear();
-                              _price14Controller.clear();
-                              // Reset manual flags when daily price is cleared
-                              spp.resetManualFlags();
+                              controller = spp.price5Controller;
+                              label = '${labelDay} Day Price';
+                              markManual = spp.markMonthlyPriceAsManual;
                             }
-                            spp.checkFormComplete();
-                          },
-                          decoration: InputDecoration(
-                            hintStyle: TextStyle(color: Colors.grey[400]),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.black, width: 2),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            hintText: (() {
-                              // Remove any currency symbol and commas, then parse
-                              String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^\d.]'), '');
-                              int retail = int.tryParse(priceStr) ?? 0;
-                              if (retail == 0) return "Daily Price";
-                              // Calculate suggested price: retail/25, rounded up to nearest 10
-                              int suggested = ((retail / 25).ceil());
-                              // Round up to nearest 10
-                              if (suggested % 10 != 0) {
-                                suggested = ((suggested / 10).ceil()) * 10;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                StyledBody(label),
+                                SizedBox(height: width * 0.03),
+                                TextField(
+                                  keyboardType: TextInputType.number,
+                                  maxLines: null,
+                                  maxLength: 6,
+                                  controller: controller,
+                                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                  onChanged: (text) {
+                                    // Mark as manually set when user edits this field
+                                    markManual();
+                                    // Remove auto-correction: manual edits should always be respected
+                                    spp.checkFormComplete();
+                                  },
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(color: Colors.black),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(color: Colors.black),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10.0),
+                                        borderSide: const BorderSide(color: Colors.black)),
+                                    filled: true,
+                                    hintStyle: TextStyle(color: Colors.grey[800], fontSize: width * 0.03),
+                                    hintText: (() {
+                                      // Remove any currency symbol and commas, then parse
+                                      String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^ -\u007F]+'), '');
+                                      int retail = int.tryParse(priceStr) ?? 0;
+                                      if (retail == 0) return "3 Day Price";
+                                      // Calculate suggested price: retail/6, rounded up to nearest 10
+                                      int suggested = ((retail / 6).ceil());
+                                      if (suggested % 10 != 0) {
+                                        suggested = ((suggested / 10).ceil()) * 10;
+                                      }
+                                      return "e.g. $suggested";
+                                    })(),
+                                    fillColor: Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
+                          // Always show 14 Day Price
+                          StyledBody('14 Day Price'),
+                          SizedBox(height: width * 0.03),
+                          TextField(
+                            keyboardType: TextInputType.number,
+                            maxLines: null,
+                            maxLength: 6,
+                            controller: spp.price14Controller,
+                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                            onChanged: (text) {
+                              // Mark as manually set when user edits this field
+                              spp.markPrice14AsManual();
+                              if (text.isEmpty) {
+                                spp.price14Controller.clear();
+                                spp.checkFormComplete();
+                                return;
                               }
-                              return "e.g. $suggested";
-                            })(),
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                        ),
-                        const StyledBody('3 Day Price'),
-                        const StyledBody(
-                            'In order to facilitate longer rentals such as holidays, we recommend offering multi-day rental prices',
-                            weight: FontWeight.normal),
-                        SizedBox(height: width * 0.03),
-                        TextField(
-                          keyboardType: TextInputType.number,
-                          maxLines: null,
-                          maxLength: 6,
-                          controller: spp.price3Controller,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          onChanged: (text) {
-                            // Mark as manually set when user edits this field
-                            spp.markWeeklyPriceAsManual();
-                            
-                            // Validate that 3-day price provides a discount (lower per-day rate)
-                            if (text.isNotEmpty && spp.dailyPriceController.text.isNotEmpty) {
-                              int dailyPrice = int.tryParse(spp.dailyPriceController.text) ?? 0;
-                              int price3Day = int.tryParse(text) ?? 0;
-                              double pricePerDay = price3Day / 3.0;
-                              if (pricePerDay >= dailyPrice) {
-                                // Set to 95% of daily price * 3 to ensure discount
-                                int discountedPrice = ((dailyPrice * 3 * 0.95).floor());
-                                spp.price3Controller.text = discountedPrice.toString();
-                                spp.price3Controller.selection = TextSelection.fromPosition(
-                                  TextPosition(offset: spp.price3Controller.text.length),
-                                );
-                              }
-                            }
-                            spp.checkFormComplete();
-                          },
-                          decoration: InputDecoration(
-                            isDense: true,
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            border: OutlineInputBorder(
+                              // Remove auto-correction: manual edits should always be respected
+                              spp.checkFormComplete();
+                            },
+                            decoration: InputDecoration(
+                              isDense: true,
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(color: Colors.black),
                                 borderRadius: BorderRadius.circular(10.0),
-                                borderSide: const BorderSide(color: Colors.black)),
-                            filled: true,
-                            hintStyle: TextStyle(color: Colors.grey[800], fontSize: width * 0.03),
-                            hintText: (() {
-                              // Remove any currency symbol and commas, then parse
-                              String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^\d.]'), '');
-                              int retail = int.tryParse(priceStr) ?? 0;
-                              if (retail == 0) return "3 Day Price";
-                              // Calculate suggested price: retail/6, rounded up to nearest 10
-                              int suggested = ((retail / 6).ceil());
-                              if (suggested % 10 != 0) {
-                                suggested = ((suggested / 10).ceil()) * 10;
-                              }
-                              return "e.g. $suggested";
-                            })(),
-                            fillColor: Colors.white70,
-                          ),
-                        ),
-                        const StyledBody('5 Day Price'),
-                        SizedBox(height: width * 0.03),
-                        TextField(
-                          keyboardType: TextInputType.number,
-                          maxLines: null,
-                          maxLength: 6,
-                          controller: spp.price5Controller,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          onChanged: (text) {
-                            // Mark as manually set when user edits this field
-                            spp.markMonthlyPriceAsManual();
-                            
-                            // Validate that 5-day price provides a discount (lower per-day rate)
-                            if (text.isNotEmpty && spp.dailyPriceController.text.isNotEmpty) {
-                              int dailyPrice = int.tryParse(spp.dailyPriceController.text) ?? 0;
-                              int price5Day = int.tryParse(text) ?? 0;
-                              double pricePerDay = price5Day / 5.0;
-                              if (pricePerDay >= dailyPrice) {
-                                // Set to 90% of daily price * 5 to ensure discount
-                                int discountedPrice = ((dailyPrice * 5 * 0.90).floor());
-                                spp.price5Controller.text = discountedPrice.toString();
-                                spp.price5Controller.selection = TextSelection.fromPosition(
-                                  TextPosition(offset: spp.price5Controller.text.length),
-                                );
-                              }
-                            }
-                            spp.checkFormComplete();
-                          },
-                          decoration: InputDecoration(
-                            isDense: true,
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            border: OutlineInputBorder(
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(color: Colors.black),
                                 borderRadius: BorderRadius.circular(10.0),
-                                borderSide: const BorderSide(color: Colors.black)),
-                            filled: true,
-                            hintStyle: TextStyle(color: Colors.grey[800], fontSize: width * 0.03),
-                            hintText: (() {
-                              // Remove any currency symbol and commas, then parse
-                              String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^\d.]'), '');
-                              int retail = int.tryParse(priceStr) ?? 0;
-                              if (retail == 0) return "5 Day Price";
-                              // Calculate suggested price: retail/2.2, rounded up to nearest 10
-                              int suggested = (retail / 2.2).ceil();
-                              if (suggested % 10 != 0) {
-                                suggested = ((suggested / 10).ceil()) * 10;
-                              }
-                              return "e.g. $suggested";
-                            })(),
-                            fillColor: Colors.white70,
-                          ),
-                        ),
-                        const StyledBody('7 Day Price'),
-                        SizedBox(height: width * 0.03),
-                        TextField(
-                          keyboardType: TextInputType.number,
-                          maxLines: null,
-                          maxLength: 6,
-                          controller: _price7Controller,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          onChanged: (text) {
-                            // Mark as manually set when user edits this field
-                            final spp = Provider.of<SetPriceProvider>(context, listen: false);
-                            spp.markPrice7AsManual();
-                            
-                            // Validate that 7-day price provides a discount (lower per-day rate)
-                            if (text.isNotEmpty) {
-                              if (spp.dailyPriceController.text.isNotEmpty) {
-                                int dailyPrice = int.tryParse(spp.dailyPriceController.text) ?? 0;
-                                int price7Day = int.tryParse(text) ?? 0;
-                                double pricePerDay = price7Day / 7.0;
-                                if (pricePerDay >= dailyPrice) {
-                                  // Set to 85% of daily price * 7 to ensure discount
-                                  int discountedPrice = ((dailyPrice * 7 * 0.85).floor());
-                                  _price7Controller.text = discountedPrice.toString();
-                                  _price7Controller.selection = TextSelection.fromPosition(
-                                    TextPosition(offset: _price7Controller.text.length),
-                                  );
+                              ),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: const BorderSide(color: Colors.black)),
+                              filled: true,
+                              hintStyle: TextStyle(color: Colors.grey[800], fontSize: width * 0.03),
+                              hintText: (() {
+                                // Remove any currency symbol and commas, then parse
+                                String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^ -\u007F]+'), '');
+                                int retail = int.tryParse(priceStr) ?? 0;
+                                if (retail == 0) return "14 Day Price";
+                                // Calculate suggested price: retail/10, rounded up to nearest 10
+                                int suggested = ((retail / 10).ceil());
+                                if (suggested % 10 != 0) {
+                                  suggested = ((suggested / 10).ceil()) * 10;
                                 }
-                              }
-                            }
-                          },
-                          decoration: InputDecoration(
-                            isDense: true,
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
+                                return "e.g. $suggested";
+                              })(),
+                              fillColor: Colors.white70,
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: const BorderSide(color: Colors.black)),
-                            filled: true,
-                            hintStyle: TextStyle(color: Colors.grey[800], fontSize: width * 0.03),
-                            hintText: (() {
-                              // Remove any currency symbol and commas, then parse
-                              String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^\d.]'), '');
-                              int retail = int.tryParse(priceStr) ?? 0;
-                              if (retail == 0) return "7 Day Price (Optional)";
-                              // Calculate suggested price: retail/1.8, rounded up to nearest 10
-                              int suggested = (retail / 1.8).ceil();
-                              if (suggested % 10 != 0) {
-                                suggested = ((suggested / 10).ceil()) * 10;
-                              }
-                              return "e.g. $suggested";
-                            })(),
-                            fillColor: Colors.white70,
                           ),
-                        ),
-                        const StyledBody('14 Day Price'),
-                        SizedBox(height: width * 0.03),
-                        TextField(
-                          keyboardType: TextInputType.number,
-                          maxLines: null,
-                          maxLength: 6,
-                          controller: _price14Controller,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          onChanged: (text) {
-                            // Mark as manually set when user edits this field
-                            final spp = Provider.of<SetPriceProvider>(context, listen: false);
-                            spp.markPrice14AsManual();
-                            
-                            // Validate that 14-day price provides a discount (lower per-day rate)
-                            if (text.isNotEmpty) {
-                              if (spp.dailyPriceController.text.isNotEmpty) {
-                                int dailyPrice = int.tryParse(spp.dailyPriceController.text) ?? 0;
-                                int price14Day = int.tryParse(text) ?? 0;
-                                double pricePerDay = price14Day / 14.0;
-                                if (pricePerDay >= dailyPrice) {
-                                  // Set to 80% of daily price * 14 to ensure discount
-                                  int discountedPrice = ((dailyPrice * 14 * 0.80).floor());
-                                  _price14Controller.text = discountedPrice.toString();
-                                  _price14Controller.selection = TextSelection.fromPosition(
-                                    TextPosition(offset: _price14Controller.text.length),
-                                  );
-                                }
-                              }
-                            }
-                          },
-                          decoration: InputDecoration(
-                            isDense: true,
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: const BorderSide(color: Colors.black)),
-                            filled: true,
-                            hintStyle: TextStyle(color: Colors.grey[800], fontSize: width * 0.03),
-                            hintText: (() {
-                              // Remove any currency symbol and commas, then parse
-                              String priceStr = widget.retailPrice.replaceAll(RegExp(r'[^\d.]'), '');
-                              int retail = int.tryParse(priceStr) ?? 0;
-                              if (retail == 0) return "14 Day Price (Optional)";
-                              // Calculate suggested price: retail/1.5, rounded up to nearest 10
-                              int suggested = (retail / 1.5).ceil();
-                              if (suggested % 10 != 0) {
-                                suggested = ((suggested / 10).ceil()) * 10;
-                              }
-                              return "e.g. $suggested";
-                            })(),
-                            fillColor: Colors.white70,
-                          ),
-                        ),
-                        const StyledBody('Minimal Rental Period'),
-                        const StyledBody(
-                            'Tip: The most common minimum rental period is 4 days (max 30 days)',
-                            weight: FontWeight.normal),
-                        SizedBox(height: width * 0.03),
-                        TextField(
-                          keyboardType: TextInputType.number,
-                          maxLines: null,
-                          maxLength: 3,
-                          controller: spp.minimalRentalPeriodController,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          onChanged: (text) {
-                            // Only allow minDays between 1 and 30
-                            if (text.isNotEmpty) {
-                              int value = int.tryParse(text) ?? 1;
-                              if (value > 30) {
-                                spp.minimalRentalPeriodController.text = '30';
-                              } else if (value < 1) {
-                                spp.minimalRentalPeriodController.text = '1';
-                              }
-                              spp.minimalRentalPeriodController.selection = TextSelection.fromPosition(
-                                TextPosition(offset: spp.minimalRentalPeriodController.text.length),
-                              );
-                            }
-                            spp.checkFormComplete();
-                          },
-                          decoration: InputDecoration(
-                            isDense: true,
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: const BorderSide(color: Colors.black)),
-                            filled: true,
-                            hintStyle: TextStyle(color: Colors.grey[800], fontSize: width * 0.03),
-                            hintText: 'Minimal Rental Period (days)',
-                            fillColor: Colors.white70,
-                          ),
-                        ),
+                        ],
                         // const StyledBody('Postage Option'),
                         // const StyledBody(
                         //     'You can offer the option of local country tracked mail by charging a flat rate for this. The item should be received on the day the rental period begins at the very latest. The renter is in charge of sending back the item to you and icurring the fee',
@@ -687,7 +521,7 @@ class _SetPricingState extends State<SetPricing> {
     }
 
     final item = Item(
-      id: widget.dailyPrice != null && widget.rentPrice3 != null && widget.rentPrice5 != null && widget.minRentalPeriod != null && widget.title.isNotEmpty
+      id: widget.rentPrice1 != null && widget.rentPrice2 != null && widget.rentPrice3 != null && widget.minRentalPeriod != null && widget.title.isNotEmpty
           ? (widget as dynamic).id ?? newItemId // Use existing id if editing, else new
           : newItemId,
       owner: ownerId,
@@ -698,11 +532,10 @@ class _SetPricingState extends State<SetPricing> {
       brand: widget.brand,
       colour: widget.colour,
       size: widget.size,
-      rentPriceDaily: int.parse(spp.dailyPriceController.text),
-      rentPrice3: int.parse(spp.price3Controller.text),
-      rentPrice5: int.parse(spp.price5Controller.text),
-      rentPrice7: _price7Controller.text.isNotEmpty ? int.parse(_price7Controller.text) : 0,
-      rentPrice14: _price14Controller.text.isNotEmpty ? int.parse(_price14Controller.text) : 0,
+      rentPrice1: int.parse(spp.dailyPriceController.text),
+      rentPrice2: int.parse(spp.price3Controller.text),
+      rentPrice3: int.parse(spp.price5Controller.text),
+      rentPrice4: _price7Controller.text.isNotEmpty ? int.parse(_price7Controller.text) : 0,
       buyPrice: 0,
       rrp: int.tryParse(widget.retailPrice.replaceAll(RegExp(r'[^\d]'), '')) ?? 0,
       description: widget.shortDesc,
@@ -716,7 +549,7 @@ class _SetPricingState extends State<SetPricing> {
     final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
 
     // If editing, call updateItem, else addItem
-    if (widget.dailyPrice != null && widget.rentPrice3 != null && widget.rentPrice5 != null && widget.minRentalPeriod != null && widget.title.isNotEmpty && (widget as dynamic).id != null) {
+    if (widget.rentPrice1 != null && widget.rentPrice2 != null && widget.rentPrice3 != null && widget.minRentalPeriod != null && widget.title.isNotEmpty && (widget as dynamic).id != null) {
       itemStore.updateItem(item);
     } else {
       itemStore.addItem(item);

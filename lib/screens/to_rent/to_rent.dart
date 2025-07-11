@@ -51,7 +51,7 @@ class ToRent extends StatefulWidget {
 
 class _ToRentState extends State<ToRent> {
   List items = [];
-  int currentIndex = 0;
+  int currentIndex = 1; // Start carousel on item 2 (index 1)
   bool itemCheckComplete = false;
   List<Color> dotColours = [];
   // bool showMessageBox = false;
@@ -75,28 +75,36 @@ class _ToRentState extends State<ToRent> {
         // .settings[0];
     String country = 'BANGKOK'; // Default to Bangkok for now
 
-    int oneDayPrice = widget.item.rentPriceDaily;
+    int oneDayPrice = widget.item.rentPrice1;
 
     if (country == 'BANGKOK') {
-      oneDayPrice = widget.item.rentPriceDaily;
+      oneDayPrice = widget.item.rentPrice1;
     } else {
-      oneDayPrice = int.parse(convertFromTHB(widget.item.rentPriceDaily, country));
+      oneDayPrice = int.parse(convertFromTHB(widget.item.rentPrice1, country));
     }
 
+    if (noOfDays == 2) {
+      int twoDayPrice = (oneDayPrice * 0.8).toInt() - 1;
+      if (country == 'BANGKOK') {
+        return (twoDayPrice ~/ 100) * 100 + 100;
+      } else {
+        return (twoDayPrice ~/ 5) * 5 + 5;
+      }
+    }
     if (noOfDays == 3) {
-      int threeDayPrice = (oneDayPrice * 0.8).toInt() - 1;
+      int threeDayPrice = (oneDayPrice * 0.6).toInt() - 1;
       if (country == 'BANGKOK') {
         return (threeDayPrice ~/ 100) * 100 + 100;
       } else {
         return (threeDayPrice ~/ 5) * 5 + 5;
       }
     }
-    if (noOfDays == 5) {
-      int fiveDayPrice = (oneDayPrice * 0.6).toInt() - 1;
+    if (noOfDays == 4) {
+      int fourDayPrice = (oneDayPrice * 0.4).toInt() - 1;
       if (country == 'BANGKOK') {
-        return (fiveDayPrice ~/ 100) * 100 + 100;
+        return (fourDayPrice ~/ 100) * 100 + 100;
       } else {
-        return (fiveDayPrice ~/ 5) * 5 + 5;
+        return (fourDayPrice ~/ 5) * 5 + 5;
       }
     }
     return oneDayPrice;
@@ -283,6 +291,7 @@ class _ToRentState extends State<ToRent> {
                             CarouselSlider(
                               carouselController: buttonCarouselSliderController,
                               options: CarouselOptions(
+                                  initialPage: 1, // Start on item 2
                                   onPageChanged: (index, reason) {
                                     setState(() {
                                       currentIndex = index;
@@ -493,13 +502,13 @@ class _ToRentState extends State<ToRent> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   StyledBody(
-                                    "Daily Rental Price",
+                                    "${widget.item.minDays} Day Rental Price",
                                     weight: FontWeight.bold,
                                     color: Colors.grey,
                                     fontSize: width * 0.042,
                                   ),
                                   StyledBody(
-                                    "${NumberFormat('#,###').format(widget.item.rentPriceDaily)}$symbol",
+                                    "${NumberFormat('#,###').format(widget.item.rentPrice1)}$symbol",
                                     weight: FontWeight.bold,
                                     color: Colors.black,
                                     fontSize: width * 0.042,
@@ -559,19 +568,44 @@ class _ToRentState extends State<ToRent> {
                       height: 0, // Remove extra height from Divider itself
                     ),
                   ),
-                  SizedBox(height: width * 0.04), // Make the gap above and below the divider the same
+                  SizedBox(height: width * 0.005), // Further reduced gap above divider
+                  SizedBox(height: width * 0.02), // Increased gap above pricing text
                   // Rent for longer pricing cards
                   Padding(
-                    padding: EdgeInsets.only(
-                        left: width * 0.05, bottom: width * 0.05),
+                    padding: EdgeInsets.only(left: width * 0.02, bottom: width * 0.01), // Keep reduced left and bottom padding
                     child: StyledBody(
                         'Rent for longer to save on pricing.',
-                        fontSize: width * 0.042, // Make this text bigger
+                        fontSize: width * 0.042, // Keep text size
                         weight: FontWeight.normal,
                       ),
                   ),
-                  RentForLonger(item: widget.item, symbol: symbol),
-                  SizedBox(height: width * 0.03), // Make the gap above and below the cards the same
+                  RentForLonger(
+                    item: widget.item,
+                    symbol: symbol,
+                    options: [
+                      {
+                        'days': widget.item.minDays,
+                        'price': widget.item.rentPrice1,
+                        'label': '${widget.item.minDays} Days',
+                      },
+                      {
+                        'days': widget.item.minDays + 2,
+                        'price': widget.item.rentPrice2,
+                        'label': '${widget.item.minDays + 2} Days',
+                      },
+                      {
+                        'days': widget.item.minDays + 4,
+                        'price': widget.item.rentPrice3,
+                        'label': '${widget.item.minDays + 4} Days',
+                      },
+                      {
+                        'days': 14,
+                        'price': widget.item.rentPrice4,
+                        'label': '14 Days',
+                      },
+                    ],
+                  ),
+                  SizedBox(height: width * 0.005), // Further reduced gap below the cards
                   Padding(
                     padding: EdgeInsets.only(
                       left: width * 0.05,
