@@ -36,7 +36,7 @@ class _HomeState extends State<Home> {
       final itemStore = Provider.of<ItemStoreProvider>(context, listen: false);
       itemStore.fetchRentersOnce().then((_) {
         itemStore.fetchItemsOnce().then((_) {
-          // Removed fetchImages call from Home page to avoid duplicate image loading
+          itemStore.fetchImages(); // Added fetchImages back to Home page
         });
         itemStore.fetchItemRentersOnce();
         // itemStore.fetchFittingRentersOnce();

@@ -371,7 +371,7 @@ class ItemStoreProvider extends ChangeNotifier {
       }
       log('ENDING FETCHITEMSONCE');
       // fetchRentersOnce();
-      fetchImages(); // FIXED AS fetchRenters now done here, KEEP AN EYE ON THIS, ARE WE FETCHING BEFORE USERS VERIFY IMAGE IS SET
+      // fetchImages(); // FIXED AS fetchRenters now done here, KEEP AN EYE ON THIS, ARE WE FETCHING BEFORE USERS VERIFY IMAGE IS SET
       populateFavourites();
       // populateFittings();
       // fetchImages();
@@ -548,37 +548,70 @@ class ItemStoreProvider extends ChangeNotifier {
   Future<void> fetchImages() async {
     // _images.clear();
     log('Item count is: ${items.length}');
+    List<Future<void>> firstImageFutures = [];
+    List<Future<void>> restImageFutures = [];
+    // First pass: load the first image for every item
     for (Item i in items) {
-      for (String j in i.imageId) {
-        final ref = FirebaseStorage.instance.ref().child(j);
-        String url = '';
-        try {
-          url = await ref.getDownloadURL();
-          ItemImage newImage = ItemImage(id: ref.fullPath, imageId: url);
-          _images.add(newImage);
-          log('Item image added (for url $url), size now ${_images.length}');
-        } catch (e) {
-          log('Item load error: ${e.toString()} for url: $url');
-        }
+      if (i.imageId.isNotEmpty && i.imageId.first.trim().isNotEmpty) {
+        String firstImageId = i.imageId.first;
+        firstImageFutures.add(() async {
+          final ref = FirebaseStorage.instance.ref().child(firstImageId);
+          String url = '';
+          try {
+            url = await ref.getDownloadURL();
+            ItemImage newImage = ItemImage(id: ref.fullPath, imageId: url);
+            _images.add(newImage);
+            log('First item image added (for url $url), size now ${_images.length}');
+          } catch (e) {
+            log('Item load error: ${e.toString()} for image path: $firstImageId');
+          }
+        }());
       }
     }
+    // Load verify images for renters (unchanged)
     for (Renter r in renters) {
       String verifyImagePath = r.imagePath;
-      if (verifyImagePath != '') {
-        final refVerifyImage = FirebaseStorage.instance.ref().child(verifyImagePath);
-        String verifyUrl = '';
-        try {
-          verifyUrl = await refVerifyImage.getDownloadURL();
-          ItemImage newImage = ItemImage(id: refVerifyImage.fullPath, imageId: verifyUrl);
-          _images.add(newImage);
-          log('VerifyImage load success');
-        } catch (e) {
-          log('Item load error: ${e.toString()} for url: $verifyUrl');
-        }
+      if (verifyImagePath.trim().isNotEmpty) {
+        firstImageFutures.add(() async {
+          final refVerifyImage = FirebaseStorage.instance.ref().child(verifyImagePath);
+          String verifyUrl = '';
+          try {
+            verifyUrl = await refVerifyImage.getDownloadURL();
+            ItemImage newImage = ItemImage(id: refVerifyImage.fullPath, imageId: verifyUrl);
+            _images.add(newImage);
+            log('VerifyImage load success');
+          } catch (e) {
+            log('Verify image load error: ${e.toString()} for image path: $verifyImagePath');
+          }
+        }());
       } else {
         log('No image to load for user, not verified?');
       }
     }
+    // Wait for first images to load
+    await Future.wait(firstImageFutures);
+    notifyListeners();
+    // Second pass: load the rest of the images for every item
+    for (Item i in items) {
+      if (i.imageId.length > 1) {
+        for (String j in i.imageId.skip(1)) {
+          if (j.trim().isEmpty) continue;
+          restImageFutures.add(() async {
+            final ref = FirebaseStorage.instance.ref().child(j);
+            String url = '';
+            try {
+              url = await ref.getDownloadURL();
+              ItemImage newImage = ItemImage(id: ref.fullPath, imageId: url);
+              _images.add(newImage);
+              log('Additional item image added (for url $url), size now ${_images.length}');
+            } catch (e) {
+              log('Additional item image load error: ${e.toString()} for image path: $j');
+            }
+          }());
+        }
+      }
+    }
+    await Future.wait(restImageFutures);
     notifyListeners();
   }
 
