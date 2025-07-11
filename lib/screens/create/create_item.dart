@@ -110,6 +110,10 @@ class _CreateItemState extends State<CreateItem> {
     'Purple',
     'Pink',
     'Cyan',
+    'Orange',
+    'Beige',
+    'Cream',
+    'Mauve'
     'Multi-coloured',
     'Other',
   ];

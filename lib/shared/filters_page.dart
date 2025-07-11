@@ -50,6 +50,7 @@ class _FiltersPage extends State<FiltersPage> {
   }
 
   Widget myCircle(Color colour, bool selected) {
+    bool isLightColor = colour == Colors.white || colour.value == 0xFFF5F5DC || colour.value == 0xFFFFFDD0; // white, beige, cream
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -67,7 +68,7 @@ class _FiltersPage extends State<FiltersPage> {
         ),
         child: (selected)
             ? Center(
-                child: (colour == Colors.white)
+                child: isLightColor
                     ? const Icon(Icons.check_circle_outline, color: Colors.black, size: 18)
                     : const Icon(Icons.check_circle_outline, color: Colors.white, size: 18),
               )
@@ -88,6 +89,10 @@ class _FiltersPage extends State<FiltersPage> {
     Colors.purple: false,
     Colors.pink: false,
     Colors.cyan: false,
+    Colors.orange: false,
+    const Color(0xFFE0B0FF): false, // Mauve
+    const Color(0xFFFFFDD0): false, // Cream
+    const Color(0xFFF5F5DC): false, // Beige
   };
 
   Map<String, bool> sizeMap = {
@@ -120,79 +125,71 @@ class _FiltersPage extends State<FiltersPage> {
     colourMap.forEach((key, value) {
       if (value == true) {
         colourFilter = true;
-        switch (key) {
-          case Colors.black:
-            returnColours.add('Black');
-            break;
-          case Colors.white:
-            returnColours.add('White');
-            break;
-          case Colors.blue:
-            returnColours.add('Blue');
-            break;
-          case Colors.red:
-            returnColours.add('Red');
-            break;
-          case Colors.green:
-            returnColours.add('Green');
-            break;
-          case Colors.yellow:
-            returnColours.add('Yellow');
-            break;
-          case Colors.grey:
-            returnColours.add('Grey');
-            break;
-          case Colors.brown:
-            returnColours.add('Brown');
-            break;
-          case Colors.purple:
-            returnColours.add('Purple');
-            break;
-          case Colors.pink:
-            returnColours.add('Pink');
-            break;
-          case Colors.cyan:
-            returnColours.add('Cyan');
-            break;
+        if (key == Colors.black) {
+          returnColours.add('Black');
+        } else if (key == Colors.white) {
+          returnColours.add('White');
+        } else if (key == Colors.blue) {
+          returnColours.add('Blue');
+        } else if (key == Colors.red) {
+          returnColours.add('Red');
+        } else if (key == Colors.green) {
+          returnColours.add('Green');
+        } else if (key == Colors.yellow) {
+          returnColours.add('Yellow');
+        } else if (key == Colors.grey) {
+          returnColours.add('Grey');
+        } else if (key == Colors.brown) {
+          returnColours.add('Brown');
+        } else if (key == Colors.purple) {
+          returnColours.add('Purple');
+        } else if (key == Colors.pink) {
+          returnColours.add('Pink');
+        } else if (key == Colors.cyan) {
+          returnColours.add('Cyan');
+        } else if (key == Colors.orange) {
+          returnColours.add('Orange');
+        } else if (key.value == 0xFFF5F5DC) {
+          returnColours.add('Beige');
+        } else if (key.value == 0xFFFFFDD0) {
+          returnColours.add('Cream');
+        } else if (key.value == 0xFFE0B0FF) {
+          returnColours.add('Mauve');
         }
       }
     });
     if (!colourFilter) {
       colourMap.forEach((key, value) {
-        switch (key) {
-          case Colors.black:
-            returnColours.add('Black');
-            break;
-          case Colors.white:
-            returnColours.add('White');
-            break;
-          case Colors.blue:
-            returnColours.add('Blue');
-            break;
-          case Colors.red:
-            returnColours.add('Red');
-            break;
-          case Colors.green:
-            returnColours.add('Green');
-            break;
-          case Colors.yellow:
-            returnColours.add('Yellow');
-            break;
-          case Colors.grey:
-            returnColours.add('Grey');
-            break;
-          case Colors.brown:
-            returnColours.add('Brown');
-            break;
-          case Colors.purple:
-            returnColours.add('Purple');
-            break;
-          case Colors.pink:
-            returnColours.add('Pink');
-            break;
-          case Colors.cyan:
-            returnColours.add('Cyan');
-            break;
+        if (key == Colors.black) {
+          returnColours.add('Black');
+        } else if (key == Colors.white) {
+          returnColours.add('White');
+        } else if (key == Colors.blue) {
+          returnColours.add('Blue');
+        } else if (key == Colors.red) {
+          returnColours.add('Red');
+        } else if (key == Colors.green) {
+          returnColours.add('Green');
+        } else if (key == Colors.yellow) {
+          returnColours.add('Yellow');
+        } else if (key == Colors.grey) {
+          returnColours.add('Grey');
+        } else if (key == Colors.brown) {
+          returnColours.add('Brown');
+        } else if (key == Colors.purple) {
+          returnColours.add('Purple');
+        } else if (key == Colors.pink) {
+          returnColours.add('Pink');
+        } else if (key == Colors.cyan) {
+          returnColours.add('Cyan');
+        } else if (key == Colors.orange) {
+          returnColours.add('Orange');
+        } else if (key.value == 0xFFF5F5DC) {
+          returnColours.add('Beige');
+        } else if (key.value == 0xFFFFFDD0) {
+          returnColours.add('Cream');
+        } else if (key.value == 0xFFE0B0FF) {
+          returnColours.add('Mauve');
         }
       });
     }

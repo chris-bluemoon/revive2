@@ -157,6 +157,10 @@ class ItemStoreProvider extends ChangeNotifier {
     Colors.purple: false,
     Colors.pink: false,
     Colors.cyan: false,
+    Colors.orange: false,
+    const Color(0xFFE0B0FF): false, // Mauve
+    const Color(0xFFFFFDD0): false, // Cream
+    const Color(0xFFF5F5DC): false, // Beige
   };
   String? _cityFilter;
   RangeValues _rangeValuesFilter = const RangeValues(0, 10000);
@@ -933,6 +937,7 @@ class ItemStoreProvider extends ChangeNotifier {
       Colors.purple: false,
       Colors.pink: false,
       Colors.cyan: false,
+      Colors.orange: false,
     };
     _cityFilter = null;
     _rangeValuesFilter = const RangeValues(0, 10000);

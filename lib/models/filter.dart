@@ -16,6 +16,10 @@ class Filter {
     Colors.red: false,
     Colors.lime: false,
     Colors.cyan: false,
+    Colors.orange: false,
+    const Color(0xFFE0B0FF): false, // Mauve
+    const Color(0xFFFFFDD0): false, // Cream
+    const Color(0xFFF5F5DC): false, // Beige
   };
 
   Map<String, bool> sizeMap = {
