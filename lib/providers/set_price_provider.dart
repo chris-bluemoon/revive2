@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SetPriceProvider with ChangeNotifier {
   final dailyPriceController = TextEditingController();
@@ -48,7 +49,7 @@ class SetPriceProvider with ChangeNotifier {
   }
   
   /// Clear all form controllers and reset form state
-  void clearAllFields() {
+  void clearAllFields({bool deferNotifyListeners = false}) {
     dailyPriceController.clear();
     price3Controller.clear();
     price5Controller.clear();
@@ -59,11 +60,14 @@ class SetPriceProvider with ChangeNotifier {
     
     // Reset manual edit flags
     resetManualFlags();
-    
-    notifyListeners();
+    if (deferNotifyListeners) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => notifyListeners());
+    } else {
+      notifyListeners();
+    }
   }
-  
-  void checkFormComplete() {
+
+  void checkFormComplete({bool deferNotifyListeners = false}) {
     // Only require min days, min day price, min+2, min+4, and 14 day price fields
     bool minDaysFilled = minimalRentalPeriodController.text.isNotEmpty;
     bool minPriceFilled = dailyPriceController.text.isNotEmpty;
@@ -79,6 +83,59 @@ class SetPriceProvider with ChangeNotifier {
     } else {
       isCompleteForm = false;
     }
-    notifyListeners();
+    if (deferNotifyListeners) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => notifyListeners());
+    } else {
+      notifyListeners();
+    }
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Set Price Example"),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Provider.of<SetPriceProvider>(context, listen: false).clearAllFields(deferNotifyListeners: true);
+          },
+          child: Text("Clear Fields"),
+        ),
+      ),
+    );
+  }
+}
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Removed automatic clearing of fields to preserve values when navigating back
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Provider.of<SetPriceProvider>(context, listen: false).clearAllFields();
+    // });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => SetPriceProvider(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: MyHomePage(),
+      ),
+    );
   }
 }

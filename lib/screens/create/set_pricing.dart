@@ -153,7 +153,8 @@ class _SetPricingState extends State<SetPricing> {
                 leading: IconButton(
                   icon: Icon(Icons.chevron_left, color: Colors.black, size: width * 0.08),
                   onPressed: () {
-                    spp.clearAllFields();
+                    // Do NOT clear fields when popping back
+                    // spp.clearAllFields();
                     _price7Controller.clear();
                     _price14Controller.clear();
                     final cip = Provider.of<CreateItemProvider>(context, listen: false);
