@@ -1,18 +1,20 @@
-const { onCall } = require("firebase-functions/v2/https");
-const { initializeApp } = require("firebase-admin/app");
-const { getMessaging } = require("firebase-admin/messaging");
-const { defineSecret } = require("firebase-functions/params");
+import { onCall } from "firebase-functions/v2/https";
+import { initializeApp } from "firebase-admin/app";
+import { getMessaging } from "firebase-admin/messaging";
+import { defineSecret } from "firebase-functions/params";
+import stripePackage from "stripe";
+
 const stripeSecret = defineSecret("STRIPE_SECRET");
 
 initializeApp();
 
-exports.createPaymentIntent = onCall(
+export const createPaymentIntent = onCall(
   {
     secrets: [stripeSecret],
   },
   async (request) => {
     try {
-      const stripe = require("stripe")(stripeSecret.value());
+      const stripe = stripePackage(stripeSecret.value());
       const amount = request.data.amount ?? request.data.data?.amount;
 
       if (!amount) {
@@ -22,7 +24,7 @@ exports.createPaymentIntent = onCall(
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount * 100,
         currency: "THB",
-        payment_method_types: ["promptpay","card"],
+        payment_method_types: ["card"],
       });
 
       return { clientSecret: paymentIntent.client_secret };
@@ -33,8 +35,7 @@ exports.createPaymentIntent = onCall(
   },
 );
 
-exports.sendNotification = onCall(async (request) => {
-
+export const sendNotification = onCall(async (request) => {
   try {
     const deviceToken = request.data.token;
     const notiTitle = request.data.notiTitle;

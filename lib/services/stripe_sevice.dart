@@ -10,9 +10,10 @@ class StripeService {
       print('StripeService: Starting payment for amount: $amount THB');
       String? paymentIntentClientSecret =
           await _createPaymentIntent(amount, "THB");
-      
-      print('StripeService: Payment intent client secret received: ${paymentIntentClientSecret != null ? "Yes" : "No"}');
-      
+
+      print(
+          'StripeService: Payment intent client secret received: ${paymentIntentClientSecret != null ? "Yes" : "No"}');
+
       if (paymentIntentClientSecret == null) {
         print('StripeService: Payment intent creation failed');
         return false;
@@ -22,9 +23,10 @@ class StripeService {
       await Stripe.instance.initPaymentSheet(
           paymentSheetParameters: SetupPaymentSheetParameters(
               paymentIntentClientSecret: paymentIntentClientSecret,
+              paymentMethodOrder: ["promptpay"],
               customFlow: true,
               merchantDisplayName: "REVIVE"));
-      
+
       print('StripeService: Processing payment');
       return await _processPayment();
     } catch (e) {
