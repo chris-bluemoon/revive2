@@ -70,16 +70,14 @@ class _SetPricingState extends State<SetPricing> {
   void initState() {
     super.initState();
     final spp = Provider.of<SetPriceProvider>(context, listen: false);
-    
     // Check if this is a new item creation (no existing data) - clear all fields
     bool isNewItem = widget.rentPrice1 == null && 
                      widget.rentPrice2 == null && 
                      widget.rentPrice3 == null && 
                      widget.rentPrice4 == null && 
                      widget.minRentalPeriod == null;
-    
     // Always clear controllers first to ensure clean state for any new item creation
-    spp.clearAllFields();
+    spp.clearAllFields(deferNotifyListeners: true); // <-- FIXED HERE
     _price7Controller.clear();
     _price14Controller.clear();
     
@@ -155,10 +153,8 @@ class _SetPricingState extends State<SetPricing> {
                   onPressed: () {
                     // Do NOT clear fields when popping back
                     // spp.clearAllFields();
-                    _price7Controller.clear();
-                    _price14Controller.clear();
-                    final cip = Provider.of<CreateItemProvider>(context, listen: false);
-                    cip.reset();
+                    // final cip = Provider.of<CreateItemProvider>(context, listen: false);
+                    // cip.reset();
                     Navigator.pop(context);
                   },
                 ),
@@ -178,11 +174,19 @@ class _SetPricingState extends State<SetPricing> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(5, (i) {
                             int day = i + 1;
+                            bool isSelected = _selectedMinDays == day;
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 8.0),
                               child: ChoiceChip(
-                                label: Text(day.toString()),
-                                selected: _selectedMinDays == day,
+                                label: Text(
+                                  day.toString(),
+                                  style: TextStyle(
+                                    color: isSelected ? Colors.white : Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: width * 0.045,
+                                  ),
+                                ),
+                                selected: isSelected,
                                 onSelected: (selected) {
                                   setState(() {
                                     _selectedMinDays = day;
@@ -190,9 +194,14 @@ class _SetPricingState extends State<SetPricing> {
                                   });
                                 },
                                 selectedColor: Colors.black,
-                                labelStyle: TextStyle(
-                                  color: _selectedMinDays == day ? Colors.white : Colors.black,
-                                  fontWeight: FontWeight.bold,
+                                backgroundColor: Colors.white,
+                                avatar: isSelected ? Icon(Icons.check, color: Colors.white, size: width * 0.045) : null,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: BorderSide(
+                                    color: isSelected ? Colors.black : Colors.grey[300]!,
+                                    width: 2,
+                                  ),
                                 ),
                               ),
                             );

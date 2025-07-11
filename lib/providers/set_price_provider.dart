@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class SetPriceProvider with ChangeNotifier {
   final dailyPriceController = TextEditingController();
@@ -88,54 +87,5 @@ class SetPriceProvider with ChangeNotifier {
     } else {
       notifyListeners();
     }
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Set Price Example"),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Provider.of<SetPriceProvider>(context, listen: false).clearAllFields(deferNotifyListeners: true);
-          },
-          child: Text("Clear Fields"),
-        ),
-      ),
-    );
-  }
-}
-
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    // Removed automatic clearing of fields to preserve values when navigating back
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   Provider.of<SetPriceProvider>(context, listen: false).clearAllFields();
-    // });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => SetPriceProvider(),
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: MyHomePage(),
-      ),
-    );
   }
 }
