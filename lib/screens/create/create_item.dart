@@ -1064,11 +1064,15 @@ class _CreateItemState extends State<CreateItem> {
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    cip.images.removeAt(n - 1);
-                    _imageFiles.removeAt(n - 1);
+                    if (cip.images.length >= n) {
+                      cip.images.removeAt(n - 1);
+                    }
+                    if (_imageFiles.length >= n) {
+                      _imageFiles.removeAt(n - 1);
+                    }
+                    cip.checkFormComplete();
                   });
                   Navigator.pop(context);
-                  cip.checkFormComplete();
                 },
                 child: const Center(child: StyledBody('DELETE')),
               ),
