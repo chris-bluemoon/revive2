@@ -933,33 +933,17 @@ class _CreateItemState extends State<CreateItem> {
                       imageQuality: 100,
                     );
                     if (image != null) {
-                      // Crop the image to 3:4 ratio before adding, enforce JPG
-                      final croppedFile = await ImageCropper().cropImage(
-                        sourcePath: image.path,
-                        aspectRatio: const CropAspectRatio(ratioX: 3, ratioY: 4),
-                        compressFormat: ImageCompressFormat.jpg,
-                        uiSettings: [
-                          AndroidUiSettings(
-                            toolbarTitle: 'Crop Image',
-                            toolbarColor: Colors.black,
-                            toolbarWidgetColor: Colors.white,
-                            initAspectRatio: CropAspectRatioPreset.original,
-                            lockAspectRatio: true,
-                          ),
-                          IOSUiSettings(
-                            title: 'Crop Image',
-                            aspectRatioLockEnabled: true,
-                          ),
-                        ],
-                      );
-                      if (croppedFile != null) {
-                        // Ensure .jpg extension
-                        String jpgPath = croppedFile.path.replaceAll(RegExp(r'\.(png|jpeg|heic|webp) 0$'), '.jpg');
-                        File(croppedFile.path).copySync(jpgPath);
-                        cip.images.add(jpgPath);
-                        _imageFiles.add(XFile(jpgPath));
-                        log('Added cropped JPG imageFile: ' + jpgPath);
+                      final jpgFile = await compressAndConvertToJpg(image);
+                      if (jpgFile != null) {
+                        cip.images.add(jpgFile.path);
+                        _imageFiles.add(jpgFile);
+                        log('Added compressed JPG imageFile: ' + jpgFile.path);
                         cip.checkFormComplete();
+                      } else {
+                        // Show error: file too large or compression failed
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Image must be JPG and less than 200kB')),
+                        );
                       }
                     }
                     setState(() {});
@@ -977,33 +961,17 @@ class _CreateItemState extends State<CreateItem> {
                       imageQuality: 100,
                     );
                     if (image != null) {
-                      // Crop the image to 3:4 ratio before adding, enforce JPG
-                      final croppedFile = await ImageCropper().cropImage(
-                        sourcePath: image.path,
-                        aspectRatio: const CropAspectRatio(ratioX: 3, ratioY: 4),
-                        compressFormat: ImageCompressFormat.jpg,
-                        uiSettings: [
-                          AndroidUiSettings(
-                            toolbarTitle: 'Crop Image',
-                            toolbarColor: Colors.black,
-                            toolbarWidgetColor: Colors.white,
-                            initAspectRatio: CropAspectRatioPreset.original,
-                            lockAspectRatio: true,
-                          ),
-                          IOSUiSettings(
-                            title: 'Crop Image',
-                            aspectRatioLockEnabled: true,
-                          ),
-                        ],
-                      );
-                      if (croppedFile != null) {
-                        // Ensure .jpg extension
-                        String jpgPath = croppedFile.path.replaceAll(RegExp(r'\.(png|jpeg|heic|webp) 0$'), '.jpg');
-                        File(croppedFile.path).copySync(jpgPath);
-                        cip.images.add(jpgPath);
-                        _imageFiles.add(XFile(jpgPath));
-                        log('Added cropped JPG imageFile: ' + jpgPath);
+                      final jpgFile = await compressAndConvertToJpg(image);
+                      if (jpgFile != null) {
+                        cip.images.add(jpgFile.path);
+                        _imageFiles.add(jpgFile);
+                        log('Added compressed JPG imageFile: ' + jpgFile.path);
                         cip.checkFormComplete();
+                      } else {
+                        // Show error: file too large or compression failed
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Image must be JPG and less than 200kB')),
+                        );
                       }
                     }
                     setState(() {});
@@ -1080,6 +1048,54 @@ class _CreateItemState extends State<CreateItem> {
           });
     }
   }
+
+  Future<XFile?> compressAndConvertToJpg(XFile original) async {
+  // Use image_cropper for cropping and compressing, or use flutter_image_compress for more control
+  final croppedFile = await ImageCropper().cropImage(
+    sourcePath: original.path,
+    aspectRatio: const CropAspectRatio(ratioX: 3, ratioY: 4),
+    compressFormat: ImageCompressFormat.jpg,
+    compressQuality: 90, // Adjust for quality/size tradeoff
+    uiSettings: [
+      AndroidUiSettings(
+        toolbarTitle: 'Crop Image',
+        toolbarColor: Colors.black,
+        toolbarWidgetColor: Colors.white,
+        lockAspectRatio: true,
+      ),
+      IOSUiSettings(
+        title: 'Crop Image',
+        aspectRatioLockEnabled: true,
+      ),
+    ],
+  );
+  if (croppedFile == null) return null;
+
+  // Ensure .jpg extension
+  String jpgPath = croppedFile.path.replaceAll(RegExp(r'\.(png|jpeg|heic|webp)$'), '.jpg');
+  File(croppedFile.path).copySync(jpgPath);
+
+  // Check file size, compress further if needed
+  File jpgFile = File(jpgPath);
+  if (jpgFile.lengthSync() > 200 * 1024) {
+    // Use flutter_image_compress for further compression
+    final result = await FlutterImageCompress.compressAndGetFile(
+      jpgPath,
+      jpgPath,
+      quality: 70, // Lower quality for smaller size
+      format: CompressFormat.jpeg,
+      minWidth: 600,
+      minHeight: 800,
+    );
+    if (result != null && result.lengthSync() <= 200 * 1024) {
+      return XFile(result.path);
+    } else {
+      // If still too large, return null or handle accordingly
+      return null;
+    }
+  }
+  return XFile(jpgPath);
+}
 
   // void checkFormComplete() {
   //   formComplete = true;
