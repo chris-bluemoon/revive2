@@ -101,8 +101,13 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       useInheritedMediaQuery: true,
-      // locale: DevicePreview.locale(context),
-      // builder: DevicePreview.appBuilder,
+      builder: (context, child) {
+        // Prevent dynamic text sizing from phone settings
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          child: child!,
+        );
+      },
       debugShowCheckedModeBanner: false,
       theme: primaryTheme,
       routes: {

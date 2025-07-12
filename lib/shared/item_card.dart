@@ -168,11 +168,14 @@ class _ItemCardState extends State<ItemCard> {
         // If no imageId, we'll show the fallback image
         
         return Card(
-          shape: BeveledRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+          shape: RoundedRectangleBorder( // Changed to rounded corners
+            borderRadius: BorderRadius.circular(16.0), // More rounded than before
           ),
           color: Colors.white,
-          margin: EdgeInsets.symmetric(horizontal: width * 0.01), // Reduced margin
+          margin: EdgeInsets.symmetric(
+            horizontal: width * 0.01,
+            vertical: width * 0.015, // Add vertical gap between grid rows
+          ),
           child: IntrinsicHeight(
             child: Padding(
               padding: EdgeInsets.all(width * 0.012), // Reduced padding
