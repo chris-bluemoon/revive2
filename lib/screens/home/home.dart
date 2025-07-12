@@ -70,10 +70,10 @@ class _HomeState extends State<Home> {
     return Scaffold(
         backgroundColor: Colors.grey[50], // Light background for luxury feel
         appBar: AppBar(
-          automaticallyImplyLeading: false, // Never show back chevron on home page
-          toolbarHeight: width * 0.25, // Slightly taller AppBar
+          automaticallyImplyLeading: false,
+          toolbarHeight: width * 0.25,
           backgroundColor: Colors.white,
-          elevation: 0, // Remove shadow for clean look
+          elevation: 0,
           shadowColor: Colors.transparent,
           actions: Provider.of<ItemStoreProvider>(context, listen: false).loggedIn
               ? [
@@ -137,21 +137,6 @@ class _HomeState extends State<Home> {
                   ),
                 ]
               : [],
-          title: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              'SECOND STORIES',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Lovelo',
-                fontWeight: FontWeight.normal,
-                fontSize: width * 0.06 > 28 ? 28 : width * 0.06, // Clamp max font size
-                color: Colors.black,
-                letterSpacing: 4.0,
-                height: 1.1,
-              ),
-            ),
-          ),
           centerTitle: true,
         ),
         body: Container(
