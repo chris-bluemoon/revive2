@@ -75,6 +75,18 @@ class _HomeState extends State<Home> {
           backgroundColor: Colors.white,
           elevation: 0,
           shadowColor: Colors.transparent,
+          title: Text(
+            'SECOND STORIES',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Lovelo',
+              fontWeight: FontWeight.normal,
+              fontSize: width * 0.06,
+              color: Colors.black,
+              letterSpacing: 4.0,
+              height: 1.1,
+            ),
+          ),
           actions: Provider.of<ItemStoreProvider>(context, listen: false).loggedIn
               ? [
                   Padding(
