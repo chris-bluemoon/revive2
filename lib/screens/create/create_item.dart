@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -1087,7 +1088,7 @@ class _CreateItemState extends State<CreateItem> {
       minWidth: 600,
       minHeight: 800,
     );
-    if (result != null && result.lengthSync() <= 200 * 1024) {
+    if (result != null && File(result.path).lengthSync() <= 200 * 1024) {
       return XFile(result.path);
     } else {
       // If still too large, return null or handle accordingly
