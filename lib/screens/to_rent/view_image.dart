@@ -77,13 +77,24 @@ class _ViewImageState extends State<ViewImage> {
                     initialScale: PhotoViewComputedScale.contained * 1,
                     minScale: PhotoViewComputedScale.contained * 1, // Prevent zooming out smaller than original
                     maxScale: PhotoViewComputedScale.covered * 2.0, // Allow zoom in
-                    child: CachedNetworkImage(
-                      imageUrl: widget.thisImages[index],
-                      placeholder: (context, url) =>
-                          const Center(child: Loading()),
-                      errorWidget: (context, url, error) =>
-                          const Center(child: Icon(Icons.error)),
-                      fit: BoxFit.contain,
+                    child: SizedBox(
+                      height: 180, // or use MediaQuery for dynamic sizing
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: widget.thisImages[index].isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: widget.thisImages[index],
+                                placeholder: (context, url) => const Loading(),
+                                errorWidget: (context, url, error) =>
+                                    Image.asset(
+                                        'assets/img/items/No_Image_Available.jpg'),
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(
+                                'assets/img/items/No_Image_Available.jpg',
+                                fit: BoxFit.cover,
+                              ),
+                      ),
                     ))
                 : PhotoViewGalleryPageOptions(
                     imageProvider: FileImage(File(widget.thisImages[index])),

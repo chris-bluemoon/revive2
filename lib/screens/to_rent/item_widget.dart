@@ -76,7 +76,7 @@ class _ItemWidgetState extends State<ItemWidget> {
         if (images.isNotEmpty) {
           Navigator.of(context).push(SmoothTransitions.luxury(ViewImage(
             images,
-            0,
+            widget.itemNumber,
           )));
         }
       },

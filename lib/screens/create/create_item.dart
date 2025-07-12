@@ -1044,14 +1044,18 @@ class _CreateItemState extends State<CreateItem> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      // Move selected image to first position
-                      final img = cip.images.removeAt(n - 1);
-                      cip.images.insert(0, img);
-                      final file = _imageFiles.removeAt(n - 1);
-                      _imageFiles.insert(0, file);
+                      if (cip.images.length >= n) {
+                        final img = cip.images.removeAt(n - 1);
+                        cip.images.insert(0, img);
+                        // If you use _imageFiles for upload, update it too:
+                        if (_imageFiles.length >= n) {
+                          final file = _imageFiles.removeAt(n - 1);
+                          _imageFiles.insert(0, file);
+                        }
+                        cip.checkFormComplete();
+                      }
                     });
                     Navigator.pop(context);
-                    cip.checkFormComplete();
                   },
                   child: const Center(child: StyledBody('MAKE COVER IMAGE')),
                 ),
