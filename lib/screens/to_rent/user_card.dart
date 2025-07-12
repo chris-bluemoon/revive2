@@ -32,7 +32,11 @@ class UserCard extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            StyledBody(ownerName),
+            Text(ownerName, style: TextStyle(
+              fontSize: width * 0.05, // Increased font size
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            )),
             StyledBody(location, weight: FontWeight.normal)
           ],
         ),

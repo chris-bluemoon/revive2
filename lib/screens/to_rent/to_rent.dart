@@ -441,40 +441,11 @@ class _ToRentState extends State<ToRent> {
                             color: Colors.black,
                           ),
                           softWrap: true,
-                          maxLines: 5, // or remove for unlimited lines
+                          maxLines: 5,
                           overflow: TextOverflow.visible,
                         ),
                         SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                        Row(
-                          children: [
-                            // Item type to the left of the size, with a comma
-                            StyledBody(
-                              widget.item.type +
-                                  (widget.item.type.toLowerCase() == 'dress' ? ',' : ''),
-                              weight: FontWeight.normal,
-                              fontSize: width * 0.042, // <-- Set font size here
-                            ),
-                            if (widget.item.type.toLowerCase() == 'dress') ...[
-                              SizedBox(width: width * 0.01),
-                              StyledBody(
-                                widget.item.size.isNotEmpty ? "UK ${widget.item.size}" : '',
-                                weight: FontWeight.normal,
-                                fontSize: width * 0.042, // <-- Set font size here
-                              ),
-                            ],
-                          ],
-                        ),
-                        // Move long description here, directly below type and size
-                        if (widget.item.longDescription.isNotEmpty)
-                          Padding(
-                            padding: EdgeInsets.only(top: width * 0.02),
-                            child: StyledBody(
-                              widget.item.longDescription,
-                              weight: FontWeight.normal,
-                              fontSize: width * 0.042, // <-- Set font size here
-                            ),
-                          ),
-                        SizedBox(height: width * 0.04),
+                        // REMOVE: Row with type and size
                         // --- Product details section ---
                         Padding(
                           padding: EdgeInsets.only(top: width * 0.01),
@@ -497,6 +468,27 @@ class _ToRentState extends State<ToRent> {
                                   ),
                                 ],
                               ),
+                              // If item is a dress, show size under Product Type
+                              if (widget.item.type.toLowerCase() == 'dress' && widget.item.size.isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    StyledBody(
+                                      "Size",
+                                      weight: FontWeight.bold,
+                                      color: Colors.grey,
+                                      fontSize: width * 0.042,
+                                    ),
+                                    StyledBody(
+                                      "UK ${widget.item.size}",
+                                      weight: FontWeight.bold,
+                                      color: Colors.black,
+                                      fontSize: width * 0.042,
+                                    ),
+                                  ],
+                                ),
+                              ],
                               const SizedBox(height: 12),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -565,20 +557,19 @@ class _ToRentState extends State<ToRent> {
                     child: Divider(
                       color: Colors.grey[400],
                       thickness: 1,
-                      height: 0, // Remove extra height from Divider itself
+                      height: 0,
                     ),
                   ),
-                  SizedBox(height: width * 0.005), // Further reduced gap above divider
-                  SizedBox(height: width * 0.02), // Increased gap above pricing text
-                  // Rent for longer pricing cards
+                  SizedBox(height: width * 0.04), // <-- Increased gap below divider
                   Padding(
-                    padding: EdgeInsets.only(left: width * 0.02, bottom: width * 0.01), // Keep reduced left and bottom padding
+                    padding: EdgeInsets.only(left: width * 0.02, bottom: width * 0.01),
                     child: StyledBody(
-                        'Rent for longer to save on pricing.',
-                        fontSize: width * 0.042, // Keep text size
-                        weight: FontWeight.normal,
-                      ),
+                      'Extend your rental period for better rates',
+                      fontSize: width * 0.042,
+                      weight: FontWeight.normal,
+                    ),
                   ),
+                  SizedBox(height: width * 0.04), // <-- Increased gap below "Rent for longer" text
                   RentForLonger(
                     item: widget.item,
                     symbol: symbol,
@@ -605,7 +596,7 @@ class _ToRentState extends State<ToRent> {
                       },
                     ],
                   ),
-                  SizedBox(height: width * 0.005), // Further reduced gap below the cards
+                  SizedBox(height: width * 0.02), // Further reduced gap below the cards
                   Padding(
                     padding: EdgeInsets.only(
                       left: width * 0.05,
@@ -613,7 +604,7 @@ class _ToRentState extends State<ToRent> {
                       top: width * 0.02,
                     ),
                     child: const Text(
-                      "ALL PRICING IS FINAL, NEGOTIATION IS NOT ALLOWED.",
+                      "ALL PRICING IS FINAL, NO NEGOTIATIONS ALLOWED",
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold, // <-- Make text bold
